@@ -8,7 +8,8 @@
 # Download main script @
 # http://dl.dropbox.com/u/18712538/LaSi/LaSi.sh
 #
-# please report bugs @ LaSi.Mar2zz@gmail.com
+# please report bugs/issues @
+# https://github.com/Mar2zz/LaSi/issues
 #  ___________________________________________________________________________________
 # | 
 # | When not using LaSi's Menuscript:

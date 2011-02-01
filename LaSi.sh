@@ -6,14 +6,18 @@
 # 
 # This is the main script of "Lazy Admins Scripted Installers (LaSi)"
 #
-# please report bugs @ LaSi.Mar2zz@gmail.com
+# please report bugs/issues @
+# https://github.com/Mar2zz/LaSi/issues
 #  ___________________________________________________________________________________
 # |
-# | execute this script with the command: sudo chmod +x LaSi_menu 
-# | then run with ./LaSi_menu
+# | execute this script with the command: sudo chmod +x LaSi.sh 
+# | then run with ./LaSi.sh
 # |
-# | LaSi_menu will install the programs you choose
-# | from the menu (currently only SickBeard and CouchPotato.                                      
+# | LaSi will install the programs you choose
+# | from the menu:
+# | # Sickbeard
+# | # CouchPotato
+# | # Periscope (alpha, not tested thoroughly)                                      
 # |___________________________________________________________________________________
 #
 # Tested succesful on OS's:
