@@ -291,12 +291,12 @@ echo "LaSi $VERSION"
      			;;
      		2)
      			echo "Backup $INSTALLDIR to LaSi/$APP"
-     			if [ -d LaSi ]
+     			if [ -d /home/$USER/LaSi ]
      				then
-     				mv -f $INSTALLDIR LaSi/$APP
+     				mv -f $INSTALLDIR /home/$USER/LaSi/$APP
      			else
      				mkdir LaSi
-     				mv -f $INSTALLDIR LaSi/$APP
+     				mv -f $INSTALLDIR /home/$USER/LaSi/$APP
      			fi
      			;;
      		3)

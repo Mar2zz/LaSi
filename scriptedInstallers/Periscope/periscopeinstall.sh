@@ -287,8 +287,13 @@ echo "LaSi $VERSION"
      			;;
      		2)
      			echo "Backup $INSTALLDIR to LaSi/$APP"
-     			mkdir bak
-     			mv -f $INSTALLDIR bak/$APP
+     			if [ -d /home/$USER/LaSi ]
+     				then
+     				mv -f $INSTALLDIR /home/$USER/LaSi/$APP
+     			else
+     				mkdir /home/$USER/LaSi
+     				mv -f $INSTALLDIR /home/$USER/LaSi/$APP
+     			fi
      			;;
      		3)
      		    echo "Deleting $INSTALLDIR."
