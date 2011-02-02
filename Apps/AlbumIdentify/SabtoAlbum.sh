@@ -21,9 +21,9 @@
 
 DIR=$1; 								#fullpath passed by sabnzbdplus.
 NZB=$3;									#Clean nzb-name
-RENAMEALBUM="path/to/renamealbum"; 		#path to executable renamealbum
+RENAMEALBUM="/path/to/renamealbum"; 		#path to executable renamealbum
 FAILDIR="/path/to/UNTAGGED"; 			#directory to move files that were not autotagged
-SUCCESDIR="path/to/TAGGED";				#directory to keep original files that were tagged and moved to library 
+SUCCESDIR="/path/to/TAGGED";				#directory to keep original files that were tagged and moved to library 
 
 
 #### PROCESSING FILES ####
@@ -74,7 +74,7 @@ fi
 
 
 #### DELETE LOGS THAT IDENTIFY FAIL/SUCCES IN CASE OF MULTIPLE FOLDERS ####
-clean_Up ()
+clean_Up () {
 if [ -e /tmp/fail.txt ]
 	then 
 	rm -f /tmp/fail.txt

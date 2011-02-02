@@ -4,8 +4,6 @@
 # blogs: mar2zz.tweakblogs.net
 # License: Same as GPL I guess. hey, it's just text. give credit and edit.
 #
-# I modified J. van Emden (Brickman)'s script for Synology NAS devices
-# original script can be found here: http://dl.dropbox.com/u/5653370/synology.html
 #
 # This script is part of "Lazy admin Scripted installers (LaSi)"
 #
@@ -23,7 +21,7 @@
 
 DIR="/path/to/process"; 				#fullpath with musicfiles you want to tag (do not point to your musiclibrary!!!)
 FAILDIR="/path/to/UNTAGGED"; 			#directory to move files that were not autotagged
-SUCCESDIR="path/to/TAGGED";				#directory to keep original files that were tagged and moved to library 
+SUCCESDIR="/path/to/TAGGED";				#directory to keep original files that were tagged and moved to library 
 
 
 #### PROCESSING FILES ####

@@ -519,7 +519,7 @@ echo "LaSi $VERSION"
    			[Yy]*)
    				echo "Ok, adding $PATH_MUSIC to config.ini..."
    			    sed -i "
-   			    	s/#dest_path=/dest_path=$PATH_MUSIC/g
+   			    	s!#dest_path=!dest_path=$PATH_MUSIC!g
 					" /home/$USER/$CONFIGFILE
 				;;
    			[Nn]*)
@@ -630,7 +630,7 @@ echo "LaSi $VERSION"
 	read -p "(yes/no)   :" REPLY
 	case $REPLY in
 		[Yy]*)
-	 		echo "Ok, treating soundtracks like normal musicfiles..."
+	 		echo "Changed to strict handling.."
    		 	sed -i "
    			   	s/#force_order=True/force_order=True/g
 				" /home/$USER/$CONFIGFILE
@@ -702,6 +702,9 @@ echo "LaSi $VERSION"
 	wget -P $INSTALLDIR $DROPBOX/$APP/$SABTOALBUM
 	wget -P $INSTALLDIR $DROPBOX/$APP/$SCANALBUM
 	wget -P $INSTALLDIR $DROPBOX/$APP/$MANALBUM
+	sudo chmod +x $INSTALLDIR $DROPBOX/$APP/$SABTOALBUM
+	sudo chmod +x $INSTALLDIR $DROPBOX/$APP/$SCANALBUM
+	sudo chmod +x $INSTALLDIR $DROPBOX/$APP/$MANALBUM	
 	}
 
 
@@ -721,10 +724,10 @@ echo "LaSi $VERSION"
 
 #### SET RENAMEALBUM PATH IN SCRIPTS ####
 
-	path_Renamealbum () {
-   	sed -i "s#path/to/renamealbum#$INSTALLDIR/renamealbum#g" $INSTALLDIR/$SABTOALBUM
-   	sed -i "s#path/to/renamealbum#$INSTALLDIR/renamealbum#g" $INSTALLDIR/$SCANALBUM
-   	sed -i "s#path/to/renamealbum#$INSTALLDIR/renamealbum#g" $INSTALLDIR/$MANALBUM
+	path_Renalbum () {
+   	sed -i "s!/path/to/renamealbum!$INSTALLDIR/renamealbum!g" $INSTALLDIR/$SABTOALBUM
+   	sed -i "s!/path/to/renamealbum!$INSTALLDIR/renamealbum!g" $INSTALLDIR/$SCANALBUM
+   	sed -i "s!/path/to/renamealbum!$INSTALLDIR/renamealbum!g" $INSTALLDIR/$MANALBUM
 	}
 
 
@@ -906,7 +909,7 @@ echo "LaSi $VERSION"
 			fi
 		}
 
-		cf_Sabnbzd () {
+		cf_Sabnzbd () {
 		echo
 		echo "AlbumIdentify can be used as postprocessing script for Sabnzbd"
 		echo "Do you want to enable this?"
@@ -951,12 +954,13 @@ clone_Git		#clone the git repo into $installdir
 new_Config		#import or create configfile
 set_Musicdir	#set path to musiclibrary (where succesful identified files go to)
 show_Scheme		#keep or change namingscheme
+cf_Soundtrack	#put soundtracks in their own folder
 cf_Order		#make identifying more strict
 cf_Dest			#no doubleups of flacs and mp3's (replace if better quality)
 cf_Edit			#edit the rest of configfile (musicbrainz related)
 get_Scripts		#Download all scripts used
 path_Python		#Write python path in scripts
-path_Renamealbum	#write albumidentify paths in script
+path_Renalbum	#write albumidentify paths in script
 cf_Coverart		#embed coverart or not?
 show_Failed		#set action on failed items
 show_Succes		#set action on succes items
