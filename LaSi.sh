@@ -17,7 +17,8 @@
 # | from the menu:
 # | # Sickbeard
 # | # CouchPotato
-# | # Periscope (alpha, not tested thoroughly)                                      
+# | # Periscope (alpha, not tested thoroughly)   
+# | # AlbumIdentify (alpha, not tested yet)                                   
 # |___________________________________________________________________________________
 #
 # Tested succesful on OS's:
@@ -55,6 +56,9 @@ APP2_INST=sickbeardinstall.sh;
 APP3=Periscope;
 APP3_INST=periscopeinstall.sh;
 
+APP4=AlbumIdentify;
+APP4_INST=albumidentify.sh;
+
 #######################################################################################
 
 LaSi_Menu (){
@@ -83,6 +87,7 @@ LaSi_Menu (){
 		echo "1. $APP1"
 		echo "2. $APP2"
 		echo "3. $APP3"
+		echo "4. $APP4"
 		echo "Q. Quit"
 	
 		read SELECT
@@ -96,6 +101,9 @@ LaSi_Menu (){
 			[3]*)
 				info_Peris
 				;;
+			[4]*)
+				info_Album
+				;;
 			[Qq]*)
 				exit
 				;;
@@ -108,6 +116,7 @@ LaSi_Menu (){
 		}
 show_Menu
 }
+	
 	
 #### COUCHPOTATO ####
 
@@ -181,6 +190,7 @@ SET_INST=$APP2_INST
 cf_Choice
 }
 
+
 #### PERISCOPE ####
 
 info_Peris () {
@@ -221,6 +231,39 @@ SET_APP=$APP3
 SET_INST=$APP3_INST
 cf_Choice
 }
+
+
+#### ALBUMIDENTIFY ####
+
+info_Album () {
+clear
+echo "
+*################### ALBUMIDENTIFY ##########################
+#															
+# Albumidentify description on github:
+# Tools to identify and manage music albums.
+#
+*############################################################
+#													
+# LaSi will enable one part of this powerfull toolset, the 
+# 'renamealbum' part of it. Though the whole collection of
+# tools will be downloaded, I am using just 1 or 2 of 'm.
+# 
+# I am adding a batchscript (for cronjobs or manual) and a
+# sabnzbd postprocessingscript to it.
+#
+*############################################################
+#
+# AlbumIdentify is written by the albumidentify-team..
+#
+# Visit https://github.com/scottr/albumidentify	
+*#############################################################"
+SET_APP=$APP4
+SET_INST=$APP4_INST
+cf_Choice
+}
+
+
 	
 #### BACKTOMENU OR INSTALL ####
 cf_Choice () {
