@@ -28,12 +28,12 @@ SUCCESDIR="/path/to/TAGGED";				#directory to keep original files that were tagg
 process () {
 echo "--------------------------"
 echo $(date)
-echo "Starting renamealbum for $NZB"
+echo "Starting renamealbum for $DIR"
 
 /usr/bin/python /path/to/renamealbum -R --no-embed-coverart $DIR
 
 echo $(date)
-echo "Album search ended for $NZB"
+echo "Album search ended for $DIR"
 }
 
 
@@ -41,30 +41,30 @@ echo "Album search ended for $NZB"
 move_Failed () {
 if grep -R --include=report.txt -i "fail!" $DIR >> /tmp/fail.txt
 	then
-	sed -i "s#report.txt:fail!##g" /tmp/fail.txt
-	mv -f $(cat /tmp/fail.txt) $FAILDIR
+	sed -i "s#/report.txt.*##g" /tmp/fail.txt
+	mv -f "$(cat /tmp/fail.txt)" $FAILDIR
 	echo "The following albums weren't identified:"
 	echo $(cat /tmp/fail.txt)
 fi
 }
 	
 #### MOVE IDENTIFIED SOURCEFILES ####
-move_Succes () {	
-if grep -R --include=report.txt -i "succes!" $DIR >> /tmp/succes.txt
+move_Succes () {
+if grep -R --include=report.txt -i "success!" $DIR >> /tmp/succes.txt
 	then
-	sed -i "s#report.txt:succes!##g" /tmp/succes.txt
-	mv -f $(cat /tmp/succes.txt) $SUCCESDIR
-	echo "The following albums were identified:"
+	sed -i "s#/report.txt.*##g" /tmp/succes.txt
+	mv -f "$(cat /tmp/succes.txt)" $SUCCESDIR
+	echo "The following albums were moved to $SUCCESDIR:"
 	echo $(cat /tmp/succes.txt)
 fi
 }
 
 #### DELETE IDENTIFIED SOURCEFILES ####
 delete_Succes () {
-if grep -R --include=report.txt -i "succes!" $DIR >> /tmp/succes.txt
+if grep -R --include=report.txt -i "success!" $DIR >> /tmp/succes.txt
 	then
-	sed -i "s#report.txt:succes!##g" /tmp/succes.txt
-	rm -Rf $(cat /tmp/succes.txt) $SUCCESDIR 
+	sed -i "s#/report.txt.*##g" /tmp/succes.txt
+	rm -Rf "$(cat /tmp/succes.txt)" $SUCCESDIR 
 	echo "The following albums were identified:"
 	echo $(cat /tmp/succes.txt)
 fi
@@ -72,7 +72,7 @@ fi
 
 
 #### REMOVE LOGS TO AVOID USING THEM OVER AND OVER AGAIN ####
-clean_Up ()
+clean_Up () {
 if [ -e /tmp/fail.txt ]
 	then 
 	rm -f /tmp/fail.txt

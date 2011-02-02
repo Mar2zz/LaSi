@@ -565,7 +565,8 @@ echo "LaSi $VERSION"
 				;;
    			*)
    				sed -i "
-   					s!#naming_scheme=*!naming_scheme=$NEWSCHEME!g
+   					14s!#!!g
+   					14s!=.*!=$NEWSCHEME!g
    					" /home/$USER/$CONFIGFILE &&
    				echo
    				echo "Naming scheme set to:"
@@ -583,9 +584,6 @@ echo "LaSi $VERSION"
 				;;
    			[Nn]*)
    				echo "Ok, keeping defaults..."
-   		 		sed -i "
-   			    	s/#naming_scheme=%/ naming_scheme=%/g
-					" /home/$USER/$CONFIGFILE
 				;;
    			*)
 				echo "Answer yes or no"
@@ -702,9 +700,9 @@ echo "LaSi $VERSION"
 	wget -P $INSTALLDIR $DROPBOX/$APP/$SABTOALBUM
 	wget -P $INSTALLDIR $DROPBOX/$APP/$SCANALBUM
 	wget -P $INSTALLDIR $DROPBOX/$APP/$MANALBUM
-	sudo chmod +x $INSTALLDIR $DROPBOX/$APP/$SABTOALBUM
-	sudo chmod +x $INSTALLDIR $DROPBOX/$APP/$SCANALBUM
-	sudo chmod +x $INSTALLDIR $DROPBOX/$APP/$MANALBUM	
+	sudo chmod +x $INSTALLDIR/$SABTOALBUM
+	sudo chmod +x $INSTALLDIR/$SCANALBUM
+	sudo chmod +x $INSTALLDIR/$MANALBUM	
 	}
 
 

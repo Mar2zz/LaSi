@@ -21,7 +21,6 @@
 
 DIR=$1; 								#fullpath passed by sabnzbdplus.
 NZB=$3;									#Clean nzb-name
-RENAMEALBUM="/path/to/renamealbum"; 		#path to executable renamealbum
 FAILDIR="/path/to/UNTAGGED"; 			#directory to move files that were not autotagged
 SUCCESDIR="/path/to/TAGGED";				#directory to keep original files that were tagged and moved to library 
 
@@ -32,7 +31,7 @@ echo "--------------------------"
 echo $(date)
 echo "Starting renamealbum for $NZB"
 
-/usr/bin/python $RENAMEALBUM -R --no-embed-coverart $DIR
+/usr/bin/python /path/to/renamealbum -R --no-embed-coverart $DIR
 
 echo $(date)
 echo "Album search ended for $NZB"
@@ -43,20 +42,20 @@ echo "Album search ended for $NZB"
 move_Failed () {
 if grep -R --include=report.txt -i "fail!" $DIR >> /tmp/fail.txt
 	then
-	sed -i "s#report.txt:fail!##g" /tmp/fail.txt
-	mv -f $(cat /tmp/fail.txt) $FAILDIR
-	echo "The following albums weren't identified:"
+	sed -i "s#/report.txt.*##g" /tmp/fail.txt
+	mv -f "$(cat /tmp/fail.txt)" $FAILDIR
+	echo "The following albums were moved to $FAILDIR:"
 	echo $(cat /tmp/fail.txt)
 fi
 }
 	
 #### MOVE IDENTIFIED SOURCEFILES ####
-move_Succes () {	
+move_Succes () {
 if grep -R --include=report.txt -i "success!" $DIR >> /tmp/succes.txt
 	then
-	sed -i "s#report.txt:success!##g" /tmp/succes.txt
-	mv -f $(cat /tmp/succes.txt) $SUCCESDIR
-	echo "The following albums were identified:"
+	sed -i "s#/report.txt.*##g" /tmp/succes.txt
+	mv -f "$(cat /tmp/succes.txt)" $SUCCESDIR &&
+	echo "The following albums were moved to $SUCCESDIR:"
 	echo $(cat /tmp/succes.txt)
 fi
 }
@@ -65,8 +64,8 @@ fi
 delete_Succes () {
 if grep -R --include=report.txt -i "success!" $DIR >> /tmp/succes.txt
 	then
-	sed -i "s#report.txt:success!##g" /tmp/succes.txt
-	rm -Rf $(cat /tmp/succes.txt) $SUCCESDIR 
+	sed -i "s#/report.txt.*##g" /tmp/succes.txt
+	rm -Rf "$(cat /tmp/succes.txt)" $SUCCESDIR
 	echo "The following albums were identified:"
 	echo $(cat /tmp/succes.txt)
 fi
