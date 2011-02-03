@@ -22,7 +22,7 @@ sub_222 = path + "/" + file + ".222.srt"
 print "\nSearch for '111' subtitle:"
 print "===================================="
 if not (os.path.isfile (sub_111)) :
-    subtitle1 = subdl.downloadSubtitle(filepath + "/*.avi" , ['111'])    
+    subtitle1 = subdl.downloadSubtitle(filepath, ['111'])    
     if subtitle1 :
         print "Found a sub from %s in language %s, downloaded to %s" % ( subtitle1['plugin'], subtitle1['lang'], subtitle1['subtitlepath'])
         os.rename(subtitle1['subtitlepath'], string.join(string.split(subtitle1['subtitlepath'], ".srt"), ".111.srt"))

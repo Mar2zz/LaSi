@@ -633,7 +633,7 @@ echo "LaSi $VERSION"
     		 	Question_Path
     	  		;;
     	  	[Ss]*)
-    	  		echo "Search subs for files in $PATH not scheduled"
+    	  		echo "Search subs for files in $SCANPATH not scheduled"
     	  		echo "TIP: Type crontab -e to schedule yourself"
     	  		echo "Do you want to set another path?"
     		 	Question_Path
