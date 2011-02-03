@@ -1,5 +1,13 @@
 LaSi: Lazy admin Scripted installers
 
+# Author:  Mar2zz
+# blogs: mar2zz.tweakblogs.net
+# License: Same as GPL I guess. hey, it's just text. give credit and edit.
+# 
+# please report bugs/issues @
+# https://github.com/Mar2zz/LaSi/issues
+
+
 The purpose of the main script LaSi.sh is to present a menu
 in the terminal. This menu presents some info about accom-
 panied programs and those programs can be installed from
@@ -24,26 +32,27 @@ but for example only on Github or googlecode.
 
 The programs I chose are mainly written for media 
 entertainment and centered around Sabnzbd and postprocessing.
+They work best on headless linuxservers or dedicated linux HTPC's.
 
 Programs supported:
-* SickBeard			TV Shows 	(github)
-* CouchPotato 		Movies 		(github)
-* Periscope			Subtitles 	(googlecode)
-* AlbumIdentify		Music 		(github)
+* SickBeard
+-- TV Shows (git)
+URL: http://sickbeard.com/
 
+* CouchPotato
+-- Movies (git)
+URL: http://couchpotatoapp.com/
+
+* Periscope
+-- Subtitles (svn)
+http://code.google.com/p/periscope/
+
+* AlbumIdentify
+-- Music (git)
+https://github.com/scottr/albumidentify
 
 ##############################################################
 ##############################################################
-
-
-# Author:  Mar2zz
-# blogs: mar2zz.tweakblogs.net
-# License: Same as GPL I guess. hey, it's just text. give credit and edit.
-# 
-# This is the main script of "Lazy Admins Scripted Installers (LaSi)"
-#
-# please report bugs/issues @
-# https://github.com/Mar2zz/LaSi/issues
 
 # Tested succesful on OS's:
 # Ubuntu 10.4 Desktop, 
