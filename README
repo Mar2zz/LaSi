@@ -2,11 +2,10 @@ LaSi: Lazy admin Scripted installers
 
 # Author:  Mar2zz
 # blogs: mar2zz.tweakblogs.net
-# License: Same as GPL I guess. hey, it's just text. give credit and edit.
+# License: GNU GPL v3
 # 
 # please report bugs/issues @
 # https://github.com/Mar2zz/LaSi/issues
-
 
 The purpose of the main script LaSi.sh is to present a menu
 in the terminal. This menu presents some info about accom-
