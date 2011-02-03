@@ -2,7 +2,7 @@
 
 # Author:  Mar2zz
 # blogs: mar2zz.tweakblogs.net
-# License: Same as GPL I guess. hey, it's just text. give credit and edit.
+# License: GNU GPL v3
 # 
 # This installer is part of "Lazy admins Scripted installers (LaSi)"
 # Download main script @

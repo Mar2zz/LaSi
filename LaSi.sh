@@ -2,7 +2,7 @@
 
 # Author:  Mar2zz
 # blogs: mar2zz.tweakblogs.net
-# License: Same as GPL I guess. hey, it's just text. give credit and edit.
+# License: GNU GPL v3
 # 
 # This is the main script of "Lazy Admins Scripted Installers (LaSi)"
 #
@@ -222,7 +222,7 @@ read -sn 1 -p "--- [more]---"
 echo "											
 *############################################################
 #
-# Periscope is written by patrick@gmail.com...
+# Periscope is written by Patrick Desalle...
 # ..so buy him a coke to support him.
 #
 # Visit http://code.google.com/p/periscope/	

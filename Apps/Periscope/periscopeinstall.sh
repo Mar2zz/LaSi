@@ -2,7 +2,7 @@
 
 # Author:  Mar2zz
 # blogs: mar2zz.tweakblogs.net
-# License: Same as GPL I guess. hey, it's just text. give credit and edit.
+# License: GNU GPL v3
 # 
 # This installer is part of "Lazy admins Scripted installers (LaSi)"
 # Download main script @
@@ -58,10 +58,10 @@ PACK2_EXE=$PACK2;
 
 INSTALLDIR=/home/$USER/.$APPLOW; #directory you want to install to.
 
-SCANPATH=scanPath.sh;
-DOWN_SUB=downloadSub.py;
-SABPER=SabtoPeriscope.py;
-SABPERSICK=SabtoPertoSick.py;
+SCANPATH=scanPath.sh;			#script to batchsearch
+DOWN_SUB=downloadSub.py;		#Periscope CLI
+SABPER=SabtoPeriscope.py;		#Postprocessingscript Sabnzbd
+SABPERSICK=SabtoPertoSick.py;	#Postprocessingscript Sabnzbd to Periscope to Sickbeard
 
 
 
@@ -92,8 +92,8 @@ echo
 
 show_Author () {
 echo '--------------------------------'
-echo 'PERSISCOPE IS CREATED BY PATRICK'
-echo '--- code.google.com/p/periscope/'
+echo 'PERSISCOPE IS CREATED BY PATRICK DESALLE'
+echo '----------- code.google.com/p/periscope/'
 echo
 echo "LaSi $VERSION" 
 }

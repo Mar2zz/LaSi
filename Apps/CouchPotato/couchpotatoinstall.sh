@@ -2,7 +2,7 @@
 
 # Author:  Mar2zz
 # blogs: mar2zz.tweakblogs.net
-# License: Same as GPL I guess. hey, it's just text. give credit and edit.
+# License: GNU GPL v3
 # 
 # This installer is part of "Lazy admins Scripted installers (LaSi)"
 # Download main script @
@@ -15,9 +15,9 @@
 # | When not using LaSi's Menuscript:
 # | execute this script with the command sudo chmod +x couchpotatoinstall.sh
 # | and run with ./couchpotatoinstall.sh 
-# |            | 
+# |            
 # | answer all questions the terminal asks,
-# | and sickbeard will be running in no time!
+# | and couchpotato will be running in no time!
 # |___________________________________________________________________________________
 #
 # Tested succesful on OS's:
