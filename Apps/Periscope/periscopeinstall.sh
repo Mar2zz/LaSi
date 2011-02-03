@@ -60,7 +60,7 @@ INSTALLDIR=/home/$USER/.$APPLOW; #directory you want to install to.
 
 SCANPATH=scanPath.sh;			#script to batchsearch
 DOWN_SUB=downloadSub.py;		#Periscope CLI
-SABPER=SabtoPeriscope.py;		#Postprocessingscript Sabnzbd
+SABPER=SabtoPeriscope.sh;		#Postprocessingscript Sabnzbd
 SABPERSICK=SabtoPertoSick.py;	#Postprocessingscript Sabnzbd to Periscope to Sickbeard
 
 
@@ -399,9 +399,9 @@ echo "LaSi $VERSION"
 #### SET PERISCOPE PATH IN SCRIPTS ####
 
 	path_Periscope () {
-	sed -i "s#PATH_PERISCOPE#$INSTALLDIR#g" $INSTALLDIR/$SABPER
 	sed -i "s#PATH_PERISCOPE#$INSTALLDIR#g" $INSTALLDIR/$SABPERSICK
 	sed -i "s#PATH_PERISCOPE#$INSTALLDIR#g" $INSTALLDIR/$SCANPATH
+	sed -i "s#PATH_PERISCOPE#$INSTALLDIR#g" $INSTALLDIR/$SABPER
 	}
 	
 #### CHOOSE LANGUAGES ####
@@ -441,18 +441,8 @@ echo "LaSi $VERSION"
 		if echo "$LANG_SET1 $LANG_SET2" | grep -w $LANG1 >/dev/null
 			then
 			echo "First language set to $LANG1"
-			#first all between ''
-			sed -i "s/'en'/'$LANG1'/g" $INSTALLDIR/$DOWN_SUB
-			sed -i "s/'en'/'$LANG1'/g" $INSTALLDIR/$SABPER
-			sed -i "s/'en'/'$LANG1'/g" $INSTALLDIR/$SABPERSICK
-			#second all between ..
-			sed -i "s/.en.srt/.$LANG1.srt/g" $INSTALLDIR/$DOWN_SUB
-			sed -i "s/.en.srt/.$LANG1.srt/g" $INSTALLDIR/$SABPER
-			sed -i "s/.en.srt/.$LANG1.srt/g" $INSTALLDIR/$SABPERSICK
-			#third all sub_
-			sed -i "s/sub_en/sub_$LANG1 =/g" $INSTALLDIR/$DOWN_SUB
-			sed -i "s/sub_en/sub_$LANG1 =/g" $INSTALLDIR/$SABPER
-			sed -i "s/sub_en/sub_$LANG1 =/g" $INSTALLDIR/$SABPERSICK
+			sed -i "s/111/$LANG1/g" $INSTALLDIR/$DOWN_SUB
+			sed -i "s/111/$LANG1/g" $INSTALLDIR/$SABPERSICK
 		else
 			echo "Language not found, try again"
 			choose_Lang1
@@ -465,17 +455,8 @@ echo "LaSi $VERSION"
 		if echo "$LANG_SET1 $LANG_SET2" | grep -w $LANG2 >/dev/null
 			then
 			echo "Second language set to $LANG2"
-			sed -i "s/'nl'/'$LANG2'/g" $INSTALLDIR/$DOWN_SUB
-			sed -i "s/'nl'/'$LANG2'/g" $INSTALLDIR/$SABPER
-			sed -i "s/'nl'/'$LANG2'/g" $INSTALLDIR/$SABPERSICK
-			#second all between ..
-			sed -i "s/.nl.srt/.$LANG2.srt/g" $INSTALLDIR/$DOWN_SUB
-			sed -i "s/.nl.srt/.$LANG2.srt/g" $INSTALLDIR/$SABPER
-			sed -i "s/.nl.srt/.$LANG2.srt/g" $INSTALLDIR/$SABPERSICK
-			#third all sub_
-			sed -i "s/sub_nl/sub_$LANG2/g" $INSTALLDIR/$DOWN_SUB
-			sed -i "s/sub_nl/sub_$LANG2/g" $INSTALLDIR/$SABPER
-			sed -i "s/sub_nl/sub_$LANG2/g" $INSTALLDIR/$SABPERSICK		
+			sed -i "s/222/$LANG2/g" $INSTALLDIR/$DOWN_SUB
+			sed -i "s/222/$LANG2/g" $INSTALLDIR/$SABPERSICK
 		else
 			echo "Language not found, try again"
 			choose_Lang2
