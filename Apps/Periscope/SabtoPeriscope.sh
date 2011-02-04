@@ -16,8 +16,12 @@
 # http://dl.dropbox.com/u/18712538/LaSi/LaSi.sh
 #------------------------------------------
 
-DIR=$1;
+DIR=$1;                                     #### Pathname passed by Sabnzbd
+NZB=$2;                                     #### Clean nzb-name passed by Sabnzbd (unused in this script)
+GARBAGE=".nfo .srr .sfv .nzb .jpg"          #### Add or remove extensions here, files with those extensions will be deleted
 
+
+Periscope () {  #### Find subtitles
 echo "--------------------------"
 echo $(date)
 echo ': Starting subtitle search'
@@ -27,3 +31,16 @@ find $DIR \( -name *.avi -o -name *.mkv \) -type f -exec /usr/bin/python PATH_PE
 echo $(date)
 echo ': Subtitle search ended'
 echo "--------------------------"
+}
+
+Cleanup () { #### Remove unwanted files
+for junk in $GARBAGE
+do
+find $DIR -name *$junk -type f -exec rm -f {} \;
+done
+}
+
+#### FUNCTIONS ####
+Periscope               #### Find subtitles
+Cleanup                 #### COMMENT IF YOU DO NOT WANT TO CLEAN FILES
+

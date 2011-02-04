@@ -21,8 +21,18 @@
 
 DIR=$1; 								#fullpath passed by sabnzbdplus.
 NZB=$3;									#Clean nzb-name
+GARBAGE=".m3u .sfv .nzb .nfo"         # Add or remove extensions here, files with those extensions will be deleted
 FAILDIR="/path/to/UNTAGGED"; 			#directory to move files that were not autotagged
-SUCCESDIR="/path/to/TAGGED";				#directory to keep original files that were tagged and moved to library 
+SUCCESDIR="/path/to/TAGGED";			#directory to keep original files that were tagged and moved to library 
+
+
+#### FIRST SOME CLEANSING ####
+cleanup () { #### Remove unwanted files
+for junk in $GARBAGE
+do
+find $DIR -name *$junk -type f -exec rm -f {} \;
+done
+}
 
 
 #### PROCESSING FILES ####
@@ -89,6 +99,7 @@ echo "--------------------------"
 
 
 #### CALLING FUNCTIONS ####
+cleanup
 process					#DEFAULT POSTPROCESSING STUFF
 move_Failed #			#COMMENT IF YOU WANT THE SOURCEFILES TO STAY WHERE THEY ARE WHEN NOT IDENTIFIED
 move_Succes #			#COMMENT IF YOU WANT THE SOURCEFILES TO STAY WHERE THEY ARE WHEN IDENTIFIED
