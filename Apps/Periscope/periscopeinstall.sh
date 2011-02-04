@@ -61,7 +61,7 @@ INSTALLDIR=/home/$USER/.$APPLOW; #directory you want to install to.
 SCANPATH=scanPath.sh;			#script to batchsearch
 DOWN_SUB=downloadSub.py;		#Periscope CLI
 SABPER=SabtoPeriscope.sh;		#Postprocessingscript Sabnzbd
-SABPERSICK=SabtoPertoSick.py;	#Postprocessingscript Sabnzbd to Periscope to Sickbeard
+SABPERSICK=SabtoPertoSick.sh;	#Postprocessingscript Sabnzbd to Periscope to Sickbeard
 
 
 
@@ -383,6 +383,9 @@ echo "LaSi $VERSION"
 	wget -P $INSTALLDIR $DROPBOX/$APP/$DOWN_SUB
 	wget -P $INSTALLDIR $DROPBOX/$APP/$SABPER
 	wget -P $INSTALLDIR	$DROPBOX/$APP/$SABPERSICK   
+	sudo chmod +x $INSTALLDIR/$SABPERSICK
+	sudo chmod +x $INSTALLDIR/$SABPER
+	sudo chmod +x $INSTALLDIR/$SCANPATH
 	}
 
 	
@@ -394,6 +397,8 @@ echo "LaSi $VERSION"
 	path_Python() {
 	PATH_PYTHON=$(which python)	
 	sed -i "s#/usr/bin/python#$PATH_PYTHON#g" $INSTALLDIR/$SCANPATH
+	sed -i "s#/usr/bin/python#$PATH_PYTHON#g" $INSTALLDIR/$SABPER
+	sed -i "s#/usr/bin/python#$PATH_PYTHON#g" $INSTALLDIR/$SABPERSICK
 	}
 
 #### SET PERISCOPE PATH IN SCRIPTS ####
@@ -442,7 +447,6 @@ echo "LaSi $VERSION"
 			then
 			echo "First language set to $LANG1"
 			sed -i "s/111/$LANG1/g" $INSTALLDIR/$DOWN_SUB
-			sed -i "s/111/$LANG1/g" $INSTALLDIR/$SABPERSICK
 		else
 			echo "Language not found, try again"
 			choose_Lang1
@@ -456,7 +460,6 @@ echo "LaSi $VERSION"
 			then
 			echo "Second language set to $LANG2"
 			sed -i "s/222/$LANG2/g" $INSTALLDIR/$DOWN_SUB
-			sed -i "s/222/$LANG2/g" $INSTALLDIR/$SABPERSICK
 		else
 			echo "Language not found, try again"
 			choose_Lang2
@@ -633,7 +636,7 @@ echo "LaSi $VERSION"
     		 	Question_Path
     	  		;;
     	  	[Ss]*)
-    	  		echo "Search subs for files in $SCANPATH not scheduled"
+    	  		echo "Search subs for files in $BATCHPATH not scheduled"
     	  		echo "TIP: Type crontab -e to schedule yourself"
     	  		echo "Do you want to set another path?"
     		 	Question_Path
@@ -672,7 +675,6 @@ echo "LaSi $VERSION"
 		}
 		
 		set_Sabpost () {
-		sudo chmod +x $INSTALLDIR/$SABPER &&
 		ln -s -b $INSTALLDIR/$SABPER $SABPATH/$SABPER
     	echo
     	echo "Created symbolic link to $SABPATH/$SABPER" 
@@ -682,23 +684,23 @@ echo "LaSi $VERSION"
 	
 		set_Sickpath () {
 		echo
-		echo 'Please specify the full path to your Sickbeard autoProcessTV folder'
-		echo "e.g. /home/$USER/.sickbeard/autoProcessTV"
+		echo 'Please specify the full path to your Sickbeard folder'
+		echo "e.g. /home/$USER/.sickbeard"
 		echo "or S to skip"
 		read -p ":" SICKPATH
     		if [ -d $SICKPATH ]
     			then
-				sudo chmod +x $INSTALLDIR/$SABPERSICK &&
-				ln -s -b $INSTALLDIR/$SABPERSICK $SICKPATH/$SABPERSICK &&
-				ln -s -b $SICKPATH/$SABPERSICK $SABPATH/$SABPERSICK &&
-    			echo "Created symbolick link $SICKPATH/$SABPERSICK" 
-    			echo "Make sure you enable this in Sabnzbd+ for your movies and TVshows" 
+				sed -i "s!/PATH_SICK!$SICKPATH!g" $INSTALLDIR/$SABPERSICK
+                ln -s -b $INSTALLDIR/$SABPERSICK $SABPATH/$SABPERSICK
+                echo
+    			echo "Created symbolick link $SABPATH/$SABPERSICK" 
+    			echo "Make sure you enable this in Sabnzbd+ for your TVshows" 
     		elif [ $SICKPATH = S -o $SICKPATH = s ]
     			then
     			echo "Skipped Sabnzbd+ to Periscope to Sickbeard postprocessing"
     			echo "Tip: You can use the script $INSTALLDIR/$SABPERSICK anytime"
-    			echo "just symlink it to your Sickbeard autoProcessTV dir,"
-    			echo "then symlink that to your Sabnzbd+ postprocessingdir and enable it in Sabnzbd+."
+    			echo "Edit it with the correct paths"
+    			echo "and symlink it to your Sabnzbd postprocessing folder"
     		else	
     			echo "$SICKPATH doesn't exist, try again"
     			set_Sickpath
