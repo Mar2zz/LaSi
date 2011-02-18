@@ -22,7 +22,7 @@
 #this script can be used to scan a specific directory 
 #NEVER use this script on your musiclibrary!!!
 
-DIR=$1; 								#usage ./manualalbum.sh /path/to/dir/you/want/to/scan
+DIR="$1"; 								#usage ./manualalbum.sh /path/to/dir/you/want/to/scan
 FAILDIR="/path/to/UNTAGGED"; 			#directory to move files that were not autotagged
 SUCCESDIR="/path/to/TAGGED";			#directory to keep original files that were tagged and moved to library 
 
@@ -33,7 +33,7 @@ echo "--------------------------"
 echo $(date)
 echo "Starting renamealbum for $NZB"
 
-/usr/bin/python /path/to/renamealbum -R --no-embed-coverart $DIR
+/usr/bin/python /path/to/renamealbum -R --no-embed-coverart "$DIR"
 
 echo $(date)
 echo "Album search ended for $NZB"
@@ -42,10 +42,10 @@ echo "Album search ended for $NZB"
 
 #### MOVE UNIDENTIFIED FOLDERS ####
 move_Failed () {
-if grep -R --include=report.txt -i "fail!" $DIR >> /tmp/fail.txt
+if grep -R --include=report.txt -i "fail!" "$DIR" >> /tmp/fail.txt
 	then
 	sed -i "s#/report.txt.*##g" /tmp/fail.txt
-	mv -f "$(cat /tmp/fail.txt)" $FAILDIR
+	mv -f "$(cat /tmp/fail.txt)" "$FAILDIR"
 	echo "The following albums moved to $FAILDIR:"
 	echo $(cat /tmp/fail.txt)
 fi
@@ -53,10 +53,10 @@ fi
 	
 #### MOVE IDENTIFIED SOURCEFILES ####
 move_Succes () {
-if grep -R --include=report.txt -i "success!" $DIR >> /tmp/succes.txt
+if grep -R --include=report.txt -i "success!" "$DIR" >> /tmp/succes.txt
 	then
 	sed -i "s#/report.txt.*##g" /tmp/succes.txt
-	mv -f "$(cat /tmp/succes.txt)" $SUCCESDIR
+	mv -f "$(cat /tmp/succes.txt)" "$SUCCESDIR"
 	echo "The following albums moved to $SUCCESDIR:"
 	echo $(cat /tmp/succes.txt)
 fi
@@ -64,10 +64,10 @@ fi
 
 #### DELETE IDENTIFIED SOURCEFILES ####
 delete_Succes () {
-if grep -R --include=report.txt -i "success!" $DIR >> /tmp/succes.txt
+if grep -R --include=report.txt -i "success!" "$DIR" >> /tmp/succes.txt
 	then
 	sed -i "s#/report.txt.*##g" /tmp/succes.txt
-	rm -Rf "$(cat /tmp/succes.txt)" $SUCCESDIR 
+	rm -Rf "$(cat /tmp/succes.txt)" "$SUCCESDIR"
 	echo "The following albums were identified:"
 	echo $(cat /tmp/succes.txt)
 fi
