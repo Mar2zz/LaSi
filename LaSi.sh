@@ -2,7 +2,7 @@
 
 # Author:  Mar2zz
 # blogs: mar2zz.tweakblogs.net
-# License: GNU GPL v3
+# License: Same as GPL I guess. hey, it's just text. give credit and edit.
 # 
 # This is the main script of "Lazy Admins Scripted Installers (LaSi)"
 #
@@ -18,7 +18,8 @@
 # | # Sickbeard
 # | # CouchPotato
 # | # Periscope (alpha, not tested thoroughly)   
-# | # AlbumIdentify (alpha, not tested yet)                                   
+# | # AlbumIdentify (alpha, not tested yet)
+# | # Spotweb                                   
 # |___________________________________________________________________________________
 #
 # Tested succesful on OS's:
@@ -41,7 +42,7 @@ TESTOS3=XBMC_Live_Dharma
 #SET SOME VARIABLES (SOME VARIABLES WILL BE SET THROUGH LIVE USERINPUT IN TERMINAL)
 
 DROPBOX=http://dl.dropbox.com/u/18712538/ 				# dropbox-adres
-CONN2=dropbox.com										# to test connections needed
+CONN2=dropbox.com							# to test connections needed
 													
 
 #######################################################################################
@@ -58,6 +59,9 @@ APP3_INST=periscopeinstall.sh;
 
 APP4=AlbumIdentify;
 APP4_INST=albumidentify.sh;
+
+APP5=Spotweb;
+APP5_INST=spotwebinstall.sh;
 
 #######################################################################################
 
@@ -86,8 +90,9 @@ LaSi_Menu (){
 		echo "Make a choice to see info or install these apps..."
 		echo "1. $APP1"
 		echo "2. $APP2"
-		echo "3. $APP3"
+		echo "3. $APP3 (needs updating)"
 		echo "4. $APP4"
+		echo "5. $APP5"
 		echo "Q. Quit"
 	
 		read SELECT
@@ -103,6 +108,9 @@ LaSi_Menu (){
 				;;
 			[4]*)
 				info_Album
+				;;
+			[5]*)
+				info_Spot
 				;;
 			[Qq]*)
 				exit
@@ -222,7 +230,7 @@ read -sn 1 -p "--- [more]---"
 echo "											
 *############################################################
 #
-# Periscope is written by Patrick Desalle...
+# Periscope is written by patrick@gmail.com...
 # ..so buy him a coke to support him.
 #
 # Visit http://code.google.com/p/periscope/	
@@ -263,6 +271,40 @@ SET_INST=$APP4_INST
 cf_Choice
 }
 
+
+#### SPOTWEB ####
+
+info_Spot () {
+clear
+echo "
+*################### SPOTWEB ##########################
+#															
+# SpotWeb is een versie van SpotNed (http://twitter.com/spotned) 
+# voor het web. 
+# Het gebruikt PHP5 om de meeste functies te implementeren
+# en is getest op Linux en FreeBSD
+#
+*############################################################
+#													
+# Deze installer installeert alle benodigdheden voor Spotweb. 
+# Als de installatie klaar is zal spotweb draaien op 
+# http://$HOSTNAME/spotweb, maar je moet dan nog wel spots
+# binnenhalen via php retrieve.php in de spotwebmap.
+# 
+# Je kunt kiezen tussen SQLite en mySQL database. De mySQL
+# database moet je zelf aanmaken en configureren.
+# SQlite werkt out of the box.
+#
+*############################################################
+#
+# Spotweb is geschreven door Spotweb (m.a.w. hij wil anoniem blijven).
+#
+# Visit https://github.com/spotweb/spotweb	
+*#############################################################"
+SET_APP=$APP5
+SET_INST=$APP5_INST
+cf_Choice
+}
 
 	
 #### BACKTOMENU OR INSTALL ####
