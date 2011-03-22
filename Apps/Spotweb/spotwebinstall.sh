@@ -551,6 +551,8 @@ echo "LaSi $VERSION"
 	start_App() {
 		LOCATION=$(hostname)
 		echo "Installation is done..."
+		echo "Now restarting Apache to be sure everything new will be loaded..."
+		sudo /etc/init.d/apache2 restart
 		echo "Point your webbrowser to http://$LOCATION/spotweb/testinstall.php to confirm everything is working!"
 		echo "After that edit ownsettings.php if you didn't do so allready"
 		echo "Then do cd /var/www/spotweb and then execute php retrieve.php"
