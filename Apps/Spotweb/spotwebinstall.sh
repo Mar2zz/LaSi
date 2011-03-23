@@ -249,10 +249,13 @@ echo "LaSi $VERSION"
 		read -p "Press 1, 2 or Q to select an option    :" REPLY
 		case $REPLY in
      		1)
-			check_Pack5
-     			;;
+			    DBCHOICE=mySQL
+			    check_Pack5
+			    echo ""
+			    ;;
      		2)
-			check_Pack4
+			    check_Pack4
+			    DBCHOICE=SQLite
      			;;
      		[Qq]*)
      			echo "Fini..."
@@ -436,62 +439,48 @@ echo "LaSi $VERSION"
 		echo 'Type the full path of ownsettings.php that you want to import'
 		echo 'or s to skip:'
 		read -p ' :' IMPORTCONFIG
-     		if [ $IMPORTCONFIG = S -o $IMPORTCONFIG = s ]
-     			then
-     			cf_Import
-     		elif [ -e $IMPORTCONFIG ]
+     	if [ $IMPORTCONFIG = S -o $IMPORTCONFIG = s ]
+     		then
+     		cf_Import
+     	elif [ -e $IMPORTCONFIG ]
 			then
 			cp -f -b $IMPORTCONFIG $INSTALLDIR/$CONFIGFILE
 			echo "File imported to $INSTALLDIR/$CONFIGFILE"
 		else
-			echo 'File does not exist, enter correct path as /path/to/ownsettings.php' &&
+		    echo 'File does not exist, enter correct path as /path/to/ownsettings.php' &&
 			import_Config
 		fi
 		}
-
-			cf_Edit () { # Edit clean configfile
-			echo
-			echo "Change ownsettings.php to your personal needs"
-			echo "You can edit the configfile now in your terminal-editor or do it later"
-			echo "If you use a fresh install with clean settings, you need to edit anyway"
-			echo "Do you want to view them or edit now?"
-			read -p "(yes/no)   :" REPLY
-			case $REPLY in
-				[Yy]*)
-			   		command editor $INSTALLDIR/$CONFIGFILE
-					;;
-				[Nn]*)
-					echo
-					echo "Skipping this step"
-					echo "Don't forget to edit it before using $APP"
-					echo
-					;;
-				*)
-					echo "Answer yes or no"
-					cf_Edit
-					;;
-			esac
-			}
 
 		cf_Import () { # Confirm import
 		echo "Do you want to import your own configurationfile (ownsettings.php)?"
 		read -p "(yes/no)   :" IMPORTREPLY
 		case $IMPORTREPLY in
      		[Yy]*)
+     		    IMPORTSETTINGS=1
      			import_Config
      			;;
      		[Nn]*)
-     			echo "Using the default one"
-			cp -f -b $INSTALLDIR/settings.php $INSTALLDIR/ownsettings.php
-			echo "Clean config created in $INSTALLDIR/$CONFIGFILE"
-			sed -i "s!if (file_exists!#if (file_exists!g" $INSTALLDIR/$CONFIGFILE
-			cf_Edit
-      		;;
+     		    IMPORTSETTINGS=0
+     			echo "Een standaard configuratie wordt opgehaald"
+     			if [ -e $INSTALLDIR/$CONFIGFILE ]
+			        then
+			        echo "Backup ownsettings.php naar ownsettings.php.bak"
+			        mv -f $INSTALLDIR/$CONFIGFILE $INSTALLDIR/$CONFIGFILE.bak &&
+			        wget -P $INSTALLDIR $DROPBOX/$APP/$CONFIGFILE &&
+			        sed -i "s/mijnuniekeservernaam/$HOSTNAME/g" $INSTALLDIR/$CONFIGFILE
+			        echo "Standaard configuratiefile gemaakt in $INSTALLDIR/$CONFIGFILE"
+		        else
+			        wget -P $INSTALLDIR $DROPBOX/$APP/$CONFIGFILE &&
+			        echo "Standaard configuratiefile gemaakt in $INSTALLDIR/$CONFIGFILE"
+			        sed -i "s/mijnuniekeservernaam/$HOSTNAME/g" $INSTALLDIR/$CONFIGFILE
+		        fi
+     		    ;;
       		*)
 			echo "Answer yes or no"
 			cf_Import
       		;;
-			esac
+		esac
 		}
 	cf_Import
 	}
@@ -502,63 +491,155 @@ echo "LaSi $VERSION"
 
 		cf_PHP () { # Edit php.ini
 		echo
-		echo "PHP needs to know what timezone you are in"
-		echo "You can edit the php.ini files later in your terminal-editor"
-		echo "search for this part:"
-		echo "-----------"
-		echo "[Date]"
-		echo "; Defines the default timezone used by the date functions"
-		echo "; http://php.net/date.timezone"
-		echo ";date.timezone ="
-		echo "-----------"
-		echo "and change:"
-		echo ";date.timezone = \"\""
-		echo "for example to"
-		echo "date.timezone = \"Europe/Amsterdam\""
-		echo "-----------"
-		echo "Do you want me to change your timezone to Europe/Amsterdam??"
-		read -p "(yes/no)   :" REPLY
-		case $REPLY in
-			[Yy]*)
-		   		sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/apache2/php.ini
-				sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/cli/php.ini
-				;;
-			[Nn]*)
-				echo
-				echo "Skipping this step"
-				echo "Don't forget to edit it before using $APP"
-				echo
-				;;
-			*)
-				echo "Answer yes or no"
-				cf_PHP
-				;;
-		esac
+		if grep -i ";date.timezone =" /etc/php5/apache2/php.ini
+		    then
+		    echo "Datum/tijdzone wordt aangepast naar Europe/Amsterdam in php.ini"
+		    sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/apache2/php.ini
+		    sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/cli/php.ini
+		fi
 		}
 		
 	if [ -e /etc/php5/apache2/php.ini ]
 		then
 		cf_PHP
 	else
-		echo "Can't find php.ini, so you need to find and edit it yourself"
-		echo "You can also ignore this error, but it's better to specify your timezone in there"
+		echo "Kan php.ini niet vinden, je moet deze zelf aanpassen met je timezone"
+		echo "Deze fout kun je ook negeren, maar het is beter om het wel aan te passen"
 	fi
 	}
+	
+#### CONFIGURE MYSQL DB ####
+    config_SQL () {
+    if [ $DBCHOICE=mySQL ]
+        then
+        echo ""
+        echo "Je hebt gekozen voor een mySQL database"
+        
+        cf_SQL () {
+        echo "Wil je dat ik een nieuwe database voor je aanmaak?"
+		read -p "(ja/nee)   :" DBREPLY
+		case $DBREPLY in
+     		[YyJj]*)
+     		    input_PW
+     			;;
+     		[Nn]*)
+     			echo "Je hebt dus al een database"
+     			echo "Check even ownsettings of je wachtwoord en user goed staan"
+     			editor $INSTALLDIR/$CONFIGFILE
+      		    ;;
+      		*)
+			    echo "Antwoord ja of nee"
+			    ;;
+		esac
+		}
+		
+		    input_PW () {
+		    echo ""
+		    echo "Welk wachtwoord heb je opgegeven tijdens de mySQL installatie?"
+		    read -p "wachtwoord:" SQLPASSWORD
+		    }
+		    
+		    create_DB () {
+		    MYSQL=$(which mysql)
+		    if $($MYSQL mysql -u root --password="$SQLPASSWORD" -e "CREATE DATABASE spotweb;")
+		        then
+		        $MYSQL mysql -u root --password="$SQLPASSWORD" -e "CREATE USER 'spotweb'@'localhost' IDENTIFIED BY 'spotweb';"
+                $MYSQL mysql -u root --password="$SQLPASSWORD" -e "GRANT ALL PRIVILEGES ON spotweb.* TO spotweb @'localhost' IDENTIFIED BY 'spotweb';"
+                echo "Database aangemaakt met de naam spotweb, user spotweb en wachtwoord spotweb ;)"
+                sed -i "
+                    s/$settings['db']['engine'] = 'sqlite3';/$settings['db']['engine'] = 'mysql';/g
+                    s!$settings['db']['path'] = './nntpdb.sqlite3';!#$settings['db']['path'] = './nntpdb.sqlite3';!g
+                    s/#$settings['db']['engine'] = 'mysql';/$settings['db']['engine'] = 'mysql';/g
+                    s/#$settings['db']['host'] = 'localhost';/$settings['db']['host'] = 'localhost';/g
+                    s/#$settings['db']['dbname'] = 'spotweb';/$settings['db']['dbname'] = 'spotweb';/g
+                    s/#$settings['db']['user'] = 'spotweb';/$settings['db']['user'] = 'spotweb';/g
+                    s/#$settings['db']['pass'] = 'spotweb';/$settings['db']['pass'] = 'spotweb';/g
+                    " $INSTALLDIR/$CONFIGFILE
+            else
+                echo "Je hebt een verkeerd wachtwoord opgegeven, probeer het nog een keer"
+                input_PW
+            fi
+            }
+    cf_SQL
+    }
+    
+    
+#### NOG WAT CONFIGURATIE ####
+		cf_Newsserver () {
+		if [ $IMPORTSETTINGS -eq 0 ]
+		    then
+		    echo "Wil je alvast een nieuwsserver opgegeven?"
+		    read -p "(ja/nee)   :" REPLY
+		    case $REPLY in
+     		    [Yy]*)
+     		    	read -p "Wat is het usenetadres (bv. news.ziggo.nl)?" USENET
+     		    	read -p "Wat is de gebruikersnaam (alleen enter voor blanco)?" USERNAME
+     		    	read -p "Wat is het wachtwoord (enter voor blanco)?" PASSWORD
+     		    	read -p "Welk poortnummer wil je gebruiken? 119 of 563 (encrypted)?" PORT
+     		    	#### check of encryptie
+     		    	if [ $PORT -eq 563 ]
+     		    	    then
+     		    	    ENC="\'ssl\'"
+     		    	else
+     		    	    ENC="false"
+     		    	fi
+     		    	#### pas ownsettings aan
+     		    	sed -i "
+                        s/news.ziggo.nl/$USENET/g
+                        s/\$settings[\'nntp_nzb\'][\'user\'] = \'xx\';/\$settings[\'nntp_nzb\'][\'user\'] = \'$USERNAME\';/g
+                        s/\$settings[\'nntp_nzb\'][\'pass\'] = \'yy\';/\$settings[\'nntp_nzb\'][\'pass\'] = \'$PASSWORD\';/g
+                        s/\$settings[\'nntp_nzb\'][\'enc\'] = false;/\$settings[\'nntp_nzb\'][\'enc\'] = $ENC;/g
+                        s/\$settings[\'nntp_nzb\'][\'port\'] = 119;/\$settings[\'nntp_nzb\'][\'port\'] = $PORT;/g
+     		    	" $INSTALLDIR/$CONFIGFILE
+     		    	;;
+     		    [Nn]*)
+     			    echo "Downloading fresh config from dropbox.com"
+     			    get_Config
+      		        ;;
+      		    *)
+			    echo "Answer yes or no"
+				    cf_Import
+      		    ;;
+		    esac
+		   }
+	cf_Import
+	}    
+                 
+        
+		
+	
 
 ######################################################
 
-#### STARTING APP ####		
-	start_App() {
+#### HERSTART APACHE ####		
+	restart_Ap() {
 		LOCATION=$(hostname)
 		echo "Installation is done..."
 		echo "Now restarting Apache to be sure everything new will be loaded..."
 		sudo /etc/init.d/apache2 restart
-		echo "Point your webbrowser to http://$LOCATION/spotweb/testinstall.php to confirm everything is working!"
-		echo "After that edit ownsettings.php if you didn't do so allready"
-		echo "Then do cd /var/www/spotweb and then execute php retrieve.php"
-		echo "then go to http://$LOCATION/spotweb/ to browse your personal Spotweb."
-		echo "Have fun!"
 	}
+	
+
+#### HERSTART APACHE ####	
+		cf_Retrieve () { # Confirm import
+		echo "Wil je alvast spots binnenhalen? Dit kan even duren maar is wel nodig @ first run"
+		read -p "(ja/nee)   :" REPLY
+		case $REPLY in
+     		[YyJj]*)
+     		    PHP=$(which php)
+     		    cd $INSTALLDIR
+     		    $PHP retrieve.php
+     			;;
+     		[Nn]*)
+     		    echo "Spotweb zonder spots is alleen maar web"
+      		    ;;
+      		*)
+			echo "Antwoord ja of nee"
+				cf_Retrieve
+      		    ;;
+		esac
+		}
+
 
 #### RETURN TO MENU ####
 	LaSi_Menu () {
@@ -583,7 +664,10 @@ set_Dir			#choose installation directory
 clone_Git		#clone the git repo into $installdir
 new_Config		#import or create configfile
 edit_PHP
-start_App
+config_SQL
+cf_Newsserver
+restart_Ap
+cf_Retrieve
 LaSi_Menu		#Return to main script
 
 
