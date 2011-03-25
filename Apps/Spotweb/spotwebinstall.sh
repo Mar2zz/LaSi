@@ -600,7 +600,45 @@ echo "LaSi $VERSION"
 		fi
         }
              
-        
+
+#### Optioneel headerserver ####
+		cf_Headerserver () {
+		if [ $IMPORTSETTINGS -eq 0 ]
+		    then
+		    echo "Wil je een aparte headerserver opgegeven?"
+		    read -p "(ja/nee)   :" REPLY
+		    case $REPLY in
+     		    [YyJj]*)
+     		    	read -p "Wat is het usenetadres (bv. textnews.eweka.nl)?" USENET2
+     		    	read -p "Wat is de gebruikersnaam (alleen enter voor blanco)?" USERNAME2
+     		    	read -p "Wat is het wachtwoord (enter voor blanco)?" PASSWORD2
+     		    	read -p "Welk poortnummer wil je gebruiken? 119 of 563 (encrypted)?" PORT2
+     		    	#### check of encryptie
+     		    	if [ $PORT2 -eq 563 ]
+     		    	    then
+     		    	    ENC2="'ssl'"
+     		    	else
+     		    	    ENC2="false"
+     		    	fi
+     		    	#### pas ownsettings aan
+     		    	sed -i "
+                        13 s/news.ziggo.nl/$USENET2/
+                        14 s/xx/$USERNAME2/
+                        15 s/yy/$PASSWORD2/
+                        16 s/false;/$ENC2;/
+                        17 s/119/$PORT2/
+     		    	" $INSTALLDIR/$CONFIGFILE
+     		    	;;
+     		    [Nn]*)
+     			    echo "Bij Eweka, en misschien meer providers, is dit wel een vereiste"
+     			    ;;
+      		    *)
+			    echo "Antwoord ja of nee"
+				    cf_Headerserver
+      		    ;;
+		    esac
+		fi
+        }       
 		
 	
 
@@ -661,6 +699,7 @@ new_Config		#import or create configfile
 edit_PHP
 config_SQL
 cf_Newsserver
+cf_Headerserver
 restart_Ap
 cf_Retrieve
 LaSi_Menu		#Return to main script
