@@ -582,11 +582,11 @@ echo "LaSi $VERSION"
      		    	fi
      		    	#### pas ownsettings aan
      		    	sed -i "
-                        s/news.ziggo.nl/$USENET/g
-                        s/[\'user\'] = \'xx\'/[\'user\'] = \'$USERNAME\'/g
-                        s/[\'pass\'] = \'yy\'['pass'] = \'$PASSWORD\'/g
-                        s/[\'enc\'] = false/[\'enc\'] = $ENC/g
-                        s/[\'port\'] = 119/[\'port\'] = $PORT/g
+                        6 s/news.ziggo.nl/$USENET/
+                        7 s/xx/$USERNAME/
+                        8 s/yy/$PASSWORD/
+                        9 s/false;/$ENC;/
+                        10 s/119/$PORT/
      		    	" $INSTALLDIR/$CONFIGFILE
      		    	;;
      		    [Nn]*)
