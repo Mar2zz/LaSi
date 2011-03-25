@@ -147,7 +147,7 @@ echo "LaSi $VERSION"
 
 		Question() {
 		echo "Weet je zeker dat je $APP wilt installeren?"
-		read -p "(yes/no)   :" REPLY
+		read -p "(ja/nee)   :" REPLY
 		case $REPLY in
      		[YyJj]*)
      			echo "Into the rabbit hole..."
@@ -241,11 +241,11 @@ echo "LaSi $VERSION"
 		}
 
 		cf_Dbase () {
-		echo "Choose databasetype"
+		echo "Kiesdatabasetype"
 		echo "1. mySQL is sneller dan SQLite"
 		echo "2. SQLite (makkelijkst, geen extra configuratie nodig)"
 		echo "Q. Quit"
-		read -p "Press 1, 2 or Q to select an option    :" REPLY
+		read -p "Kies optie 1, 2 of Q    :" REPLY
 		case $REPLY in
      		1)
 			    DBCHOICE=mySQL
@@ -404,7 +404,7 @@ echo "LaSi $VERSION"
      					choose_Dir
      					;;
      				[Nn]*)
-     					echo "Installing $APP in $INSTALLDIR"
+     					echo "Installeert $APP in $INSTALLDIR"
      					;;
       				*)
 					echo "Antwoord ja of nee"
@@ -524,8 +524,6 @@ echo "LaSi $VERSION"
      			;;
      		[Nn]*)
      			echo "Je hebt dus al een database"
-     			echo "Check even ownsettings of je wachtwoord en user goed staan"
-     			editor $INSTALLDIR/$CONFIGFILE
       		    ;;
       		*)
 			    echo "Antwoord ja of nee"
@@ -593,7 +591,7 @@ echo "LaSi $VERSION"
      			    echo "Er kunnen geen spots opgehaald worden tot je dit hebt aangepast"
      			    ;;
       		    *)
-			    echo "Answer yes or no"
+			        echo "Antwoord ja of nee"
 				    cf_Newsserver
       		    ;;
 		    esac
