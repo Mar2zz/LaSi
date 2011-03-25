@@ -146,17 +146,17 @@ echo "LaSi $VERSION"
 	echo ' '
 
 		Question() {
-		echo "Are you sure you want to continue and install $APP?"
+		echo "Weet je zeker dat je $APP wilt installeren?"
 		read -p "(yes/no)   :" REPLY
 		case $REPLY in
-     		[Yy]*)
+     		[YyJj]*)
      			echo "Into the rabbit hole..."
 	    		;;
      		[Nn]*)
 				LaSi_Menu
 			 	;;
 			*)
-				echo "Answer yes or no"
+				echo "Antwoord ja of nee"
 				Question
 			  	;;
 		esac
@@ -242,9 +242,8 @@ echo "LaSi $VERSION"
 
 		cf_Dbase () {
 		echo "Choose databasetype"
-		echo "1. mySQL (requires configuration that is not (yet) supported by this installer"
-		echo "   but is slightly faster than SQLite"
-		echo "2. SQLite (easiest, requires no configuration at all)"
+		echo "1. mySQL is sneller dan SQLite"
+		echo "2. SQLite (makkelijkst, geen extra configuratie nodig)"
 		echo "Q. Quit"
 		read -p "Press 1, 2 or Q to select an option    :" REPLY
 		case $REPLY in
@@ -269,9 +268,9 @@ echo "LaSi $VERSION"
 		}
 
 	check_Pack1
+	check_Pack2
 	check_Pack3
 	cf_Dbase
-	check_Pack2
 	}
 
 
@@ -342,17 +341,17 @@ echo "LaSi $VERSION"
 	set_Dir () {
 
 		cf_Overwrite () {
-		echo "1. Choose another directory"
-		echo "2. Backup $INSTALLDIR to LaSi/$APP"
+		echo "1. Kies een andere map"
+		echo "2. Backup $INSTALLDIR naar LaSi/$APP"
 		echo "3. Delete $INSTALLDIR"
 		echo "Q. Quit"
-		read -p "Press 1, 2, 3 or Q to select an option    :" REPLY
+		read -p "Kies 1, 2, 3 of Q om te stoppen    :" REPLY
 		case $REPLY in
      		1)
 			choose_Dir
      			;;
      		2)
-     			echo "Backup $INSTALLDIR to /home/$USER/LaSi/$APP"
+     			echo "Backup $INSTALLDIR naar /home/$USER/LaSi/$APP"
      			if [ -d LaSi ]
      				then
      				cp -af $INSTALLDIR /home/$USER/LaSi/$APP &&
@@ -364,7 +363,7 @@ echo "LaSi $VERSION"
      			fi
      			;;
      		3)
-     		    echo "Deleting $INSTALLDIR."
+     		    echo "Delete $INSTALLDIR."
      			sudo rm -Rf $INSTALLDIR
      			;;
      		[Qq]*)
@@ -372,21 +371,21 @@ echo "LaSi $VERSION"
      			LaSi_Menu
      			;;
       		*)
-				echo "Choose 1, 2, 3 or Q to quit"
+				echo "Kies 1, 2, 3 of Q om te stoppen"
 				cf_Dir
       			;;
 		esac
 		}
 
 		choose_Dir() {
-		read -p 'Type the path of the directory you want to install in...   :' INSTALLDIR
+		read -p "Typ het pad waar je $APP wilt installeren...   :" INSTALLDIR
 		if [ -d $INSTALLDIR ]
 			then
 			echo
-			echo "$INSTALLDIR allready exists, please choose an option:"
+			echo "$INSTALLDIR bestaat al, maak een keuze:"
 			cf_Overwrite
 		else
-			echo "Installing $APP in $INSTALLDIR."
+			echo "Installeert $APP in $INSTALLDIR."
 		fi
 		}
 
@@ -397,18 +396,18 @@ echo "LaSi $VERSION"
 			echo "$INSTALLDIR allready exists, please choose an option:"
 			cf_Overwrite
 		else
-			echo "By default $APP will be installed in $INSTALLDIR."
-			echo "Do you want to change this?"
-			read -p "(yes/no)   :" REPLY
+			echo "Standaard zal $APP in $INSTALLDIR gezet worden."
+			echo "Wil je dit veranderen? (doe dat alleen als je weet waarmee je bezig bent)"
+			read -p "(ja/nee)   :" REPLY
 			case $REPLY in
-     				[Yy]*)
+     				[YyJj]*)
      					choose_Dir
      					;;
      				[Nn]*)
      					echo "Installing $APP in $INSTALLDIR"
      					;;
       				*)
-					echo "Answer yes or no"
+					echo "Antwoord ja of nee"
 					cf_Dir
       				;;
 			esac
@@ -422,7 +421,7 @@ echo "LaSi $VERSION"
 	clone_Git () {
 	echo
 	echo '-------'
-	echo "Download and install the most recent version of $APP from GitHub"
+	echo "Download en installeer de meest recente $APP van GitHub"
 	echo '-------'
 	echo
 	command git clone $GITHUB $HOME/temp_$APPLOW &&
@@ -436,8 +435,8 @@ echo "LaSi $VERSION"
 
 		import_Config() { # import config.ini
 		echo
-		echo 'Type the full path of ownsettings.php that you want to import'
-		echo 'or s to skip:'
+		echo 'Typ het volledige pad in naar ownsettings.php'
+		echo 'of typ s om over te slaan:'
 		read -p ' :' IMPORTCONFIG
      	if [ $IMPORTCONFIG = S -o $IMPORTCONFIG = s ]
      		then
@@ -445,18 +444,18 @@ echo "LaSi $VERSION"
      	elif [ -e $IMPORTCONFIG ]
 			then
 			cp -f -b $IMPORTCONFIG $INSTALLDIR/$CONFIGFILE
-			echo "File imported to $INSTALLDIR/$CONFIGFILE"
+			echo "Bestand geimporteerd naar $INSTALLDIR/$CONFIGFILE"
 		else
-		    echo 'File does not exist, enter correct path as /path/to/ownsettings.php' &&
+		    echo 'Bestand bestaat niet, voer het zo in /pad/naar/ownsettings.php' &&
 			import_Config
 		fi
 		}
 
 		cf_Import () { # Confirm import
-		echo "Do you want to import your own configurationfile (ownsettings.php)?"
-		read -p "(yes/no)   :" IMPORTREPLY
+		echo "Wil je je eigen configuratiefile (ownsettings.php) importeren?"
+		read -p "(ja/nee)   :" IMPORTREPLY
 		case $IMPORTREPLY in
-     		[Yy]*)
+     		[YyJj]*)
      		    IMPORTSETTINGS=1
      			import_Config
      			;;
@@ -477,7 +476,7 @@ echo "LaSi $VERSION"
 		        fi
      		    ;;
       		*)
-			echo "Answer yes or no"
+			echo "Antwoord ja of nee"
 			cf_Import
       		;;
 		esac
@@ -491,7 +490,7 @@ echo "LaSi $VERSION"
 
 		cf_PHP () { # Edit php.ini
 		echo
-		if grep -i ";date.timezone =" /etc/php5/apache2/php.ini
+		if grep -i ";date.timezone =" /etc/php5/apache2/php.ini > /dev/null
 		    then
 		    echo "Datum/tijdzone wordt aangepast naar Europe/Amsterdam in php.ini"
 		    sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/apache2/php.ini
@@ -514,6 +513,7 @@ echo "LaSi $VERSION"
         then
         echo ""
         echo "Je hebt gekozen voor een mySQL database"
+    fi
         
         cf_SQL () {
         echo "Wil je dat ik een nieuwe database voor je aanmaak?"
@@ -537,6 +537,7 @@ echo "LaSi $VERSION"
 		    echo ""
 		    echo "Welk wachtwoord heb je opgegeven tijdens de mySQL installatie?"
 		    read -p "wachtwoord:" SQLPASSWORD
+		    create_DB
 		    }
 		    
 		    create_DB () {
@@ -547,14 +548,10 @@ echo "LaSi $VERSION"
                 $MYSQL mysql -u root --password="$SQLPASSWORD" -e "GRANT ALL PRIVILEGES ON spotweb.* TO spotweb @'localhost' IDENTIFIED BY 'spotweb';"
                 echo "Database aangemaakt met de naam spotweb, user spotweb en wachtwoord spotweb ;)"
                 sed -i "
-                    s/$settings['db']['engine'] = 'sqlite3';/$settings['db']['engine'] = 'mysql';/g
-                    s!$settings['db']['path'] = './nntpdb.sqlite3';!#$settings['db']['path'] = './nntpdb.sqlite3';!g
-                    s/#$settings['db']['engine'] = 'mysql';/$settings['db']['engine'] = 'mysql';/g
-                    s/#$settings['db']['host'] = 'localhost';/$settings['db']['host'] = 'localhost';/g
-                    s/#$settings['db']['dbname'] = 'spotweb';/$settings['db']['dbname'] = 'spotweb';/g
-                    s/#$settings['db']['user'] = 'spotweb';/$settings['db']['user'] = 'spotweb';/g
-                    s/#$settings['db']['pass'] = 'spotweb';/$settings['db']['pass'] = 'spotweb';/g
-                    " $INSTALLDIR/$CONFIGFILE
+                    s/'sqlite3'/'mysql'/g
+                    145,149 s/#//
+                    142d
+                " $INSTALLDIR/$CONFIGFILE
             else
                 echo "Je hebt een verkeerd wachtwoord opgegeven, probeer het nog een keer"
                 input_PW
@@ -571,7 +568,7 @@ echo "LaSi $VERSION"
 		    echo "Wil je alvast een nieuwsserver opgegeven?"
 		    read -p "(ja/nee)   :" REPLY
 		    case $REPLY in
-     		    [Yy]*)
+     		    [YyJj]*)
      		    	read -p "Wat is het usenetadres (bv. news.ziggo.nl)?" USENET
      		    	read -p "Wat is de gebruikersnaam (alleen enter voor blanco)?" USERNAME
      		    	read -p "Wat is het wachtwoord (enter voor blanco)?" PASSWORD
@@ -579,32 +576,30 @@ echo "LaSi $VERSION"
      		    	#### check of encryptie
      		    	if [ $PORT -eq 563 ]
      		    	    then
-     		    	    ENC="\'ssl\'"
+     		    	    ENC="'ssl'"
      		    	else
      		    	    ENC="false"
      		    	fi
      		    	#### pas ownsettings aan
      		    	sed -i "
                         s/news.ziggo.nl/$USENET/g
-                        s/\$settings[\'nntp_nzb\'][\'user\'] = \'xx\';/\$settings[\'nntp_nzb\'][\'user\'] = \'$USERNAME\';/g
-                        s/\$settings[\'nntp_nzb\'][\'pass\'] = \'yy\';/\$settings[\'nntp_nzb\'][\'pass\'] = \'$PASSWORD\';/g
-                        s/\$settings[\'nntp_nzb\'][\'enc\'] = false;/\$settings[\'nntp_nzb\'][\'enc\'] = $ENC;/g
-                        s/\$settings[\'nntp_nzb\'][\'port\'] = 119;/\$settings[\'nntp_nzb\'][\'port\'] = $PORT;/g
+                        s/[\'user\'] = \'xx\'/[\'user\'] = \'$USERNAME\'/g
+                        s/[\'pass\'] = \'yy\'['pass'] = \'$PASSWORD\'/g
+                        s/[\'enc\'] = false/[\'enc\'] = $ENC/g
+                        s/[\'port\'] = 119/[\'port\'] = $PORT/g
      		    	" $INSTALLDIR/$CONFIGFILE
      		    	;;
      		    [Nn]*)
-     			    echo "Downloading fresh config from dropbox.com"
-     			    get_Config
-      		        ;;
+     			    echo "Er kunnen geen spots opgehaald worden tot je dit hebt aangepast"
+     			    ;;
       		    *)
 			    echo "Answer yes or no"
-				    cf_Import
+				    cf_Newsserver
       		    ;;
 		    esac
-		   }
-	cf_Import
-	}    
-                 
+		fi
+        }
+             
         
 		
 	
@@ -614,13 +609,13 @@ echo "LaSi $VERSION"
 #### HERSTART APACHE ####		
 	restart_Ap() {
 		LOCATION=$(hostname)
-		echo "Installation is done..."
-		echo "Now restarting Apache to be sure everything new will be loaded..."
+		echo "Installation is klaar..."
+		echo "Herstart Apache om alle wijzigingen door te voeren..."
 		sudo /etc/init.d/apache2 restart
 	}
 	
 
-#### HERSTART APACHE ####	
+#### RETRIEVE SPOTS ####	
 		cf_Retrieve () { # Confirm import
 		echo "Wil je alvast spots binnenhalen? Dit kan even duren maar is wel nodig @ first run"
 		read -p "(ja/nee)   :" REPLY
