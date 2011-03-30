@@ -25,7 +25,7 @@ echo "--------------------------"
 echo $(date)
 echo ': Starting subtitle search'
 
-find $DIR \( -name *.avi -o -name *.mkv \) -type f -exec /usr/bin/python PATH_PERISCOPE/downloadSub.py {} \;
+find "$DIR" \( -name *.avi -o -name *.mkv \) -type f -exec /usr/bin/python PATH_PERISCOPE/downloadSub.py {} \;
 
 echo $(date)
 echo ': Subtitle search ended'
