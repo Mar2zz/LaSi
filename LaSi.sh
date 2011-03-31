@@ -288,16 +288,18 @@ echo "
 #													
 # Deze installer installeert alle benodigdheden voor Spotweb. 
 # Als de installatie klaar is zal spotweb draaien op 
-# http://$HOSTNAME/spotweb, maar je moet dan nog wel spots
-# binnenhalen via php retrieve.php in de spotwebmap.
+# http://$HOSTNAME/spotweb.
 # 
-# Je kunt kiezen tussen SQLite en mySQL database. De mySQL
-# database moet je zelf aanmaken en configureren.
-# SQlite werkt out of the box.
+# Je kunt kiezen tussen SQLite en mySQL database. 
+# Indien je niet kiest voor het importeren van je eigen
+# ownsettings.php dan wordt er een minimale ownsettings aan-
+# gemaakt, zodat je gelijk aan de slag kunt.
+# Deze kun je verrijken door settings vanuit settings.php te
+# kopieren naar ownsettings.php en dan aan te passen.
 #
 *############################################################
 #
-# Spotweb is geschreven door Spotweb (m.a.w. hij wil anoniem blijven).
+# Spotweb is geschreven door Spotweb e.a.
 #
 # Visit https://github.com/spotweb/spotweb	
 *#############################################################"
