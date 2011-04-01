@@ -55,7 +55,7 @@ PACK3_EXE=cheetah;
 
 INSTALLDIR=/home/$USER/.$APPLOW; #directory you want to install to.
 DAEMONUSER=$USER; 	#the user the app is started with
-INITD=initscript;	#name of default init-script
+INITD=init.ubuntu;	#name of default init-script
 
 IPADRESS=0.0.0.0; 	#default ipadress to listen on
 PORT=8081; 			#default port to listen on
@@ -373,6 +373,8 @@ echo "LaSi $VERSION"
 	echo
 	echo '-------'
 	echo "You can install $APP as a daemon, so it will start when your pc starts..."
+	echo "daemoninstall works only Ubuntu or Debian, I need commands for other OS's"
+	echo "So if you want this script to work on your *nix, email me the commands needed"
 	echo '-------'
 	echo ' '
 		
