@@ -467,12 +467,12 @@ echo "LaSi $VERSION"
 			        echo "Backup ownsettings.php naar ownsettings.php.bak"
 			        mv -f $INSTALLDIR/$CONFIGFILE $INSTALLDIR/$CONFIGFILE.bak &&
 			        wget -P $INSTALLDIR $DROPBOX/$APP/$CONFIGFILE &&
-			        sed -i "s/mijnuniekeservernaam/$HOSTNAME/g" $INSTALLDIR/$CONFIGFILE
+			        #sed -i "s/mijnuniekeservernaam/$HOSTNAME/g" $INSTALLDIR/$CONFIGFILE
 			        echo "Standaard configuratiefile gemaakt in $INSTALLDIR/$CONFIGFILE"
 		        else
 			        wget -P $INSTALLDIR $DROPBOX/$APP/$CONFIGFILE &&
 			        echo "Standaard configuratiefile gemaakt in $INSTALLDIR/$CONFIGFILE"
-			        sed -i "s/mijnuniekeservernaam/$HOSTNAME/g" $INSTALLDIR/$CONFIGFILE
+			        #sed -i "s/mijnuniekeservernaam/$HOSTNAME/g" $INSTALLDIR/$CONFIGFILE
 		        fi
      		    ;;
       		*)
