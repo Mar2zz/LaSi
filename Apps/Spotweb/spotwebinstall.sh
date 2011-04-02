@@ -26,7 +26,7 @@
 #######################################################################################
 #######################################################################################
 
-VERSION=v0.1 ####
+VERSION=v0.4 ####
 
 TESTOS1=Ubuntu_10.4_Desktop
 TESTOS2=Ubuntu_10.4_Server
@@ -690,16 +690,16 @@ conn_Test		#connection test for url's used in installation
 cf_Continue		#let user confirm to continue
 root_Test		#test user is not root but has sudo
 check_Packs		#check dependencys
-set_NNTP
+set_NNTP        # Pear install NNTP
 set_Dir			#choose installation directory
 clone_Git		#clone the git repo into $installdir
 new_Config		#import or create configfile
-edit_PHP
-config_SQL
-cf_Newsserver
-cf_Headerserver
-restart_Ap
-cf_Retrieve
+edit_PHP        #timezone to europe/amsterdam
+config_SQL      #configure mysql dbase
+cf_Newsserver   #configure newsserver
+cf_Headerserver #configure headerserver
+restart_Ap      #restart apache for all changes to take effect
+cf_Retrieve     #optional retrieve spots immediately
 LaSi_Menu		#Return to main script
 
 
