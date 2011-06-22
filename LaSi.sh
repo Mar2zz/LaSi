@@ -63,6 +63,9 @@ APP4_INST=albumidentify.sh;
 APP5=Spotweb;
 APP5_INST=spotwebinstall.sh;
 
+APP6=Headphones;
+APP6_INST=headphonesinstall.sh;
+
 #######################################################################################
 
 LaSi_Menu (){
@@ -88,11 +91,10 @@ LaSi_Menu (){
 	
 		show_Menu () {
 		echo "Make a choice to see info or install these apps..."
-		echo "1. $APP1"
-		echo "2. $APP2"
-		echo "3. $APP3 (needs updating)"
-		echo "4. $APP4"
-		echo "5. $APP5"
+		echo "1. CouchPotato			4. AlbumIdentify"
+		echo "2. SickBeard			5. Spotweb (dutch only)"
+		echo "3. Periscope			6. Headphones"
+		echo
 		echo "Q. Quit"
 	
 		read SELECT
@@ -111,6 +113,9 @@ LaSi_Menu (){
 				;;
 			[5]*)
 				info_Spot
+				;;
+			[6]*)
+				info_Head
 				;;
 			[Qq]*)
 				exit
@@ -305,6 +310,33 @@ echo "
 *#############################################################"
 SET_APP=$APP5
 SET_INST=$APP5_INST
+cf_Choice
+}
+
+
+#### HEADPHONES ####
+
+info_Head () {
+clear
+echo "
+*###################### HEADPHONES ########################## 
+#															
+# Headphones is an automatic NZB downloader. 
+# You can keep a 'musicalbums I want'-list and it will search 
+# for NZBs of these albums every X hours.
+#
+# It is also possible to 'follow' artists for upcoming albums.	
+#													
+# Once an album is found, it will send it to SABnzbd.
+#											
+*############################################################
+#
+# Headphones is written by Rembo10 in his spare time...
+#
+# Visit https://github.com/rembo10/headphones	
+*#############################################################"
+SET_APP=$APP6
+SET_INST=$APP6_INST
 cf_Choice
 }
 
