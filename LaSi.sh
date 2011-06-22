@@ -287,22 +287,21 @@ echo "
 #
 *############################################################
 #
-# Deze installer installeert alle benodigdheden voor Spotweb. 
+# Deze installer installeert alle benodigdheden voor Spotweb.
+# en installeert en configureert een apache/mysql-server indien
+# dat nodig is. 
 # Als de installatie klaar is zal spotweb draaien op 
 # http://$HOSTNAME/spotweb.
 # 
-# Je kunt kiezen tussen SQLite en mySQL database. 
 # Indien je niet kiest voor het importeren van je eigen
 # ownsettings.php dan wordt er een minimale ownsettings aan-
 # gemaakt, zodat je gelijk aan de slag kunt.
-# Deze kun je verrijken door settings vanuit settings.php te
-# kopieren naar ownsettings.php en dan aan te passen.
 #
 *############################################################
 #
 # Spotweb is geschreven door Spotweb e.a.
 #
-# Visit https://github.com/spotweb/spotweb	
+# Visit https://github.com/spotweb/spotweb
 *#############################################################"
 SET_APP=$APP5
 SET_INST=$APP5_INST
