@@ -10,13 +10,14 @@ import os.path
 import string
 logging.basicConfig(level=logging.DEBUG)
 
-subdl = periscope.Periscope()
+subdl = periscope.Periscope(cache_folder="PATH_PERISCOPE/cache")
 filepath = sys.argv[1]
 path, file = os.path.split(filepath)
 filepath2 = path + "/" + file.lower()
 file, ext = os.path.splitext(file)
 sub_111 = path + "/" + file + ".111.srt"
 sub_222 = path + "/" + file + ".222.srt"
+
 
 # First language
 print "\nSearch for '111' subtitle:"

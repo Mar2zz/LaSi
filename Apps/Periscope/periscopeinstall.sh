@@ -26,7 +26,7 @@
 #######################################################################################
 #######################################################################################
 
-VERSION=v0.2 ####
+VERSION=v0.3 ####
                          
 TESTOS1=Ubuntu_10.4_Desktop
 TESTOS2=Ubuntu_10.4_Server
@@ -55,6 +55,8 @@ PACK1=subversion; 	#needed packages to run (using apt to check and install)
 PACK1_EXE=svn;		#name _exe when execute command differs from packagename.
 PACK2=python;
 PACK2_EXE=$PACK2;
+PACK3=python-xdg
+PACK3_EXE=$PACK3
 
 INSTALLDIR=/home/$USER/.$APPLOW; #directory you want to install to.
 
@@ -211,8 +213,23 @@ echo "LaSi $VERSION"
 			echo "$PACK2 installed"
 		fi
 		}
+
+		check_Pack3 () {
+		if ! which $PACK3_EXE
+			then
+			echo
+			echo "Cannot find if $PACK3 is installed"
+			echo "Trying to install..."
+			echo
+			INST_PACK=$PACK3
+			use_PM
+		else
+			echo "$PACK3 installed"
+		fi
+		}
 	check_Pack1
 	check_Pack2
+	check_Pack3
 	}
 	
 	
@@ -358,6 +375,7 @@ echo "LaSi $VERSION"
 	echo '--------'
 	echo ' '
 	command svn checkout $SVN $INSTALLDIR
+	mkdir -p $INSTALLDIR/cache
 	echo
 	}
 	
@@ -382,7 +400,7 @@ echo "LaSi $VERSION"
 	wget -P $INSTALLDIR $DROPBOX/$APP/$SCANPATH
 	wget -P $INSTALLDIR $DROPBOX/$APP/$DOWN_SUB
 	wget -P $INSTALLDIR $DROPBOX/$APP/$SABPER
-	wget -P $INSTALLDIR	$DROPBOX/$APP/$SABPERSICK   
+	wget -P $INSTALLDIR $DROPBOX/$APP/$SABPERSICK   
 	sudo chmod +x $INSTALLDIR/$SABPERSICK
 	sudo chmod +x $INSTALLDIR/$SABPER
 	sudo chmod +x $INSTALLDIR/$SCANPATH
@@ -407,6 +425,7 @@ echo "LaSi $VERSION"
 	sed -i "s#PATH_PERISCOPE#$INSTALLDIR#g" $INSTALLDIR/$SABPERSICK
 	sed -i "s#PATH_PERISCOPE#$INSTALLDIR#g" $INSTALLDIR/$SCANPATH
 	sed -i "s#PATH_PERISCOPE#$INSTALLDIR#g" $INSTALLDIR/$SABPER
+	sed -i "s#PATH_PERISCOPE#$INSTALLDIR#g" $INSTALLDIR/$DOWN_SUB
 	}
 	
 #### CHOOSE LANGUAGES ####
