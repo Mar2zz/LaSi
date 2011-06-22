@@ -52,8 +52,7 @@ PACK1=git-core; 	#needed packages to run (using apt to check and install)
 PACK1_EXE=git;		#EXE optional needed when packagename differs from executable
 PACK2=apache2;
 PACK3="php5 php5-curl php-pear";
-PACK4="php5-sqlite sqlite3"
-PACK5="php5-mysql mysql-server"
+PACK4="php5-mysql mysql-server"
 
 PHPPACK1="Net_NNTP"
 
@@ -225,52 +224,10 @@ echo "LaSi $VERSION"
 			echo "$PACK4 installed"
 		fi
 		}
-
-		check_Pack5 () {
-		if ! which $PACK5
-			then
-			echo
-			echo "Cannot find if $PACK5 is installed"
-			echo "Trying to install..."
-			echo
-			INST_PACK=$PACK5
-			use_PM
-		else
-			echo "$PACK5 installed"
-		fi
-		}
-
-		cf_Dbase () {
-		echo "Kiesdatabasetype"
-		echo "1. mySQL is sneller dan SQLite"
-		echo "2. SQLite (makkelijkst, geen extra configuratie nodig)"
-		echo "Q. Quit"
-		read -p "Kies optie 1, 2 of Q    :" REPLY
-		case $REPLY in
-     		1)
-			    DBCHOICE=mySQL
-			    check_Pack5
-			    echo ""
-			    ;;
-     		2)
-			    check_Pack4
-			    DBCHOICE=SQLite
-     			;;
-     		[Qq]*)
-     			echo "Fini..."
-     			LaSi_Menu
-     			;;
-      		*)
-				echo "Choose 1, 2, 3 or Q to quit"
-				cf_Dir
-      			;;
-		esac
-		}
-
 	check_Pack1
 	check_Pack2
 	check_Pack3
-	cf_Dbase
+	check_Pack4
 	}
 
 
@@ -509,56 +466,46 @@ echo "LaSi $VERSION"
 	
 #### CONFIGURE MYSQL DB ####
     config_SQL () {
-    if [ $DBCHOICE=mySQL ]
-        then
-        echo ""
-        echo "Je hebt gekozen voor een mySQL database"
-    fi
         
         cf_SQL () {
         echo "Wil je dat ik een nieuwe database voor je aanmaak?"
 		read -p "(ja/nee)   :" DBREPLY
 		case $DBREPLY in
-     		[YyJj]*)
-     		    input_PW
-     			;;
-     		[Nn]*)
-     			echo "Je hebt dus al een database"
-      		    ;;
-      		*)
-			    echo "Antwoord ja of nee"
-			    ;;
+		[YyJj]*)
+			input_PW
+			;;
+		[Nn]*)
+			echo "Je hebt dus al een database"
+			;;
+		*)
+			echo "Antwoord ja of nee"
+			;;
 		esac
 		}
 		
-		    input_PW () {
-		    echo ""
-		    echo "Welk wachtwoord heb je opgegeven tijdens de mySQL installatie?"
-		    read -p "wachtwoord:" SQLPASSWORD
-		    create_DB
-		    }
-		    
-		    create_DB () {
-		    MYSQL=$(which mysql)
-		    if $($MYSQL mysql -u root --password="$SQLPASSWORD" -e "CREATE DATABASE spotweb;")
-		        then
-		        $MYSQL mysql -u root --password="$SQLPASSWORD" -e "CREATE USER 'spotweb'@'localhost' IDENTIFIED BY 'spotweb';"
-                $MYSQL mysql -u root --password="$SQLPASSWORD" -e "GRANT ALL PRIVILEGES ON spotweb.* TO spotweb @'localhost' IDENTIFIED BY 'spotweb';"
-                echo "Database aangemaakt met de naam spotweb, user spotweb en wachtwoord spotweb ;)"
-                sed -i "
-                    s/'sqlite3'/'mysql'/g
-                    145,149 s/#//
-                    142d
-                " $INSTALLDIR/$CONFIGFILE
-            else
-                echo "Je hebt een verkeerd wachtwoord opgegeven, probeer het nog een keer"
-                input_PW
-            fi
-            }
-    cf_SQL
-    }
-    
-    
+			input_PW () {
+			echo ""
+			echo "Welk wachtwoord heb je opgegeven tijdens de mySQL installatie?"
+			read -p "wachtwoord:" SQLPASSWORD
+			create_DB
+			}
+
+			create_DB () {
+			MYSQL=$(which mysql)
+			if $($MYSQL mysql -u root --password="$SQLPASSWORD" -e "CREATE DATABASE spotweb;")
+				then
+				$MYSQL mysql -u root --password="$SQLPASSWORD" -e "CREATE USER 'spotweb'@'localhost' IDENTIFIED BY 'spotweb';"
+				$MYSQL mysql -u root --password="$SQLPASSWORD" -e "GRANT ALL PRIVILEGES ON spotweb.* TO spotweb @'localhost' IDENTIFIED BY 'spotweb';"
+				echo "Database aangemaakt met de naam spotweb, user spotweb en wachtwoord spotweb ;)"
+			else
+				echo "Je hebt een verkeerd wachtwoord opgegeven, probeer het nog een keer"
+				input_PW
+			fi
+			}
+		cf_SQL
+	}
+
+
 #### NOG WAT CONFIGURATIE ####
 		cf_Newsserver () {
 		if [ $IMPORTSETTINGS -eq 0 ]
@@ -567,26 +514,26 @@ echo "LaSi $VERSION"
 		    read -p "(ja/nee)   :" REPLY
 		    case $REPLY in
      		    [YyJj]*)
-     		    	read -p "Wat is het usenetadres (bv. news.ziggo.nl)?" USENET
-     		    	read -p "Wat is de gebruikersnaam (alleen enter voor blanco)?" USERNAME
-     		    	read -p "Wat is het wachtwoord (enter voor blanco)?" PASSWORD
-     		    	read -p "Welk poortnummer wil je gebruiken? 119 of 563 (encrypted)?" PORT
-     		    	#### check of encryptie
-     		    	if [ $PORT -eq 563 ]
-     		    	    then
-     		    	    ENC="'ssl'"
-     		    	else
-     		    	    ENC="false"
-     		    	fi
-     		    	#### pas ownsettings aan
-     		    	sed -i "
+				read -p "Wat is het usenetadres (bv. news.ziggo.nl)?" USENET
+				read -p "Wat is de gebruikersnaam (alleen enter voor blanco)?" USERNAME
+				read -p "Wat is het wachtwoord (enter voor blanco)?" PASSWORD
+				read -p "Welk poortnummer wil je gebruiken? 119 of 563 (encrypted)?" PORT
+				#### check of encryptie
+				if [ $PORT -eq 563 ]
+				    then
+				    ENC="'ssl'"
+				else
+				    ENC="false"
+				fi
+				#### pas ownsettings aan
+				sed -i "
                         6 s/news.ziggo.nl/$USENET/
                         7 s/xx/$USERNAME/
                         8 s/yy/$PASSWORD/
                         9 s/false;/$ENC;/
                         10 s/119/$PORT/
-     		    	" $INSTALLDIR/$CONFIGFILE
-     		    	;;
+				" $INSTALLDIR/$CONFIGFILE
+				;;
      		    [Nn]*)
      			    echo "Er kunnen geen spots opgehaald worden tot je dit hebt aangepast"
      			    ;;
@@ -602,72 +549,73 @@ echo "LaSi $VERSION"
 #### Optioneel headerserver ####
 		cf_Headerserver () {
 		if [ $IMPORTSETTINGS -eq 0 ]
-		    then
-		    echo "Wil je een aparte headerserver opgegeven?"
-		    read -p "(ja/nee)   :" REPLY
-		    case $REPLY in
-     		    [YyJj]*)
-     		    	read -p "Wat is het usenetadres (bv. textnews.eweka.nl)?" USENET2
-     		    	read -p "Wat is de gebruikersnaam (alleen enter voor blanco)?" USERNAME2
-     		    	read -p "Wat is het wachtwoord (enter voor blanco)?" PASSWORD2
-     		    	read -p "Welk poortnummer wil je gebruiken? 119 of 563 (encrypted)?" PORT2
-     		    	#### check of encryptie
-     		    	if [ $PORT2 -eq 563 ]
-     		    	    then
-     		    	    ENC2="'ssl'"
-     		    	else
-     		    	    ENC2="false"
-     		    	fi
-     		    	#### pas ownsettings aan
-     		    	sed -i "
-                        13 s/news.ziggo.nl/$USENET2/
-                        14 s/xx/$USERNAME2/
-                        15 s/yy/$PASSWORD2/
-                        16 s/false;/$ENC2;/
-                        17 s/119/$PORT2/
-     		    	" $INSTALLDIR/$CONFIGFILE
-     		    	;;
-     		    [Nn]*)
-     			    echo "Bij Eweka, en misschien meer providers, is dit wel een vereiste"
-     			    ;;
-      		    *)
-			    echo "Antwoord ja of nee"
-				    cf_Headerserver
-      		    ;;
-		    esac
+			then
+			echo "Wil je een aparte headerserver opgegeven?"
+			read -p "(ja/nee)   :" REPLY
+			case $REPLY in
+			[YyJj]*)
+				read -p "Wat is het usenetadres (bv. textnews.eweka.nl)?" USENET2
+				read -p "Wat is de gebruikersnaam (alleen enter voor blanco)?" USERNAME2
+				read -p "Wat is het wachtwoord (enter voor blanco)?" PASSWORD2
+				read -p "Welk poortnummer wil je gebruiken? 119 of 563 (encrypted)?" PORT2
+				#### check of encryptie
+				if [ $PORT2 -eq 563 ]
+				    then
+				    ENC2="'ssl'"
+				else
+				    ENC2="false"
+				fi
+				#### pas ownsettings aan
+				sed -i "
+					13 s/news.ziggo.nl/$USENET2/
+					14 s/xx/$USERNAME2/
+					15 s/yy/$PASSWORD2/
+					16 s/false;/$ENC2;/
+					17 s/119/$PORT2/
+				" $INSTALLDIR/$CONFIGFILE
+			;;
+			[Nn]*)
+				echo "Bij Eweka, en misschien meer providers, is dit wel een vereiste"
+				;;
+			*)
+				echo "Antwoord ja of nee"
+				cf_Headerserver
+				;;
+		esac
 		fi
-        }       
-		
-	
+	}
+
+
 
 ######################################################
 
-#### HERSTART APACHE ####		
+#### HERSTART APACHE ####
 	restart_Ap() {
 		LOCATION=$(hostname)
 		echo "Installation is klaar..."
 		echo "Herstart Apache om alle wijzigingen door te voeren..."
 		sudo /etc/init.d/apache2 restart
 	}
-	
 
-#### RETRIEVE SPOTS ####	
+
+#### RETRIEVE SPOTS ####
 		cf_Retrieve () { # Confirm import
 		echo "Wil je alvast spots binnenhalen? Dit kan even duren maar is wel nodig @ first run"
 		read -p "(ja/nee)   :" REPLY
 		case $REPLY in
-     		[YyJj]*)
-     		    PHP=$(which php)
-     		    cd $INSTALLDIR
-     		    $PHP retrieve.php
-     			;;
-     		[Nn]*)
-     		    echo "Spotweb zonder spots is alleen maar web"
-      		    ;;
-      		*)
+		[YyJj]*)
+			PHP=$(which php)
+			cd $INSTALLDIR &&
+			$PHP upgrade-db.php &&
+			$PHP retrieve.php
+			;;
+		[Nn]*)
+			echo "Spotweb zonder spots is alleen maar web"
+			;;
+		*)
 			echo "Antwoord ja of nee"
-				cf_Retrieve
-      		    ;;
+			cf_Retrieve
+			;;
 		esac
 		}
 
