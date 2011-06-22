@@ -3,7 +3,7 @@
 # Author:  Mar2zz
 # blogs: mar2zz.tweakblogs.net
 # License: GNU GPL v3
-# 
+#
 # This is the main script of "Lazy Admins Scripted Installers (LaSi)"
 #
 # please report bugs/issues @
@@ -17,23 +17,19 @@
 # | from the menu:
 # | # Sickbeard
 # | # CouchPotato
-# | # Periscope (alpha, not tested thoroughly)   
-# | # AlbumIdentify (alpha, not tested yet)
-# | # Spotweb                                   
+# | # Periscope
+# | # AlbumIdentify 
+# | # Spotweb
+# | # Headphones
 # |___________________________________________________________________________________
 #
 # Tested succesful on OS's:
-# Ubuntu 10.4 Desktop, Ubuntu 10.4 Minimal server, XBMC Live Dharma
+# Ubuntu 9.10 and higher and XBMC Live Dharma
 #
 #######################################################################################
 #######################################################################################
 
-                         		#### v1.0 ####
-                         
-TESTOS1=Ubuntu_10.4_Desktop
-TESTOS2=Ubuntu_10.4_Server
-TESTOS3=XBMC_Live_Dharma
-
+#### v1.5 ####
 
 #######################################################################################
 #################### LIST OF VARIABLES USED ###########################################
@@ -41,9 +37,9 @@ TESTOS3=XBMC_Live_Dharma
 
 #SET SOME VARIABLES (SOME VARIABLES WILL BE SET THROUGH LIVE USERINPUT IN TERMINAL)
 
-DROPBOX=http://dl.dropbox.com/u/18712538/ 				# dropbox-adres
-CONN2=dropbox.com							# to test connections needed
-													
+DROPBOX=http://dl.dropbox.com/u/18712538/ 		# dropbox-adres
+CONN2=dropbox.com					# to test connections needed
+
 
 #######################################################################################
 #################### LIST APPS USED ###################################################
@@ -120,43 +116,43 @@ LaSi_Menu (){
 			[Qq]*)
 				exit
 				;;
-    	    *)
-    	    	echo "Please make a selection..."
-    	    	echo
-    	    	show_Menu
-    	    	;;              
+			*)
+				echo "Please make a selection..."
+				echo
+				show_Menu
+				;;
 		esac
 		}
 show_Menu
 }
-	
-	
+
+
 #### COUCHPOTATO ####
 
 info_Couch () {
 clear
 echo "
 *###################### COUCHPOTATO ######################### 
-#															
+#
 # CouchPotato is an automatic NZB and torrent downloader. 
 # You can keep a 'movies I want'-list and it will search 
 # for NZBs/torrents of these movies every X hours.	
-#													
+#
 # Once a movie is found, it will send it to SABnzbd
-# or download the .nzb or .torrent to a	# specified directory.						 
-#											
+# or download the .nzb or .torrent to a	# specified directory.
+#
 *############################################################
 #
 # CouchPotato is written by Ruud Burger in his spare time...
 # ..so buy him a coke to support him.
 #
-# Visit http://www.couchpotatoapp.com	
+# Visit http://www.couchpotatoapp.com
 *#############################################################"
 SET_APP=$APP1
 SET_INST=$APP1_INST
 cf_Choice
 }
-	
+
 
 #### SICKBEARD ####
 
@@ -164,7 +160,7 @@ info_Sick () {
 clear
 echo "
 *####################### SICKBEARD ######################### 
-#															
+#
 # Sick Beard is currently an alpha release. 
 # There may be severe bugs in it and at any given time it may not work at all.
 #
@@ -191,12 +187,12 @@ echo "
 * available for any platform, uses simple HTTP interface
 * can notify XBMC, Growl, or Twitter when new episodes are downloaded
 * specials and double episode support
-#											
+#
 *############################################################
 #
 # SickBeard is written by midgetspy
 #
-# Visit http://www.sickbeard.com	
+# Visit http://www.sickbeard.com
 *#############################################################"	
 SET_APP=$APP2
 SET_INST=$APP2_INST
@@ -210,7 +206,7 @@ info_Peris () {
 clear
 echo "
 *###################### PERISCOPE ######################### 
-#															
+#
 # Periscope is a subtitles searching module written in python 
 # that tries to find a correct match for a given video file. 
 # The goal behind periscope is that it will only return only 
@@ -228,11 +224,11 @@ echo "
 # means that separate application and their plugin 
 # (file browser, video player, media center application, ...) 
 # don't have to maintain the code to search, parse and download 
-# subtitles and the user preference about languages.  						 
+# subtitles and the user preference about languages.
 #"
 echo
 read -sn 1 -p "--- [more]---"
-echo "											
+echo "
 *############################################################
 #
 # Periscope is written by patrick@gmail.com...
@@ -252,12 +248,12 @@ info_Album () {
 clear
 echo "
 *################### ALBUMIDENTIFY ##########################
-#															
+#
 # Albumidentify description on github:
 # Tools to identify and manage music albums.
 #
 *############################################################
-#													
+#
 # LaSi will enable one part of this powerfull toolset, the 
 # 'renamealbum' part of it. Though the whole collection of
 # tools will be downloaded, I am using just 1 or 2 of 'm.
@@ -283,14 +279,14 @@ info_Spot () {
 clear
 echo "
 *################### SPOTWEB ##########################
-#															
+#
 # SpotWeb is een versie van SpotNed (http://twitter.com/spotned) 
 # voor het web. 
 # Het gebruikt PHP5 om de meeste functies te implementeren
 # en is getest op Linux en FreeBSD
 #
 *############################################################
-#													
+#
 # Deze installer installeert alle benodigdheden voor Spotweb. 
 # Als de installatie klaar is zal spotweb draaien op 
 # http://$HOSTNAME/spotweb.
@@ -320,15 +316,15 @@ info_Head () {
 clear
 echo "
 *###################### HEADPHONES ########################## 
-#															
+#
 # Headphones is an automatic NZB downloader. 
 # You can keep a 'musicalbums I want'-list and it will search 
 # for NZBs of these albums every X hours.
 #
 # It is also possible to 'follow' artists for upcoming albums.	
-#													
+#
 # Once an album is found, it will send it to SABnzbd.
-#											
+#
 *############################################################
 #
 # Headphones is written by Rembo10 in his spare time...
@@ -340,7 +336,7 @@ SET_INST=$APP6_INST
 cf_Choice
 }
 
-	
+
 #### BACKTOMENU OR INSTALL ####
 cf_Choice () {
 echo
@@ -360,11 +356,11 @@ read SELECT
 		[Qq]*)
 			exit
 			;;
-        *)
-        	echo "Please choose..."
-        	echo
-        	cf_Choice
-        	;;              
+		*)
+			echo "Please choose..."
+			echo
+			cf_Choice
+			;;
 	esac
 }
 
@@ -412,13 +408,13 @@ inst_App () {
 	echo "Are you sure you want to continue and install $SET_APP?"
 	read -p "(yes/no)   :" REPLY
 	case $REPLY in
-     	[Yy]*)
-     		echo
-     		echo "Say hello to my little friend!"
-     		echo
-     		dropbox_Test
-	    	;;
-     	[Nn]*)
+	[Yy]*)
+		echo
+		echo "Say hello to my little friend!"
+		echo
+		dropbox_Test
+		;;
+	[Nn]*)
 			LaSi_Menu
 			;;
 		[Qq]*)
@@ -429,16 +425,16 @@ inst_App () {
 			echo "no for menu"
 			echo "or Q to quit"
 			Question
-		  	;;
+			;;
 		esac
 	}
 Question
 }
-			
+
 LaSi_Menu
 
 
-                   	
+
 
 
 
