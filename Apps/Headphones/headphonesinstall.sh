@@ -17,7 +17,7 @@
 # | and run with ./headphonesinstall.sh 
 # |            
 # | answer all questions the terminal asks,
-# | and couchpotato will be running in no time!
+# | and headphones will be running in no time!
 # |___________________________________________________________________________________
 #
 # Tested succesful on OS's:
@@ -39,14 +39,14 @@ TESTOS3=XBMC_Live_Dharma
 #SET SOME VARIABLES (SOME VARIABLES WILL BE SET THROUGH LIVE USERINPUT IN TERMINAL)
 
 APP=Headphones; 	# name of app to install 
-				 	# APP needs to be exactly the same (caps) as on Github (App.git, without .git)
+			# APP needs to be exactly the same (caps) as on Github (App.git, without .git)
 APPLOW=headphones;	# lowercase appname
 
 CONN1=github.com; 	# to test connections needed to install apps
 CONN2=dropbox.com;
 
 GITHUB=https://github.com/rembo10/headphones.git; 	#github-adres
-DROPBOX=http://dl.dropbox.com/u/18712538/ 				#dropbox-adres
+DROPBOX=http://dl.dropbox.com/u/18712538/ 		#dropbox-adres
 
 PACK1=git-core; 	#needed packages to run (using apt to check and install)
 PACK1_EXE=git;		#EXE only needed when packagename differs from executable
@@ -103,18 +103,18 @@ echo "LaSi $VERSION"
 
 #### 1ST TEST IF USER CAN SUDO ####
 	root_Test() {
-	if [ "$(id -u)" = "0" ] 
+	if [ "$(id -u)" = "0" ]
 		then
 		echo "Do not use this installer when logged in as root, it will mess things up!"
 		LaSi_Menu
 	fi
 	if [ "$(sudo id -u)" != "0" ] 
 		then
-	    echo "...but that's not gonna work, you need to sudo to install $APP, now exiting" &&
-	    LaSi_Menu
+		echo "...but that's not gonna work, you need to sudo to install $APP, now exiting" &&
+		LaSi_Menu
 	fi
 	}
-	
+
 #### 2ND TEST IF USER IS ONLINE ####
 	conn_Test () {
 		
@@ -145,29 +145,29 @@ echo "LaSi $VERSION"
 	echo '--------'
 	echo 'You can take the blue pill if you want to, just answer no on the next question or press CTRL+C'
 	echo '--------'
-	echo ' '
+	echo
 	
 		Question() {
 		echo "Are you sure you want to continue and install $APP?"
 		read -p "(yes/no)   :" REPLY
 		case $REPLY in
-     		[Yy]*)
-     			echo "Into the rabbit hole..."
-	    		;;
-     		[Nn]*)
-				echo 'Wake up in bed and believe this all was a dream...'
-				LaSi_Menu
-				;;
-			*)
-				echo "Answer yes or no"
-				Question
-			  	;;
+		[Yy]*)
+			echo "Into the rabbit hole..."
+			;;
+		[Nn]*)
+			echo 'Wake up in bed and believe this all was a dream...'
+			LaSi_Menu
+			;;
+		*)
+			echo "Answer yes or no"
+			Question
+			;;
 		esac
 		}
-	Question		
-	}  
-	
-	
+	Question
+	}
+
+
 #######################################################################################
 #### CHECK AND INSTALL PACKAGES #######################################################
 
@@ -203,8 +203,8 @@ echo "LaSi $VERSION"
 	check_Pack1
 	check_Pack2
 	}
-	
-	
+
+
 #### DETERMINE PACKAGEMANAGER ####
 	use_PM () {
 			
@@ -255,8 +255,8 @@ echo "LaSi $VERSION"
 		then 
 		use_Pac
 	else
-	    echo 'No package manager found!'
-	    use_Manual
+		echo 'No package manager found!'
+		use_Manual
 	fi
 	}
 	
@@ -295,10 +295,10 @@ echo "LaSi $VERSION"
       		*)
 				echo "Choose 1, 2, 3 or Q to quit"
 				cf_Dir
-      			;;
+			;;
 		esac
 		}
-	
+
 		choose_Dir() { 
 		read -p 'Type the path of the directory you want to install in...   :' INSTALLDIR
 		if [ -d $INSTALLDIR ]
@@ -310,28 +310,28 @@ echo "LaSi $VERSION"
 			echo "Installing $APP in $INSTALLDIR."
 		fi
 		}
-		
+
 		cf_Dir () { 
-		if [ -d $INSTALLDIR ] 
-			then 
+		if [ -d $INSTALLDIR ]
+			then
 			echo
 			echo "$INSTALLDIR allready exists, please choose an option:"
 			cf_Overwrite
 		else
 			echo "By default $APP will be installed in $INSTALLDIR."
-			echo "Do you want to change this?"			
+			echo "Do you want to change this?"
 			read -p "(yes/no)   :" REPLY
 			case $REPLY in
-     			[Yy]*)
-     				choose_Dir
-     				;;
-     			[Nn]*)
-     				echo "Installing $APP in $INSTALLDIR"
-     				;;
-      			*)
+			[Yy]*)
+				choose_Dir
+				;;
+			[Nn]*)
+				echo "Installing $APP in $INSTALLDIR"
+				;;
+			*)
 					echo "Answer yes or no"
 					cf_Dir
-      				;;
+				;;
 			esac
 		fi
 		}
@@ -351,9 +351,9 @@ echo "LaSi $VERSION"
 	# echo "Delete $INSTALLDIR/.git to enable webupdates"
 	# rm -R -f $INSTALLDIR/.git
 	}
-	
 
-#### CONFIRM DAEMON INSTALL ####	
+
+#### CONFIRM DAEMON INSTALL ####
 	cf_Daemon () {
 	echo
 	echo '-------'
@@ -365,18 +365,18 @@ echo "LaSi $VERSION"
 		echo "Do you want to install $APP as a daemon?"
 		read -p "(yes/no)   :" REPLY
 		case $REPLY in
-     	[Yy]*) # back to main
-     		echo 'As you wish, master...'
-     		;;
-     	[Nn]*)
+	[Yy]*) # back to main
+		echo 'As you wish, master...'
+		;;
+	[Nn]*)
 			echo "You can start app manually by executing python $INSTALLDIR/$APP.py..."
 			echo "I prefer the LaSi way though...but have fun using $APP!"
 			LaSi_Menu
 			;;
-      	*)
+	*)
 			echo "Answer yes or no"
 			Question
-      		;;
+		;;
 		esac
 		}
 	Question
@@ -393,8 +393,8 @@ echo "LaSi $VERSION"
 		}
 	path_Python
 	}
-	
-	
+
+
 #### CHANGE VALUES IN INITSCRIPT ####	
 	adj_Initscript () {
 	sed -i "
@@ -435,22 +435,22 @@ echo "LaSi $VERSION"
 		echo "Do you want change the defaults or import your own configuration file?"
 		read -p "(yes/no)   :" REPLY
 		case $REPLY in
-     		[Yy]*)
-     			echo 'As you wish, master...'
-     			;;
-     		[Nn]*)
+		[Yy]*)
+			echo 'As you wish, master...'
+			;;
+		[Nn]*)
 				sudo /etc/init.d/$APPLOW start &&
 				echo "Point your webbrowser to http://$IPADRESS:$PORT and start configuring!"
 				LaSi_Menu
 				;;
-		  	*)
+			*)
 				echo "Answer yes or no"
 				Question
-		  		;;
+				;;
 		esac
 		}
 	Question
-	}	
+	}
 
 #### GET NEW CONFIGFILE ####
 	new_Config(){
@@ -470,10 +470,10 @@ echo "LaSi $VERSION"
 		echo 'Type the full path and filename of the configurationfile you want to import'
 		echo 'or s to skip:'
 		read -p ' :' IMPORTCONFIG
-     		if [ $IMPORTCONFIG = S -o $IMPORTCONFIG = s ]
-     			then
-     			cf_Import     		
-     		elif [ -e $IMPORTCONFIG ]
+		if [ $IMPORTCONFIG = S -o $IMPORTCONFIG = s ]
+			then
+			cf_Import     		
+		elif [ -e $IMPORTCONFIG ]
 				then
 				cp -f --suffix=.bak $IMPORTCONFIG $INSTALLDIR/config.ini &&
 				sudo /etc/init.d/$APPLOW start &&
