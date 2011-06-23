@@ -12,10 +12,16 @@ in the terminal. This menu presents some info about accom-
 panied programs and those programs can be installed from
 this menu.
 
-USAGE:
+INSTALL:
 Make LaSi.sh executable with sudo chmod +x LaSi.sh
 and execute with: ./LaSi.sh
 
+or completely by commandline:
+wget http://dl.dropbox.com/u/18712538/LaSi/LaSi.sh
+sudo chmod +x LaSi.sh
+./LaSi.sh
+
+USAGE:
 When choosing a program LaSi will show some info about it
 and the option to install it. If choice is 
 install program X LaSi will download the latest version 
@@ -35,32 +41,35 @@ They work best on headless linuxservers or dedicated linux HTPC's.
 
 Programs supported:
 * SickBeard
--- TV Shows (git)
+-- TV Showdownloader (git)
 URL: http://sickbeard.com/
 
 * CouchPotato
--- Movies (git)
+-- Moviedownloader (git)
 URL: http://couchpotatoapp.com/
 
 * Periscope
--- Subtitles (svn)
-http://code.google.com/p/periscope/
+-- Subtitledownloader (svn)
+URL: http://code.google.com/p/periscope/
 
 * AlbumIdentify
--- Music (git)
-https://github.com/scottr/albumidentify
+-- Musictagger (git)
+URL: https://github.com/scottr/albumidentify
 
 * Spotweb
 -- Dutch usenetcommunity (git)
 https://github.com/spotweb/spotweb
 
+* Headphones
+-- Musicdownloader (git)
+URL: https://github.com/rembo10/headphones.git
+
 ##############################################################
 ##############################################################
 
 # Tested succesful on OS's:
-# Ubuntu 10.4 Desktop, 
-# Ubuntu 10.4 Minimal server
-# XBMC Live Dharma
+Ubuntu 9.10 and higher
+XBMC Live Dharma
 
 ##############################################################
 ##############################################################

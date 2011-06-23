@@ -638,7 +638,7 @@ conn_Test		#connection test for url's used in installation
 cf_Continue		#let user confirm to continue
 root_Test		#test user is not root but has sudo
 check_Packs		#check dependencys
-set_NNTP        # Pear install NNTP
+set_NNTP		# Pear install NNTP
 set_Dir			#choose installation directory
 clone_Git		#clone the git repo into $installdir
 new_Config		#import or create configfile
