@@ -31,12 +31,12 @@ SUCCESDIR="/path/to/TAGGED";			#directory to keep original files that were tagge
 process () {
 echo "--------------------------"
 echo $(date)
-echo "Starting renamealbum for $NZB"
+echo "Starting renamealbum for $DIR"
 
 /usr/bin/python /path/to/renamealbum -R --no-embed-coverart "$DIR"
 
 echo $(date)
-echo "Album search ended for $NZB"
+echo "Album search ended for $DIR"
 }
 
 
