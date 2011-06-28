@@ -74,6 +74,7 @@ case $CHOICE in
 		show_Menu
 		;;
 	4)
+		check_Cron
 		add_Cron
 		show_Menu
 		;;
@@ -278,6 +279,29 @@ echo "Now visit http://$NAS/spotweb/api?t=c and if you see XML-output the API wo
 
 
 #### ADD CRONJOB ####
+check_Cron () {
+if $(grep -q "/usr/bin/php retrieve.php" /etc/crontab)
+	then
+	echo "The following cronjob for Spotweb allready exists"
+	echo $(grep "/usr/bin/php retrieve.php" /etc/crontab)
+	read -p "Do you want to replace this? (yes/no)" DOUBLE
+	case $DOUBLE in
+		[YyJj])
+			sed -i '/retrieve.php/d' /etc/crontab
+			add_Cron
+			;;
+		[Nn])
+			echo "Crontab not edited"
+			show_Menu
+			;;
+		*)
+			echo "Answer yes or no"
+			check_Cron
+			;;
+	case
+fi
+}
+
 add_Cron () {
 echo "How often in hours should Spotweb retrieve spots?"
 echo "Valid answers are 1, 2, 3 etc..."
@@ -287,6 +311,8 @@ if [ $HOUR -eq $HOUR ]
 	then
 	echo "30	*/$HOUR	*	*	*	root	cd /volume1/web/spotweb && /usr/bin/php retrieve.php > /dev/null" >> /etc/crontab &&
 	echo "Cronjob added for spotweb to retrieve spots every $HOUR hour(s)"
+	/usr/syno/etc/rc.d/S04crond.sh stop &&
+	/usr/syno/etc/rc.d/S04crond.sh start
 else
 	then
 	echo "You did not enter a digit, try again"
