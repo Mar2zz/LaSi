@@ -283,6 +283,29 @@ echo "Now visit http://$NAS/spotweb/api?t=c and if you see XML-output the API wo
 
 
 #### ADD CRONJOB ####
+check_Cron () {
+if $(grep -q "/usr/bin/php retrieve.php" /etc/crontab)
+	then
+	echo "The following cronjob for Spotweb allready exists"
+	echo $(grep "/usr/bin/php retrieve.php" /etc/crontab)
+	read -p "Do you want to replace this? (yes/no): " DOUBLE
+	case $DOUBLE in
+		[YyJj])
+			sed -i '/retrieve.php/d' /etc/crontab
+			;;
+		[Nn])
+			echo "Crontab not edited"
+			show_Menu
+			;;
+		*)
+			echo "Answer yes or no"
+			check_Cron
+			;;
+	esac
+fi
+}
+
+
 add_Cron () {
 echo "How often in hours should Spotweb retrieve spots?"
 echo "Valid answers are 1, 2, 3 etc..."
@@ -297,30 +320,6 @@ if [ $HOUR -eq $HOUR ]
 else
 	echo "You did not enter a digit, try again"
 	add_Cron
-fi
-}
-
-
-check_Cron () {
-if $(grep -q "/usr/bin/php retrieve.php" /etc/crontab)
-	then
-	echo "The following cronjob for Spotweb allready exists"
-	echo $(grep "/usr/bin/php retrieve.php" /etc/crontab)
-	read -p "Do you want to replace this? (yes/no): " DOUBLE
-	case $DOUBLE in
-		[YyJj])
-			sed -i '/retrieve.php/d' /etc/crontab
-			add_Cron
-			;;
-		[Nn])
-			echo "Crontab not edited"
-			show_Menu
-			;;
-		*)
-			echo "Answer yes or no"
-			check_Cron
-			;;
-	esac
 fi
 }
 
