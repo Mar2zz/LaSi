@@ -298,7 +298,7 @@ if $(grep -q "/usr/bin/php retrieve.php" /etc/crontab)
 			echo "Answer yes or no"
 			check_Cron
 			;;
-	case
+	esac
 fi
 }
 
