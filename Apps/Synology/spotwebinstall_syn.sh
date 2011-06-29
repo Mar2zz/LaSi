@@ -51,6 +51,7 @@ echo "1. (re)Install Spotweb"
 echo "2. Enable spotweb-api"
 echo "3. Update Spotweb"
 echo "4. Add a cronjob for retrieving spots"
+echo "5. Exit script"
 echo
 echo "Choose one of the above options"
 read -p "Enter 1, 2, 3 or 4" CHOICE
@@ -77,6 +78,9 @@ case $CHOICE in
 		check_Cron
 		add_Cron
 		show_Menu
+		;;
+	5)
+		echo "Have fun using spotweb @ http://$NAS/spotweb/"
 		;;
 	*)
 		echo "Enter 1, 2, 3 or 4"
