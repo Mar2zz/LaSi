@@ -283,6 +283,24 @@ echo "Now visit http://$NAS/spotweb/api?t=c and if you see XML-output the API wo
 
 
 #### ADD CRONJOB ####
+add_Cron () {
+echo "How often in hours should Spotweb retrieve spots?"
+echo "Valid answers are 1, 2, 3 etc..."
+echo "Enter 1 to update every hour, 2 for every two hours, etc...!"
+read -p "Enter a digit: " $HOUR
+if [ $HOUR -eq $HOUR ]
+	then
+	echo "0	*/$HOUR	*	*	*	root	cd /volume1/web/spotweb && /usr/bin/php retrieve.php > /dev/null" >> /etc/crontab &&
+	echo "Cronjob added for spotweb to retrieve spots every $HOUR hour(s)"
+	/usr/syno/etc/rc.d/S04crond.sh stop &&
+	/usr/syno/etc/rc.d/S04crond.sh start
+else
+	echo "You did not enter a digit, try again"
+	add_Cron
+fi
+}
+
+
 check_Cron () {
 if $(grep -q "/usr/bin/php retrieve.php" /etc/crontab)
 	then
@@ -306,22 +324,7 @@ if $(grep -q "/usr/bin/php retrieve.php" /etc/crontab)
 fi
 }
 
-add_Cron () {
-echo "How often in hours should Spotweb retrieve spots?"
-echo "Valid answers are 1, 2, 3 etc..."
-echo "Enter 1 to update every hour, 2 for every two hours, etc...!"
-read -p "Enter a digit: " $HOUR
-if [ $HOUR -eq $HOUR ]
-	then
-	echo "0	*/$HOUR	*	*	*	root	cd /volume1/web/spotweb && /usr/bin/php retrieve.php > /dev/null" >> /etc/crontab &&
-	echo "Cronjob added for spotweb to retrieve spots every $HOUR hour(s)"
-	/usr/syno/etc/rc.d/S04crond.sh stop &&
-	/usr/syno/etc/rc.d/S04crond.sh start
-else
-	echo "You did not enter a digit, try again"
-	add_Cron
-fi
-}
+
 
 
 ### Start with the menu ###
