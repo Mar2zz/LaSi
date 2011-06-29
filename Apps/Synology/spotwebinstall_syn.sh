@@ -313,7 +313,7 @@ echo "Enter 1 to update every hour, 2 for every two hours, etc...!"
 read -p "Enter a digit" $HOUR
 if [ $HOUR -eq $HOUR ]
 	then
-	echo "30	*/$HOUR	*	*	*	root	cd /volume1/web/spotweb && /usr/bin/php retrieve.php > /dev/null" >> /etc/crontab &&
+	echo "0	*/$HOUR	*	*	*	root	cd /volume1/web/spotweb && /usr/bin/php retrieve.php > /dev/null" >> /etc/crontab &&
 	echo "Cronjob added for spotweb to retrieve spots every $HOUR hour(s)"
 	/usr/syno/etc/rc.d/S04crond.sh stop &&
 	/usr/syno/etc/rc.d/S04crond.sh start
