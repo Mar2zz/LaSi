@@ -314,7 +314,6 @@ if [ $HOUR -eq $HOUR ]
 	/usr/syno/etc/rc.d/S04crond.sh stop &&
 	/usr/syno/etc/rc.d/S04crond.sh start
 else
-	then
 	echo "You did not enter a digit, try again"
 	add_Cron
 fi
