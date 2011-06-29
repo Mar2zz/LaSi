@@ -54,7 +54,7 @@ echo "4. Add a cronjob for retrieving spots"
 echo "5. Exit script"
 echo
 echo "Choose one of the above options"
-read -p "Enter 1, 2, 3 or 4" CHOICE
+read -p "Enter 1, 2, 3 ,4 or 5: " CHOICE
 case $CHOICE in
 	1)
 		install_Deps
@@ -83,7 +83,7 @@ case $CHOICE in
 		echo "Have fun using spotweb @ http://$NAS/spotweb/"
 		;;
 	*)
-		echo "Enter 1, 2, 3 or 4"
+		echo "Enter 1, 2, 3, 4 or 5"
 		show_Menu
 		;;
 esac
@@ -124,7 +124,7 @@ if [ -d /volume1/web/spotweb ]
 	backup_Spot () {
 	echo "/volume1/web/spotweb allready exists..."
 	echo "Do you want to backup this folder?"
-	read -p "Answer yes or no" REPLY
+	read -p "Answer yes or no: " REPLY
 	case $REPLY in
 		[YyJj])
 			mv -Rf /volume1/web/spotweb /volume1/web/spotweb_bak &&
@@ -155,15 +155,15 @@ install_DB () {
 ## Change mysql password?
 my_SQL () {
 echo "Do you know your mySQL password?"
-read -p "yes/no" REPLY
+read -p "yes/no :" REPLY
 case $REPLY in
 	[Yy]*)
 		read -p "Enter mySQL password:" PASSWORD
 		;;
 	[Nn]*)
 		set_Pass () { 
-		read -p "Set a new password" PASSWORD
-		read -p "Confirm new password" PASSWORD2
+		read -p "Set a new password: " PASSWORD
+		read -p "Confirm new password: " PASSWORD2
 		if [ "$PASSWORD" != "$PASSWORD2" ]
 			then
 			echo "Passwords do not match, try again"
@@ -195,7 +195,7 @@ else
 	echo "Database allready exists"
 	echo "1. It's ok, keep it"
 	echo "2. Please remove it, I want to start fresh"
-	read -p "Choose 1 or 2" DB
+	read -p "Choose 1 or 2: " DB
 	case $DB in
 		1)
 			/usr/syno/mysql/bin/mysql --password="$PASSWORD" -e "
@@ -288,7 +288,7 @@ if $(grep -q "/usr/bin/php retrieve.php" /etc/crontab)
 	then
 	echo "The following cronjob for Spotweb allready exists"
 	echo $(grep "/usr/bin/php retrieve.php" /etc/crontab)
-	read -p "Do you want to replace this? (yes/no)" DOUBLE
+	read -p "Do you want to replace this? (yes/no): " DOUBLE
 	case $DOUBLE in
 		[YyJj])
 			sed -i '/retrieve.php/d' /etc/crontab
@@ -310,7 +310,7 @@ add_Cron () {
 echo "How often in hours should Spotweb retrieve spots?"
 echo "Valid answers are 1, 2, 3 etc..."
 echo "Enter 1 to update every hour, 2 for every two hours, etc...!"
-read -p "Enter a digit" $HOUR
+read -p "Enter a digit: " $HOUR
 if [ $HOUR -eq $HOUR ]
 	then
 	echo "0	*/$HOUR	*	*	*	root	cd /volume1/web/spotweb && /usr/bin/php retrieve.php > /dev/null" >> /etc/crontab &&
@@ -325,7 +325,7 @@ fi
 
 
 ### Start with the menu ###
-show_Logo
+LaSi_Logo
 show_Menu
 
 
