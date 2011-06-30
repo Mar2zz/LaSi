@@ -98,7 +98,7 @@ show_Menu
 
 #### SPOTWEB ####
 
-info_Spot () {
+info_Spotweb () {
 clear
 echo "
 *################### SPOTWEB ##########################
@@ -134,7 +134,7 @@ cf_Choice
 
 #### PERISCOPE ####
 
-info_Peris () {
+info_Periscope () {
 clear
 echo "
 *###################### PERISCOPE ######################### 

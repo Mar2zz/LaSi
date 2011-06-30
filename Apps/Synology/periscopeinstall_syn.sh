@@ -209,8 +209,8 @@ cf_Language () {
 	
 	choose_Lang1 () {
 	echo "Choose your first (=preferred) language"
-	read -p "e.g. en:" LANG1
-	if echo "$LANG_SET1 $LANG_SET2" | grep -w $LANG1 >/dev/null
+	read -p "e.g. en: " LANG1
+	if echo "$LANG_SET1 $LANG_SET2" | grep $LANG1 >/dev/null
 		then
 		echo "First language set to $LANG1"
 		sed -i "s/111/$LANG1/g" $INSTALLDIR/periscope/downloadSub.py
@@ -222,8 +222,8 @@ cf_Language () {
 
 	choose_Lang2 () {
 	echo "Choose your second language"
-	read -p "e.g. nl:" LANG2
-	if echo "$LANG_SET1 $LANG_SET2" | grep -w $LANG2 >/dev/null
+	read -p "e.g. nl :" LANG2
+	if echo "$LANG_SET1 $LANG_SET2" | grep $LANG2 >/dev/null
 		then
 		echo "Second language set to $LANG2"
 		sed -i "s/222/$LANG2/g" $INSTALLDIR/periscope/downloadSub.py
