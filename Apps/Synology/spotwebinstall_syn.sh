@@ -8,6 +8,9 @@
 
 ## v0.8.
 
+# please report bugs/issues @
+# https://github.com/Mar2zz/LaSi/issues
+
 # Based on the tutorials by J. van Emden (Brickman)
 # http://synology.brickman.nl/HowTo%20-%20install%20Spotweb.txt
 

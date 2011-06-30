@@ -8,6 +8,9 @@
 
 ## v0.1.
 
+# please report bugs/issues @
+# https://github.com/Mar2zz/LaSi/issues
+
 # Based on the tutorials by J. van Emden (Brickman)
 # http://synology.brickman.nl/syn_howto/HowTo%20-%20install%20Periscope.txt
 
