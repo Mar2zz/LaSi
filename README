@@ -7,12 +7,12 @@ LaSi: Lazy admin Scripted installers
 # please report bugs/issues @
 # https://github.com/Mar2zz/LaSi/issues
 
-The purpose of the main script LaSi.sh is to present a menu
-in the terminal. This menu presents some info about accom-
-panied programs and those programs can be installed from
+The purpose of the main script LaSi(_syn).sh is to present a menu
+in the terminal. This menu presents some info about installable
+programs and those programs can be installed from
 this menu.
 
-INSTALL:
+INSTALL UBUNTU:
 Make LaSi.sh executable with sudo chmod +x LaSi.sh
 and execute with: ./LaSi.sh
 
@@ -20,6 +20,10 @@ or completely by commandline:
 wget http://dl.dropbox.com/u/18712538/LaSi/LaSi.sh
 sudo chmod +x LaSi.sh
 ./LaSi.sh
+
+INSTALL SYNOLOGY:
+wget http://dl.dropbox.com/u/18712538/Synology/LaSi_syn.sh
+sh LaSi.sh
 
 USAGE:
 When choosing a program LaSi will show some info about it
@@ -39,7 +43,7 @@ The programs I chose are mainly written for media
 entertainment and centered around Sabnzbd and postprocessing.
 They work best on headless linuxservers or dedicated linux HTPC's.
 
-Programs supported:
+Programs supported Ubuntu:
 * SickBeard
 -- TV Showdownloader (git)
 URL: http://sickbeard.com/
@@ -64,12 +68,13 @@ https://github.com/spotweb/spotweb
 -- Musicdownloader (git)
 URL: https://github.com/rembo10/headphones.git
 
-##############################################################
-##############################################################
+Programs supported Synology:
+* Spotweb
+* Periscope
 
-# Tested succesful on OS's:
-Ubuntu 9.10 and higher
-XBMC Live Dharma
+
+##############################################################
+##############################################################
 
 ##############################################################
 ##############################################################

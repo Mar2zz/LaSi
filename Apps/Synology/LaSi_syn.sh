@@ -209,6 +209,7 @@ inst_App () {
 		then
 		echo "Hmmm $CONN2 seems down..."
 		echo "Need $CONN2 to install... Now exiting"
+		LaSi_Menu
 	else
 		get_Installer
 	fi
