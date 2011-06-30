@@ -69,8 +69,8 @@ LaSi_Menu (){
 	
 		show_Menu () {
 		echo "Make a choice to see info or install these apps..."
-		echo "1. Spotweb"
-		echo "2. Periscope"
+		echo "1. Spotweb (Dutch Usenet Community)"
+		echo "2. Periscope (Subtitle downloader)"
 		echo
 		echo "Q. Quit"
 	
