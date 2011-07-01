@@ -105,6 +105,12 @@ cd $INSTALLDIR &&
 svn checkout http://periscope.googlecode.com/svn/trunk/periscope &&
 mkdir -p periscope/cache
 
+## make sure python 2.6 is present
+if ! $(which python | grep "python2.6")
+	then
+	ipkg install python26
+fi
+
 # get BeautifulSoup and clean up after
 wget http://www.crummy.com/software/BeautifulSoup/download/3.x/BeautifulSoup-3.2.0.tar.gz &&
 tar -xvzf BeautifulSoup-3.2.0.tar.gz &&
@@ -158,8 +164,7 @@ chmod +x $INSTALLDIR/periscope/scanPath.sh
 
 #### SET PYTHON IN SCRIPTS ####
 path_Python() {
-PATH_PYTHON=$(which python)	
-sed -i "s#/usr/bin/python#$PATH_PYTHON#g" $INSTALLDIR/scanPath.sh
+sed -i "s#/usr/bin/python#python2.6#g" $INSTALLDIR/scanPath.sh
 }
 
 #### SET PERISCOPE PATH IN SCRIPTS ####
