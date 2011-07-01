@@ -260,7 +260,8 @@ fi
 set_Age () {
 echo
 echo 'Please specify how many days back Periscope should search for'
-echo "e.g. 7"
+echo "e.g. 7, then it will only search subs for videofiles not older then a week"
+echo "This reduces the time Periscope will run on your system, which is more resource-friendly"
 read -p ' :' AGE
 if [ $AGE -eq $AGE ]
 	then
