@@ -39,7 +39,7 @@ CONN2=dropbox.com					# to test connections needed
 #################### LIST APPS USED ###################################################
 
 APP1=Spotweb;
-APP1_INST=spotwebwebinstall_syn.sh;
+APP1_INST=spotwebinstall_syn.sh;
 
 APP2=Periscope;
 APP2_INST=periscopeinstall_syn.sh;
@@ -216,17 +216,17 @@ inst_App () {
 	}
 		
 		get_Installer () {
-		if [ -e LaSi/$SET_INST ]
+		if [ -e $SET_INST ]
 			then
-			rm -f LaSi/$SET_INST &&
-			wget -P LaSi $DROPBOX/$SET_INST &&
-			chmod +x LaSi/$SET_INST &&
-			./LaSi/$SET_INST &&
+			rm -f $SET_INST &&
+			wget $DROPBOX/$SET_INST &&
+			chmod +x $SET_INST &&
+			./$SET_INST &&
 			LaSi_Menu
 		else
 			wget -P LaSi $DROPBOX/$SET_INST
-			chmod +x LaSi/$SET_INST &&
-			./LaSi/$SET_INST &&
+			chmod +x $SET_INST &&
+			./$SET_INST &&
 			LaSi_Menu
 		fi
 		} 

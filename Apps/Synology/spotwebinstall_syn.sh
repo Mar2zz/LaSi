@@ -102,7 +102,8 @@ ipkg install php-pear
 sed -i 's#;include_path = ".:/php/includes"#include_path = ".:/php/includes:/opt/share/pear"#g' /usr/syno/etc/php.ini
 
 ## Install pear
-pear install --alldeps Net_NNTP
+pear install --alldeps Net_NNTP &&
+pear config-set php_bin /usr/bin/php
 
 ## Install Git and/or Textutils
 ipkg install git
