@@ -177,8 +177,6 @@ get_Scripts
 path_Python
 path_Periscope
 
-#### /PATH/TO/VIDEO INTO A VARIABLE
-sed -i 's#/PATH/TO/VIDEOS#$1#g' $INSTALLDIR/periscope/scanPath.sh
 }
 
 #### CHOOSE LANGUAGES ####
@@ -262,15 +260,19 @@ echo
 echo 'Please specify how many days back Periscope should search for'
 echo "e.g. 7, then it will only search subs for videofiles not older then a week"
 echo "This reduces the time Periscope will run on your system, which is more resource-friendly"
-read -p ' :' AGE
-if [ $AGE -eq $AGE ]
+read -p "Days back: " AGE
+if ! [ $AGE -eq $AGE ]
 	then
-	sed -i "s/AGE_DAYS/$AGE/g" $INSTALLDIR/periscope/scanPath.sh
-else
 	echo "$AGE is not a numeric value, try again"
 	set_Age
-	fi
+fi
 }
+
+#### EDIT SCANPATH.SH
+sed -i "
+	s#/PATH/TO/VIDEOS#$1#g
+	s/AGE_DAYS/$AGE/g
+" $INSTALLDIR/periscope/scanPath.sh
 
 
 check_Cron () {
@@ -303,7 +305,7 @@ echo "Enter 6 to update every 6 hours, 12 for every twelve hours, etc...!"
 read -p "Enter a digit: " $HOUR
 if [ $HOUR -eq $HOUR ]
 	then
-	echo "0	*/$HOUR	*	*	*	root	sh $INSTALLDIR/periscope/scanPath.sh \"$BATCHPATH\" > /dev/null" >> /etc/crontab &&
+	echo 0	*/$HOUR	\*	\*	\*	root	sh $INSTALLDIR/periscope/scanPath.sh \"$BATCHPATH\" > /dev/null >> /etc/crontab &&
 	echo "Cronjob added for Periscope to retrieve spots every $HOUR hour(s)"
 	/usr/syno/etc/rc.d/S04crond.sh stop &&
 	/usr/syno/etc/rc.d/S04crond.sh start
