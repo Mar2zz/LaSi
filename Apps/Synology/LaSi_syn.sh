@@ -226,7 +226,7 @@ inst_App () {
 			./$SET_INST &&
 			LaSi_Menu
 		else
-			wget -P LaSi $DROPBOX/$SET_INST
+			wget $DROPBOX/$SET_INST
 			chmod +x $SET_INST &&
 			./$SET_INST &&
 			LaSi_Menu
