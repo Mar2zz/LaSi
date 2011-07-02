@@ -44,7 +44,7 @@ APPLOW=albumidentify;	# lowercase appname
 CONN1=github.com; 	# to test connections needed to install apps
 CONN2=dropbox.com;
 
-GITHUB=https://github.com/scottr/albumidentify.git; 	#github-adres
+GITHUB=https://github.com/albumidentify/albumidentify.git; 	#github-adres
 DROPBOX=http://dl.dropbox.com/u/18712538/ 				#dropbox-adres
 
 
