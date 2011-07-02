@@ -302,7 +302,7 @@ add_Cron () {
 echo "How often in hours should Periscope search for subs?"
 echo "Valid answers are 1, 2, 3 etc..."
 echo "Enter 6 to update every 6 hours, 12 for every twelve hours, etc...!"
-read -p "Enter a digit: " $HOUR
+read -p "Enter a digit: " HOUR
 if [ $HOUR -eq $HOUR ]
 	then
 	echo 0	\*/$HOUR	\*	\*	\*	root	sh $INSTALLDIR/periscope/scanPath.sh \"$BATCHPATH\" \> /dev/null >> /etc/crontab &&
