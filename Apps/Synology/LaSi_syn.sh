@@ -31,8 +31,10 @@
 
 #SET SOME VARIABLES (SOME VARIABLES WILL BE SET THROUGH LIVE USERINPUT IN TERMINAL)
 
-DROPBOX=http://dl.dropbox.com/u/18712538/Synology	# dropbox-adres
-CONN2=dropbox.com					# to test connections needed
+DROPBOX=http://dl.dropbox.com/u/18712538/Synology;	# dropbox-adres
+CONN2=dropbox.com;					# to test connections needed
+
+NAS=$(hostname)
 
 
 #######################################################################################
@@ -114,7 +116,7 @@ echo "
 # en installeert en configureert een apache/mysql-server indien
 # dat nodig is. 
 # Als de installatie klaar is zal spotweb draaien op 
-# http://$HOSTNAME/spotweb.
+# http://$NAS/spotweb.
 # 
 # Indien je niet kiest voor het importeren van je eigen
 # ownsettings.php dan wordt er een minimale ownsettings aan-
