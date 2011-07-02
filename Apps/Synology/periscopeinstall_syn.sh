@@ -131,12 +131,12 @@ if [ -d $INSTALLDIR/periscope ]
 	echo "Do you want to backup this folder?"
 	read -p "Answer yes or no: " REPLY
 	case $REPLY in
-		[YyJj])
+		[YyJj]*)
 			mv -Rf $INSTALLDIR/periscope $INSTALLDIRperiscope_bak &&
 			echo "Moved $INSTALLDIR/periscope to $INSTALLDIR/periscope_bak"
 			get_Periscope
 			;;
-		[Nn])
+		[Nn]*)
 			rm -Rf $INSTALLDIR/periscope
 			echo "Removed $INSTALLDIR/periscope"
 			get_Periscope
@@ -245,7 +245,7 @@ echo
 echo 'Please specify the full path to your folder containing files that need subs'
 echo "e.g. /volume1/downloads/Videos"
 echo "note: If you want to set more paths, run option 2: Add a cronjob again!"
-read -p ":" BATCHPATH
+read -p ": " BATCHPATH
 if [ -d $BATCHPATH ]
 	then
 	echo "Periscope will search for subs for all avi and mkv-files in $BATCHPATH"
@@ -282,10 +282,10 @@ if $(grep -q "scanPath.sh $BATCHPATH" /etc/crontab)
 	echo $(grep "scanPath.sh $BATCHPATH" /etc/crontab)
 	read -p "Do you want to replace this? (yes/no): " DOUBLE
 	case $DOUBLE in
-		[YyJj])
+		[YyJj]*)
 			sed -i 'scanPath.sh $BATCHPATH' /etc/crontab
 			;;
-		[Nn])
+		[Nn]*)
 			echo "Crontab not edited"
 			show_Menu
 			;;
