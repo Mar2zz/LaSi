@@ -130,12 +130,12 @@ if [ -d /volume1/web/spotweb ]
 	echo "Do you want to backup this folder?"
 	read -p "Answer yes or no: " REPLY
 	case $REPLY in
-		[YyJj])
+		[YyJj]*)
 			mv -Rf /volume1/web/spotweb /volume1/web/spotweb_bak &&
 			echo "Moved /volume1/web/spotweb to /volume1/web/spotweb_bak"
 			git clone https://github.com/spotweb/spotweb.git /volume1/web/spotweb
 			;;
-		[Nn])
+		[Nn]*)
 			rm -Rf /volume1/web/spotweb
 			echo "Removed /volume1/web/spotweb"
 			git clone https://github.com/spotweb/spotweb.git /volume1/web/spotweb
@@ -229,20 +229,48 @@ fi
 #### CREATE OWNSETTINGS STUFF ####
 
 config_Own () {
-## Create ownsettings.php
-wget -P /volume1/web/spotweb http://dl.dropbox.com/u/18712538/Spotweb/ownsettings_syn.php
-mv /volume1/web/spotweb/ownsettings_syn.php /volume1/web/spotweb/ownsettings.php
-
-## Edit ownsettings.php
-echo "Press a key to edit your usenetserver credentials"
-read -sn 1 -p "--- [continue]---"
-if $(which nano) 
-	then
-	nano /volume1/web/spotweb/ownsettings.php
-else
-	vi /volume1/web/spotweb/ownsettings.php
-fi
+echo "Do you want to import your own ownsettings.php?"
+echo "If you say no a new one will be created."
+echo "NOTE: This installer assumes you use default MYSQL-values as written in settings.php"
+echo "Make sure you didn't override those defaults in ownsettings.php when importing"
+read -p "Answer yes or no: " IMPORT
+case $IMPORT in
+	[YyJj]*)
+		import_Path () {
+		echo "Enter full path to ownsettings.php"
+		read -p "Path: " IMPORTPATH
+		if [ -e $IMPORTPATH ]
+			then
+			cp -f $IMPORTPATH /volume1/web/spotweb/ownsettings.php
+			echo "Copied $IMPORTPATH to /volume1/web/spotweb/ownsettings.php"
+		else
+			echo "File not found, try again"
+			import_Path
+		fi
+		}
+		import_Path
+		;;
+	[Nn]*)
+		echo "Importing a new ownsettings.php with minimal settings"
+		wget -P /volume1/web/spotweb http://dl.dropbox.com/u/18712538/Spotweb/ownsettings_syn.php
+		mv /volume1/web/spotweb/ownsettings_syn.php /volume1/web/spotweb/ownsettings.php
+		## Edit ownsettings.php
+		echo "Press a key to edit your usenetserver credentials"
+		read -sn 1 -p "--- [continue]---"
+		if $(which nano) 
+			then
+			nano /volume1/web/spotweb/ownsettings.php
+		else
+			vi /volume1/web/spotweb/ownsettings.php
+		fi
+		;;
+	*)
+		echo "Answer yes or no"
+		config_Own
+		;;
+esac
 }
+
 
 php_All () {
 ## Create databasetables and start retrieving.
@@ -294,10 +322,10 @@ if $(grep -q "/usr/bin/php retrieve.php" /etc/crontab)
 	echo $(grep "/usr/bin/php retrieve.php" /etc/crontab)
 	read -p "Do you want to replace this? (yes/no): " DOUBLE
 	case $DOUBLE in
-		[YyJj])
+		[YyJj]*)
 			sed -i '/retrieve.php/d' /etc/crontab
 			;;
-		[Nn])
+		[Nn]*)
 			echo "Crontab not edited"
 			show_Menu
 			;;
@@ -314,10 +342,10 @@ add_Cron () {
 echo "How often in hours should Spotweb retrieve spots?"
 echo "Valid answers are 1, 2, 3 etc..."
 echo "Enter 1 to update every hour, 2 for every two hours, etc...!"
-read -p "Enter a digit: " $HOUR
+read -p "Enter a digit: " HOUR
 if [ $HOUR -eq $HOUR ]
 	then
-	echo "0	*/$HOUR	*	*	*	root	cd /volume1/web/spotweb && /usr/bin/php retrieve.php > /dev/null" >> /etc/crontab &&
+	echo "0	\*/$HOUR	\*	\*	\*	root	cd /volume1/web/spotweb && /usr/bin/php retrieve.php \> /dev/null" >> /etc/crontab &&
 	echo "Cronjob added for spotweb to retrieve spots every $HOUR hour(s)"
 	/usr/syno/etc/rc.d/S04crond.sh stop &&
 	/usr/syno/etc/rc.d/S04crond.sh start
