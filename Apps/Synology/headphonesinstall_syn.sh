@@ -131,40 +131,12 @@ else
 fi
 }
 
-cf_Config() {
-echo '-------'
-echo "Now you can start Headphones with a clean configuration..."
-echo "By default $APP's webinterface adress is: http://$NAS:8181."
-echo "It will not ask for a username and password."
-echo 
-
-	Question() {
-	echo "Do you want change the defaults or import your own configuration file?"
-	read -p "(yes/no)   :" REPLY
-	case $REPLY in
-	[Yy]*)
-		echo 'As you wish, master...'
-		;;
-	[Nn]*)
-		echo "Point your webbrowser to http://$NAS:8181 and start configuring!"
-		LaSi_Menu
-		;;
-	*)
-		echo "Answer yes or no"
-		Question
-		;;
-	esac
-	}
-Question
-}
-
 
 #### LET USER CONFIRM CONFIGURATION ####
 cf_Config() {
 echo '-------'
 echo "Now you can start Headphones with a clean configuration..."
 echo "By default Headphones webinterface adress is: http://$NAS:8181."
-echo "It will not ask for a username and password."
 echo 
 
 	import_Config() { 
