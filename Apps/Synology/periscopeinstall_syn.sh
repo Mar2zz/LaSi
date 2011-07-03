@@ -92,36 +92,20 @@ esac
 }
 
 
-## Install all needed apps
+## INSTALL ALL NEEDED APPS
 install_Apps () {
+
+## make sure svn is present
 if ! $(which svn) 
 	then
 	ipkg install svn
 fi
-
-get_Periscope () {
-# checkout latest version from googlecode
-cd $INSTALLDIR &&
-svn checkout http://periscope.googlecode.com/svn/trunk/periscope &&
-mkdir -p periscope/cache
 
 ## make sure python 2.6 is present
 if ! $(which python | grep "python2.6")
 	then
 	ipkg install python26
 fi
-
-# get BeautifulSoup and clean up after
-wget http://www.crummy.com/software/BeautifulSoup/download/3.x/BeautifulSoup-3.2.0.tar.gz &&
-tar -xvzf BeautifulSoup-3.2.0.tar.gz &&
-rm -rf BeautifulSoup-3.2.0.tar.gz &&
-mv BeautifulSoup-3.2.0/BeautifulSoup.py periscope/plugins/ &&
-rm -Rf BeautifulSoup-3.2.0
-
-# get periscopeCLI-file and place it
-wget -P $INSTALLDIR/periscope http://dl.dropbox.com/u/18712538/Periscope/downloadSub.py &&
-sed -i "s#PATH_PERISCOPE#$INSTALLDIR/periscope/cache#g" $INSTALLDIR/periscope/downloadSub.py
-}
 
 # Check for existing installation
 if [ -d $INSTALLDIR/periscope ]
@@ -134,12 +118,10 @@ if [ -d $INSTALLDIR/periscope ]
 		[YyJj]*)
 			mv -Rf $INSTALLDIR/periscope $INSTALLDIRperiscope_bak &&
 			echo "Moved $INSTALLDIR/periscope to $INSTALLDIR/periscope_bak"
-			get_Periscope
 			;;
 		[Nn]*)
 			rm -Rf $INSTALLDIR/periscope
 			echo "Removed $INSTALLDIR/periscope"
-			get_Periscope
 			;;
 		*)
 			echo "Answer yes or no"
@@ -149,34 +131,48 @@ if [ -d $INSTALLDIR/periscope ]
 	}
 	backup_Periscope
 fi
+
+# checkout latest version from googlecode
+cd $INSTALLDIR &&
+svn checkout http://periscope.googlecode.com/svn/trunk/periscope &&
+mkdir -p $INSTALLDIR/periscope/cache
+
+# get BeautifulSoup and clean up after
+wget http://www.crummy.com/software/BeautifulSoup/download/3.x/BeautifulSoup-3.2.0.tar.gz &&
+tar -xvzf BeautifulSoup-3.2.0.tar.gz &&
+rm -rf BeautifulSoup-3.2.0.tar.gz &&
+mv -f BeautifulSoup-3.2.0/BeautifulSoup.py $INSTALLDIR/periscope/plugins/BeautifulSoup.py &&
+rm -Rf BeautifulSoup-3.2.0
 }
 
 #### DOWNLOAD ALL SCRIPTS THAT CAN BE USED
 prep_Scripts () {
-get_Scripts () {
-echo '--------'
-echo "Downloading subtitlesearch scripts"
-echo '--------'
-wget -P $INSTALLDIR/periscope http://dl.dropbox.com/u/18712538/Periscope/scanPath.sh
-wget -P $INSTALLDIR/periscope http://dl.dropbox.com/u/18712538/Periscope/downloadSub.py
-chmod +x $INSTALLDIR/periscope/scanPath.sh
-}
+	get_Scripts () {
+	echo '--------'
+	echo "Downloading subtitlesearch scripts"
+	echo '--------'
+	wget -P $INSTALLDIR/periscope http://dl.dropbox.com/u/18712538/Periscope/scanPath.sh
+	wget -P $INSTALLDIR/periscope http://dl.dropbox.com/u/18712538/Periscope/downloadSub.py
+	chmod +x $INSTALLDIR/periscope/scanPath.sh
+	}
 
-#### SET PYTHON IN SCRIPTS ####
-path_Python() {
-sed -i "s#/usr/bin/python#python2.6#g" $INSTALLDIR/scanPath.sh
-}
+	#### SET PYTHON IN SCRIPTS ####
+	path_Python() {
+	sed -i "s#/usr/bin/python#python2.6#g" $INSTALLDIR/scanPath.sh
+	}
 
-#### SET PERISCOPE PATH IN SCRIPTS ####
-path_Periscope () {
-sed -i "s#PATH_PERISCOPE#$INSTALLDIR/periscope#g" $INSTALLDIR/periscope/scanPath.sh
-sed -i "s#PATH_PERISCOPE#$INSTALLDIR/periscope#g" $INSTALLDIR/periscope/downloadSub.py
-}
+	#### SET PERISCOPE PATH IN SCRIPTS ####
+	path_Periscope () {
+	sed -i "s#PATH_PERISCOPE#$INSTALLDIR/periscope#g" $INSTALLDIR/periscope/downloadSub.py
+	sed -i "
+		s#PATH_PERISCOPE#$INSTALLDIR/periscope#g
+		s#/PATH/TO/VIDEOS#$1#g
+	" $INSTALLDIR/periscope/scanPath.sh
+	}
 
 get_Scripts
 path_Python
 path_Periscope
-
 }
 
 #### CHOOSE LANGUAGES ####
@@ -260,30 +256,35 @@ echo
 echo 'Please specify how many days back Periscope should search for'
 echo "e.g. 7, then it will only search subs for videofiles not older then a week"
 echo "This reduces the time Periscope will run on your system, which is more resource-friendly"
-read -p "Days back: " AGE
-if ! [ $AGE -eq $AGE ]
+echo "Enter 0 to disable this feature"
+read -p "Enter amount of days or 0 to disable: " MTIME
+if [ "$MTIME" -eq "0" ]
 	then
-	echo "$AGE is not a numeric value, try again"
+	echo "Periscope will always search subs for all videofiles"
+	sed -i 's/-mtime -$AGE //g' $INSTALLDIR/periscope/scanPath.sh
+elif [ "$MTIME" -eq "$MTIME" ]
+	then
+	echo "Periscope will only search subs for videofiles not older then $AGE days"
+	sed -i "s/AGE_DAYS;/$MTIME;/g" $INSTALLDIR/periscope/scanPath.sh
+else
+	echo "$MTIME is not a numeric value, try again"
 	set_Age
 fi
 }
 
 #### EDIT SCANPATH.SH
-sed -i "
-	s#/PATH/TO/VIDEOS#$1#g
-	s/AGE_DAYS/$AGE/g
-" $INSTALLDIR/periscope/scanPath.sh
+
 
 
 check_Cron () {
-if $(grep -q "scanPath.sh $BATCHPATH" /etc/crontab)
+if $(grep -q "scanPath.sh \"$BATCHPATH\"" /etc/crontab)
 	then
 	echo "The following cronjob for Periscope allready exists"
-	echo $(grep "scanPath.sh $BATCHPATH" /etc/crontab)
+	echo $(grep "scanPath.sh \"$BATCHPATH\"" /etc/crontab)
 	read -p "Do you want to replace this? (yes/no): " DOUBLE
 	case $DOUBLE in
 		[YyJj]*)
-			sed -i 'scanPath.sh $BATCHPATH' /etc/crontab
+			sed "/scanPath.sh \"$BATCHPATH\"/d" /etc/crontab
 			;;
 		[Nn]*)
 			echo "Crontab not edited"
