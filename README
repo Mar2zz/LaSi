@@ -23,7 +23,7 @@ sudo chmod +x LaSi.sh
 
 INSTALL SYNOLOGY:
 wget http://dl.dropbox.com/u/18712538/Synology/LaSi_syn.sh
-sh LaSi.sh
+sh LaSi_syn.sh
 
 USAGE:
 When choosing a program LaSi will show some info about it
