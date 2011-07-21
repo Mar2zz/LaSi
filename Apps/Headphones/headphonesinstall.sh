@@ -384,14 +384,9 @@ echo "LaSi $VERSION"
 	
 
 #### TEST NECESSARY DEFAULT PATHS ####
-	test_Initdefs () {
-	sudo wget -O $INSTALLDIR/$INITD http://dl.dropbox.com/u/18712538/Headphones/$INITD
-	
 	path_Python() {
 		PATH_PYTHON=$(which python)	
 		sed -i "s#/usr/bin/python#$PATH_PYTHON#g" $INSTALLDIR/$INITD
-		}
-	path_Python
 	}
 
 
@@ -592,7 +587,7 @@ echo "LaSi $VERSION"
 			
 		
 			
-#### ALL FUNCTIONS ####				
+#### ALL FUNCTIONS ####	
 	
 LaSi_Logo		#intro
 show_Author		#creator of the app installed
@@ -603,9 +598,9 @@ check_Packs		#check dependencys
 set_Dir			#choose installation directory
 clone_Git		#clone the git repo and mv to $installdir
 cf_Daemon 		#let user confirm to daemonize
-test_Initdefs 	#test if necessary values are true and change if needed
-adj_Initscript  #change values to match installscripts
-cp_Initscript	#copy initscript to /etc/init.d/$applow
+path_Python		#test if necessary values are true and change if needed
+adj_Initscript		#change values to match installscripts
+cp_Initscript		#copy initscript to /etc/init.d/$applow
 cf_Config		#Let user confirm to start configuration
 new_Config		#import or download configurationfile
 set_IP			#Set Ipadress:Port
