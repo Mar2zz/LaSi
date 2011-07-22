@@ -285,14 +285,14 @@ esac
 		then 
 		use_Pac
 	else
-	    echo 'No package manager found!'
-	    use_Manual
+		echo 'No package manager found!'
+		use_Manual
 	fi
 	}
 	
 	
 #### CHOOSE INSTALLATION DIRECTORY ####
-	set_Dir () {	
+	set_Dir () {
 	
 		cf_Overwrite () {
 		echo "1. Choose another directory"
@@ -301,31 +301,31 @@ esac
 		echo "Q. Quit"
 		read -p "Press 1, 2, 3 or Q to select an option    :" REPLY
 		case $REPLY in
-     		1)
-				choose_Dir
-     			;;
-     		2)
-     			echo "Backup $INSTALLDIR to LaSi/$APP"
-     			if [ -d /home/$USER/LaSi ]
-     				then
-     				mv -f $INSTALLDIR /home/$USER/LaSi/$APP
-     			else
-     				mkdir LaSi
-     				mv -f $INSTALLDIR /home/$USER/LaSi/$APP
-     			fi
-     			;;
-     		3)
-     		    echo "Deleting $INSTALLDIR."
-     			rm -R -f $INSTALLDIR
-     			;;
-     		[Qq]*)
-     			echo "Fini..."
-     			LaSi_Menu
-     			;;
-      		*)
-				echo "Choose 1, 2, 3 or Q to quit"
-				cf_Dir
-      			;;
+		1)
+			choose_Dir
+				;;
+			2)
+			echo "Backup $INSTALLDIR to LaSi/$APP"
+			if [ -d /home/$USER/LaSi ]
+				then
+				mv -f $INSTALLDIR /home/$USER/LaSi/$APP
+			else
+				mkdir LaSi
+				mv -f $INSTALLDIR /home/$USER/LaSi/$APP
+			fi
+			;;
+		3)
+			echo "Deleting $INSTALLDIR."
+			rm -R -f $INSTALLDIR
+			;;
+		[Qq]*)
+			echo "Fini..."
+			show_Menu
+			;;
+		*)
+			echo "Choose 1, 2, 3 or Q to quit"
+			cf_Dir
+			;;
 		esac
 		}
 	
@@ -342,26 +342,26 @@ esac
 		}
 		
 		cf_Dir () { 
-		if [ -d $INSTALLDIR ] 
+		if [ -d $INSTALLDIR ]
 			then 
 			echo
 			echo "$INSTALLDIR allready exists, please choose an option:"
 			cf_Overwrite
 		else
 			echo "By default $APP will be installed in $INSTALLDIR."
-			echo "Do you want to change this?"			
-			read -p "(yes/no)   :" REPLY
+			echo "Do you want to change this?"
+			read -p "(yes/no): " REPLY
 			case $REPLY in
-     			[Yy]*)
-     				choose_Dir
-     				;;
-     			[Nn]*)
-     				echo "Installing $APP in $INSTALLDIR"
-     				;;
-      			*)
-					echo "Answer yes or no"
-					cf_Dir
-      				;;
+			[Yy]*)
+				choose_Dir
+				;;
+			[Nn]*)
+				echo "Installing $APP in $INSTALLDIR"
+				;;
+			*)
+				echo "Answer yes or no"
+				cf_Dir
+				;;
 			esac
 		fi
 		}
@@ -378,12 +378,10 @@ esac
 	echo ' '
 	command git clone $GITHUB $INSTALLDIR
 	echo
-	#echo "Delete $INSTALLDIR/.git"
-	#rm -R -f $INSTALLDIR/.git (only needed in couchpotato for autoupdat)
 	}
-	
 
-#### CONFIRM DAEMON INSTALL ####	
+
+#### CONFIRM DAEMON INSTALL ####
 	cf_Daemon () {
 	echo
 	echo '-------'
@@ -391,43 +389,42 @@ esac
 	echo "daemoninstall works only Ubuntu or Debian, I need commands for other OS's"
 	echo "So if you want this script to work on your *nix, email me the commands needed"
 	echo '-------'
-	echo ' '
+	echo
 		
 		Question() {
 		echo "Do you want to install $APP as a daemon?"
 		read -p "(yes/no)   :" REPLY
 		case $REPLY in
-     	[Yy]*) # back to main
-     		echo 'As you wish, master...'
-     		;;
-     	[Nn]*)
-			echo "You can start app manually by executing python $INSTALLDIR/$APP.py..."
-			echo "I prefer the LaSi way though...but have fun using $APP!"
-			LaSi_Menu
-			;;
-      	*)
-			echo "Answer yes or no"
-			Question
-      		;;
+			[Yy]*) # back to main
+				echo 'As you wish, master...'
+				;;
+			[Nn]*)
+				echo "You can start app manually by executing python $INSTALLDIR/$APP.py..."
+				echo "I prefer the LaSi way though...but have fun using $APP!"
+				show_Menu
+				;;
+			*)
+				echo "Answer yes or no"
+				Question
+				;;
 		esac
 		}
 	Question
-	} 
-	
+	}
+
 
 #### TEST NECESSARY DEFAULT PATHS ####
 	test_Initdefs () {
 		
 		path_Python() {
-		PATH_PYTHON=$(which python)	
+		PATH_PYTHON=$(which python)
 		sed -i "s#/usr/bin/python#$PATH_PYTHON#g" $INSTALLDIR/$INITD
 		}
-		
 	path_Python
 	}
-	
-	
-#### CHANGE VALUES IN INITSCRIPT ####	
+
+
+#### CHANGE VALUES IN INITSCRIPT ####
 	adj_Initscript () {
 	cp -f $INSTALLDIR/$INITD $INSTALLDIR/$INITD.bak
 	sed -i "
@@ -459,8 +456,8 @@ esac
 		sudo update-rc.d $APPLOW defaults
 	fi
 	}
-	
-	
+
+
 #### LET USER CONFIRM CONFIGURATION ####
 	cf_Config() {
 	echo '++++++++'
@@ -474,18 +471,18 @@ esac
 		echo "Do you want change the defaults or import your own configuration file?"
 		read -p "(yes/no)   :" REPLY
 		case $REPLY in
-		[Yy]*)
-		echo 'As you wish, master...'
-			;;
-		[Nn]*)
+			[Yy]*)
+				echo 'As you wish, master...'
+				;;
+			[Nn]*)
 				sudo /etc/init.d/$APPLOW start &&
 				echo "Point your webbrowser to http://$IPADRESS:$PORT and start configuring!"
 				LaSi_Menu
 				;;
-		  	*)
+			*)
 				echo "Answer yes or no"
 				Question
-		  		;;
+				;;
 		esac
 		}
 	Question
@@ -493,7 +490,7 @@ esac
 
 #### GET NEW CONFIGFILE ####
 	new_Config(){
-		
+
 		get_Config () { #download new config.ini
 		if [ -e $INSTALLDIR/config.ini ]
 			then
@@ -509,129 +506,130 @@ esac
 		echo 'Type the full path and filename of the configurationfile you want to import'
 		echo 'or s to skip:'
 		read -p ' :' IMPORTCONFIG
-     		if [ $IMPORTCONFIG = S -o $IMPORTCONFIG = s ]
-     			then
-     			cf_Import     		
-     		elif [ -e $IMPORTCONFIG ]
-				then
-				cp -f --suffix=.bak $IMPORTCONFIG $INSTALLDIR/config.ini &&
-				sudo /etc/init.d/couchpotato start &&
-				echo "Point your webbrowser to you know where and have fun using $APP!"
-				LaSi_Menu				
-			else
-				echo 'File does not exist, enter correct path as /path/to/file.ext' &&
-				import_Config
-			fi
+		if [ $IMPORTCONFIG = S -o $IMPORTCONFIG = s ]
+			then
+			cf_Import
+		elif [ -e $IMPORTCONFIG ]
+			then
+			cp -f --suffix=.bak $IMPORTCONFIG $INSTALLDIR/config.ini &&
+			sudo /etc/init.d/couchpotato start &&
+			echo "Point your webbrowser to you know where and have fun using $APP!"
+			LaSi_Menu
+		else
+			echo 'File does not exist, enter correct path as /path/to/file.ext' &&
+			import_Config
+		fi
 		}
 		
 		cf_Import () { # Confirm import
 		echo "Do you want to import your own configurationfile?"
-		read -p "(yes/no)   :" REPLY
+		read -p "(yes/no): " REPLY
 		case $REPLY in
-     		[Yy]*)
-     			import_Config
-     			;;
-     		[Nn]*)
-     			echo "Downloading fresh config from dropbox.com"
-     			get_Config
-      		;;
-      		*)
-			echo "Answer yes or no"
+			[Yy]*)
+				import_Config
+				;;
+			[Nn]*)
+				echo "Downloading fresh config from dropbox.com"
+				get_Config
+				;;
+			*)
+				echo "Answer yes or no"
 				cf_Import
-      		;;
-			esac
+				;;
+		esac
 		}
 	cf_Import
 	}
 
-		
-#### CHANGE DEFAULTS IN CONFIGFILE ####		
+
+#### CHANGE DEFAULTS IN CONFIGFILE ####
 
 #### CHANGE IPADRESS AND PORT ####
 
 	set_IP () {
-		read -p 'Enter new ipadress, default is 0.0.0.0 ...    :' NEW_IP
-		read -p 'Enter new port, default is 5000 ...    :' NEW_PORT
+	read -p "Enter new ipadress, default is $IPADRESS: " NEW_IP
+	read -p "Enter new port, default is $PORT: " NEW_PORT
 
-			cf_IP () {
-			echo "You entered $NEW_IP:$NEW_PORT, is this correct?  :"
-			read -p "(yes/no)   :" REPLY
-			case $REPLY in
-     			[Yy]*)
-     				echo "Ok, adding $NEW_IP:$NEW_PORT to config.ini..."
-     			    sed -i "
-     			    	s/web_host = 0.0.0.0/web_host = $NEW_IP/g
-   						s/web_port = 8081/web_port = $NEW_PORT/g 
-   					" $INSTALLDIR/config.ini
-   					sed -i "
-   						s/host=/host=$NEW_IP/g
-   						s/port=/port=$NEW_PORT/g
-   						" $INSTALLDIR/autoProcessTV/autoProcessTV.cfg
+		cf_IP () {
+		echo "You entered $NEW_IP:$NEW_PORT, is this correct?: "
+		read -p "(yes/no): " REPLY
+		case $REPLY in
+			[Yy]*)
+				echo "Adding $NEW_IP:$NEW_PORT to config.ini..."
+				sed -i "
+					s/web_host = 0.0.0.0/web_host = $NEW_IP/g
+					s/web_port = 8081/web_port = $NEW_PORT/g 
+				" $INSTALLDIR/config.ini
+				echo "and autoProcessTV.cfg..."
+				sed -i "
+					s/host=/host=$NEW_IP/g
+					s/port=/port=$NEW_PORT/g
+				" $INSTALLDIR/autoProcessTV/autoProcessTV.cfg
 				;;
-     			[Nn]*)
-     				set_IP
-      			;;
-      			*)
-					echo "Answer yes or no"
-					cf_IP
-      			;;
-			esac
-			}
+			[Nn]*)
+				set_IP
+				;;
+			*)
+				echo "Answer yes or no"
+				cf_IP
+				;;
+		esac
+		}
 	cf_IP
 	}
 
 #### CHANGE USERNAME AND PASSWORD ####
 	set_UP () {
-		read -p 'Enter new username, leave blank for none ...    :' NEW_USER
-		read -p 'Enter new password, leave blank for none ...    :' NEW_PASS
+	read -p 'Enter new username, leave blank for none : ' NEW_USER
+	read -p 'Enter new password, leave blank for none : ' NEW_PASS
 
-			cf_UP () {
-			echo "You entered username '$NEW_USER' and password '$NEW_PASS', is this correct?  :"
-			read -p "(yes/no or skip)   :" REPLY
-			case $REPLY in
-     			[Yy]*)
-     				echo "Ok, adding username and password to config.ini..."
-     			    sed -i "
-  						s/web_username = \"\"/web_username = $NEW_USER/g
- 						s/web_password = \"\"/web_password = $NEW_PASS/g
-   					" $INSTALLDIR/config.ini
-   					echo "and autoProcessTV.cfg..."
-   					sed -i "
-   						s/username=/username=$NEW_USER/g
-   						s/password=/password=$NEW_PASS/g
-   						" $INSTALLDIR/autoProcessTV/autoProcessTV.cfg
+		cf_UP () {
+		echo "You entered username '$NEW_USER' and password '$NEW_PASS', is this correct?: "
+		read -p "(yes/no or skip): " REPLY
+		case $REPLY in
+			[Yy]*)
+				echo "Adding username and password to config.ini..."
+				sed -i "
+					s/web_username = \"\"/web_username = $NEW_USER/g
+					s/web_password = \"\"/web_password = $NEW_PASS/g
+				" $INSTALLDIR/config.ini
+				echo "and autoProcessTV.cfg..."
+				sed -i "
+					s/username=/username=$NEW_USER/g
+					s/password=/password=$NEW_PASS/g
+				" $INSTALLDIR/autoProcessTV/autoProcessTV.cfg
 				;;
-     			[Nn]*)
-     				set_UP
-      			;;
-      			[Ss]*)
-     				echo "Skipped that one, it stays blank"
-     			;;
-      			*)
-					echo "Answer yes or no or skip"
-					cf_UP
-      			;;
-			esac
-			}
+			[Nn]*)
+				set_UP
+				;;
+			[Ss]*)
+				echo "Skipped that one, it stays blank"
+				;;
+			*)
+				echo "Answer yes or no or skip"
+				cf_UP
+				;;
+		esac
+		}
 	cf_UP
 	}
 
 
 #### STARTING APP ####
 	start_App() {
-		echo "Now starting $APP..."
-		if sudo /etc/init.d/$APPLOW start
+	echo "Now starting $APP..."
+	if sudo /etc/init.d/$APPLOW start
 		then
-			echo "Point your webbrowser to http://$NEW_IP:$NEW_PORT and have fun!"
-		else
-			echo "Can't start $APP, try starting manually..."
-			echo "Execute sudo /etc/init.d/$APPLOW stop | start | restart | force-reload"
-			LaSi_Menu
-		fi
+		echo "Point your webbrowser to http://$NEW_IP:$NEW_PORT and have fun!"
+	else
+		echo "Can't start $APP, try starting manually..."
+		echo "Execute sudo /etc/init.d/$APPLOW stop | start | restart | force-reload"
+	fi
+	read -sn 1 -p "Press a key to return to menu."
 	}
 
-#### UPDATE APP ####
 
+#### UPDATE APP ####
 	git_Update () {
 	echo
 	echo "===="
@@ -641,6 +639,7 @@ esac
 		then
 		sudo /etc/init.d/$APPLOW restart
 	fi
+	read -sn 1 -p "Press a key to return to menu."
 	echo "===="
 	}
 
