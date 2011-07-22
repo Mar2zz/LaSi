@@ -26,7 +26,7 @@
 #######################################################################################
 #######################################################################################
 
-VERSION=v0.7 ####
+VERSION=v0.8 ####
                          
 TESTOS1=Ubuntu_10.4_Desktop
 TESTOS2=Ubuntu_10.4_Server
@@ -44,8 +44,8 @@ APPLOW=sickbeard;	# lowercase appname
 CONN1=github.com; 	# to test connections needed to install apps
 CONN2=dropbox.com;
 
-GITHUB=https://github.com/midgetspy/Sick-Beard.git; 	#github-adres
-DROPBOX=http://dl.dropbox.com/u/18712538/ 				#dropbox-adres
+GITHUB=https://github.com/midgetspy/Sick-Beard.git;	#github-adres
+DROPBOX=http://dl.dropbox.com/u/18712538/ 		#dropbox-adres
 
 PACK1=git-core; 	#needed packages to run (using apt to check and install)
 PACK1_EXE=git;		#EXE only needed when packagename differs from executable
@@ -58,7 +58,7 @@ DAEMONUSER=$USER; 	#the user the app is started with
 INITD=init.ubuntu;	#name of default init-script
 
 IPADRESS=0.0.0.0; 	#default ipadress to listen on
-PORT=8081; 			#default port to listen on
+PORT=8081; 		#default port to listen on
 
 
 
@@ -140,33 +140,48 @@ echo "LaSi $VERSION"
 	}
 
 
-#### CONFIRM_CONTINUE ####
-	cf_Continue () {
-	echo '--------'
-	echo 'You can take the blue pill if you want to, just answer no on the next question or press CTRL+C'
-	echo '--------'
-	echo ' '
-	
-		Question() {
-		echo "Are you sure you want to continue and install $APP?"
-		read -p "(yes/no)   :" REPLY
-		case $REPLY in
-     		[Yy]*)
-     			echo "Into the rabbit hole..."
-	    		;;
-     		[Nn]*)
-				LaSi_Menu
-			 	;;
-			*)
-				echo "Answer yes or no"
-				Question
-			  	;;
-		esac
-		}
-	Question		
-	}  
-	
-	
+#### PRESENT OPTIONS IN A MENU ####
+show_Menu (){
+LaSi_Logo 				#some basic info about installer
+show_Author				#creator of the app installed
+echo
+echo "1. (re)Install Sick Beard"
+echo "2. Update Sick Beard"
+echo "3. Exit script"
+echo
+echo "Choose one of the above options"
+read -p "Enter 1, 2, 3 or 4: " CHOICE
+case $CHOICE in
+	1)
+		check_Packs		#check dependencys
+		set_Dir			#choose installation directory
+		clone_Git		#clone the git repo and mv to $installdir
+		cp_Sample		#rename .cfg.sample 
+		cf_Config		#Let user confirm to start configuration
+		new_Config		#import or download configurationfile
+		set_IP			#Set Ipadress:Port
+		set_UP			#Set Username:Password
+		cf_Daemon 		#let user confirm to daemonize
+		test_Initdefs		#test if necessary values are true and change if needed
+		adj_Initscript		#change values to match installscripts
+		cp_Initscript		#copy initscript to /etc/init.d/$applow
+		start_App		#Start the application and gl!
+		show_Menu
+		;;
+	2)
+		git_Update
+		show_Menu
+		;;
+		
+	3)
+		LaSi_Menu		#Return to main script
+		;;
+	*)
+		echo "Enter 1, 2 or 3"
+		show_Menu
+		;;
+esac
+}
 #######################################################################################
 #### CHECK AND INSTALL PACKAGES #######################################################
 
@@ -420,8 +435,8 @@ echo "LaSi $VERSION"
 		s/SICKBEARD_USER/$USER/g
 		" $INSTALLDIR/$INITD
 	}
-	
-	
+
+
 #### RENAME CFG.SAMPLE ####
 	cp_Sample () {
 	cp $INSTALLDIR/autoProcessTV/autoProcessTV.cfg.sample $INSTALLDIR/autoProcessTV/autoProcessTV.cfg
@@ -459,10 +474,10 @@ echo "LaSi $VERSION"
 		echo "Do you want change the defaults or import your own configuration file?"
 		read -p "(yes/no)   :" REPLY
 		case $REPLY in
-     		[Yy]*)
-     			echo 'As you wish, master...'
-     			;;
-     		[Nn]*)
+		[Yy]*)
+		echo 'As you wish, master...'
+			;;
+		[Nn]*)
 				sudo /etc/init.d/$APPLOW start &&
 				echo "Point your webbrowser to http://$IPADRESS:$PORT and start configuring!"
 				LaSi_Menu
@@ -474,7 +489,7 @@ echo "LaSi $VERSION"
 		esac
 		}
 	Question
-	}	
+	}
 
 #### GET NEW CONFIGFILE ####
 	new_Config(){
@@ -602,7 +617,7 @@ echo "LaSi $VERSION"
 	}
 
 
-#### STARTING APP ####		
+#### STARTING APP ####
 	start_App() {
 		echo "Now starting $APP..."
 		if sudo /etc/init.d/$APPLOW start
@@ -614,37 +629,35 @@ echo "LaSi $VERSION"
 			LaSi_Menu
 		fi
 	}
-			
+
+#### UPDATE APP ####
+
+	git_Update () {
+	echo
+	echo "===="
+	echo "Checking for updates $APP"
+	cd $INSTALLDIR
+	if ! git pull | grep "Already up-to-date"
+		then
+		sudo /etc/init.d/$APPLOW restart
+	fi
+	echo "===="
+	}
+
+
+
 #### RETURN TO MENU ####
 	LaSi_Menu () {
-		
-	echo 
+	echo
 	read -sn 1 -p "Press a key to continue."
 	exit
-	}			
-			
-		
-			
+	}
+
+
 #### ALL FUNCTIONS ####	
-	
-LaSi_Logo 		#some basic info about installer
-show_Author		#creator of the app installed
 conn_Test		#connection test for url's used in installation
-cf_Continue		#let user confirm to continue
 root_Test		#test user is not root but has sudo
-check_Packs		#check dependencys
-set_Dir			#choose installation directory
-clone_Git		#clone the git repo and mv to $installdir
-cf_Daemon 		#let user confirm to daemonize
-test_Initdefs 	#test if necessary values are true and change if needed
-adj_Initscript  #change values to match installscripts
-cp_Sample		#rename .cfg.sample (SICKBEARD SPECIFIC)
-cp_Initscript	#copy initscript to /etc/init.d/$applow
-cf_Config		#Let user confirm to start configuration
-new_Config		#import or download configurationfile
-set_IP			#Set Ipadress:Port
-set_UP			#Set Username:Password
-start_App		#Start the application and gl!
-LaSi_Menu		#Return to main script
+show_Menu		#present choices for installation
+
 
 
