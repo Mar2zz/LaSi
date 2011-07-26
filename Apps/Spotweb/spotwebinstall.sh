@@ -592,10 +592,14 @@ echo "LaSi $VERSION"
 
 #### APACHESITE TOEVOEGEN ####
 add_Spotweb () {
-if ! [ -e /etc/apache2/sites-available/spotweb-site ]
+if [ -e /etc/apache2/sites-available/spotweb-site ]
 	then
+	echo "spotweb-site bestaat al in /etc/apache2/sites-available"
+	echo "site-config importeren wordt overgeslagen"
+else
+	echo "Website configuratie importeren uit dropbox..."
 	wget $DROPBOX/$APP/spotweb-site
-	sudo cp $APPLOW/spotweb-site /etc/apache2/sites-available/spotweb-site &&
+	sudo cp spotweb-site /etc/apache2/sites-available/spotweb-site &&
 	sudo a2ensite spotweb-site &&
 	sudo a2enmod rewrite &&
 	echo "Spotweb toegevoegd aan /etc/apache2/sites-enabled"
@@ -640,6 +644,7 @@ fi
 	LaSi_Menu () {
 
 	echo
+	echo "Spotwebinstall klaar, ga naar: http://$HOSTNAME/spotweb en have fun"
 	read -sn 1 -p "Press a key to continue."
 	exit
 	}
