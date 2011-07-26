@@ -589,6 +589,22 @@ echo "LaSi $VERSION"
 
 ######################################################
 
+
+#### APACHESITE TOEVOEGEN ####
+add_Spotweb () {
+if ! [ -e /etc/apache2/sites-available/spotweb-site ]
+	then
+	wget $DROPBOX/$APP/spotweb-site
+	sudo cp $APPLOW/spotweb-site /etc/apache2/sites-available/spotweb-site &&
+	sudo a2ensite spotweb-site &&
+	sudo a2enmod rewrite &&
+	echo "Spotweb toegevoegd aan /etc/apache2/sites-enabled"
+	echo "en de newznab-api toegankelijk gemaakt"
+fi
+}
+
+
+
 #### HERSTART APACHE ####
 	restart_Ap() {
 		LOCATION=$(hostname)
@@ -646,6 +662,7 @@ edit_PHP        #timezone to europe/amsterdam
 config_SQL      #configure mysql dbase
 cf_Newsserver   #configure newsserver
 cf_Headerserver #configure headerserver
+add_Spotweb	#add spotweb-site to sites-available
 restart_Ap      #restart apache for all changes to take effect
 cf_Retrieve     #optional retrieve spots immediately
 LaSi_Menu		#Return to main script

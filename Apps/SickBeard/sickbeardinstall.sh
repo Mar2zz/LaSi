@@ -648,7 +648,7 @@ esac
 #### RETURN TO MENU ####
 	LaSi_Menu () {
 	echo
-	read -sn 1 -p "Press a key to continue."
+	read -sn 1 -p "Press a key to exit."
 	exit
 	}
 
