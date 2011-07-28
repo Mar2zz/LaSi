@@ -26,7 +26,7 @@
 #######################################################################################
 #######################################################################################
 
-VERSION=v0.7
+VERSION=v0.8
                          
 TESTOS1=Ubuntu_10.4_Desktop
 TESTOS2=Ubuntu_10.4_Server
@@ -114,7 +114,7 @@ echo "LaSi $VERSION"
 	    LaSi_Menu
 	fi
 	}
-	
+
 #### 2ND TEST IF USER IS ONLINE ####
 	conn_Test () {
 		
@@ -140,34 +140,48 @@ echo "LaSi $VERSION"
 	}
 
 
-#### CONFIRM_CONTINUE ####
-	cf_Continue () {
-	echo '--------'
-	echo 'You can take the blue pill if you want to, just answer no on the next question or press CTRL+C'
-	echo '--------'
-	echo ' '
-	
-		Question() {
-		echo "Are you sure you want to continue and install $APP?"
-		read -p "(yes/no)   :" REPLY
-		case $REPLY in
-     		[Yy]*)
-     			echo "Into the rabbit hole..."
-	    		;;
-     		[Nn]*)
-				echo 'Wake up in bed and believe this all was a dream...'
-				LaSi_Menu
-				;;
-			*)
-				echo "Answer yes or no"
-				Question
-			  	;;
-		esac
-		}
-	Question		
-	}  
-	
-	
+#### PRESENT OPTIONS IN A MENU ####
+show_Menu (){
+LaSi_Logo 				#some basic info about installer
+show_Author				#creator of the app installed
+echo
+echo "1. (re)Install $APP"
+echo "2. Update $APP"
+echo "3. Exit script"
+echo
+echo "Choose one of the above options"
+read -p "Enter 1, 2 or 3: " CHOICE
+case $CHOICE in
+	1)
+		check_Packs		#check dependencys
+		set_Dir			#choose installation directory
+		clone_Git		#clone the git repo and mv to $installdir
+		cp_Sample		#rename .cfg.sample 
+		cf_Config		#Let user confirm to start configuration
+		new_Config		#import or download configurationfile
+		set_IP			#Set Ipadress:Port
+		set_UP			#Set Username:Password
+		cf_Daemon 		#let user confirm to daemonize
+		test_Initdefs		#test if necessary values are true and change if needed
+		adj_Initscript		#change values to match installscripts
+		cp_Initscript		#copy initscript to /etc/init.d/$applow
+		start_App		#Start the application and gl!
+		show_Menu
+		;;
+	2)
+		git_Update
+		show_Menu
+		;;
+		
+	3)
+		LaSi_Menu		#Return to main script
+		;;
+	*)
+		echo "Enter 1, 2 or 3"
+		show_Menu
+		;;
+esac
+}
 #######################################################################################
 #### CHECK AND INSTALL PACKAGES #######################################################
 
@@ -580,8 +594,23 @@ echo "LaSi $VERSION"
 			LaSi_Menu
 		fi
 	}
-			
-			
+
+
+#### UPDATE APP ####
+	git_Update () {
+	echo
+	echo "===="
+	echo "Checking for updates $APP"
+	cd $INSTALLDIR
+	if ! git pull | grep "Already up-to-date"
+		then
+		sudo /etc/init.d/$APPLOW restart
+	fi
+	read -sn 1 -p "Press a key to return to menu."
+	echo "===="
+	}
+
+
 #### RETURN TO MENU ####
 	LaSi_Menu () {
 		
@@ -593,24 +622,7 @@ echo "LaSi $VERSION"
 		
 			
 #### ALL FUNCTIONS ####				
-	
-LaSi_Logo		#intro
-show_Author		#creator of the app installed
 conn_Test		#connection test for url's used in installation
-cf_Continue		#let user confirm to continue
 root_Test		#test user is not root but has sudo
-check_Packs		#check dependencys
-set_Dir			#choose installation directory
-clone_Git		#clone the git repo and mv to $installdir
-cf_Daemon 		#let user confirm to daemonize
-test_Initdefs 	#test if necessary values are true and change if needed
-adj_Initscript  #change values to match installscripts
-cp_Initscript	#copy initscript to /etc/init.d/$applow
-cf_Config		#Let user confirm to start configuration
-new_Config		#import or download configurationfile
-set_IP			#Set Ipadress:Port
-set_UP			#Set Username:Password
-start_App		#Start the application and gl!
-LaSi_Menu 		#Return to main script
+show_Menu		#present choices for installation
 
-#### TEST OF MAPPEN AL BESTAAN EN STEL VOOR TE VERWIJDERN
