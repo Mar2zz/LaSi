@@ -145,12 +145,12 @@ show_Menu (){
 LaSi_Logo 				#some basic info about installer
 show_Author				#creator of the app installed
 echo
-echo "1. (re)Install Sick Beard"
-echo "2. Update Sick Beard"
+echo "1. (re)Install $APP"
+echo "2. Update $APP"
 echo "3. Exit script"
 echo
 echo "Choose one of the above options"
-read -p "Enter 1, 2, 3 or 4: " CHOICE
+read -p "Enter 1, 2 or 3: " CHOICE
 case $CHOICE in
 	1)
 		check_Packs		#check dependencys
