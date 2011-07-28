@@ -166,7 +166,7 @@ echo "4. Update $APP"
 echo "5. Exit script"
 echo
 echo "Choose one of the above options"
-read -p "Enter 1, 2 or 3: " CHOICE
+read -p "Enter 1, 2, 3, 4 or 5: " CHOICE
 case $CHOICE in
 	1)
 		check_Packs		#check dependencys
@@ -188,12 +188,14 @@ case $CHOICE in
 		show_Menu
 		;;
 	4)
-		
+		svn_Update
+		show_Menu
+		;;
 	5)
 		LaSi_Menu		#Return to main script
 		;;
 	*)
-		echo "Enter 1, 2 or 3"
+		echo "Enter 1, 2, 3, 4 or 5: "
 		show_Menu
 		;;
 esac
@@ -781,12 +783,13 @@ esac
 
 
 #UPDATE periscope
+svn_Update () {
 echo
 echo "===="
 echo "Checking for updates Periscope"
 cd $INSTALLDIR && svn update
 echo "===="
-
+}
 
 #### RETURN TO MENU ####
 	LaSi_Menu () {
