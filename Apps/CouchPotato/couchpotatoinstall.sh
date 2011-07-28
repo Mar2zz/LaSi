@@ -156,7 +156,6 @@ case $CHOICE in
 		check_Packs		#check dependencys
 		set_Dir			#choose installation directory
 		clone_Git		#clone the git repo and mv to $installdir
-		cp_Sample		#rename .cfg.sample 
 		cf_Config		#Let user confirm to start configuration
 		new_Config		#import or download configurationfile
 		set_IP			#Set Ipadress:Port
