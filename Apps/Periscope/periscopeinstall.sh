@@ -26,7 +26,7 @@
 #######################################################################################
 #######################################################################################
 
-VERSION=v0.3 ####
+VERSION=v0.4 ####
                          
 TESTOS1=Ubuntu_10.4_Desktop
 TESTOS2=Ubuntu_10.4_Server
@@ -38,32 +38,32 @@ TESTOS3=XBMC_Live_Dharma
 
 #SET SOME VARIABLES (SOME VARIABLES WILL BE SET THROUGH LIVE USERINPUT IN TERMINAL)
 
-APP=Periscope; 		# name of app to install (also for Dropboxfolders)
-APPLOW=periscope;	# lowercase appname
+APP=Periscope; 				# name of app to install (also for Dropboxfolders)
+APPLOW=periscope;			# lowercase appname
 
 CONN1=periscope.googlecode.com; 	# to test connections needed to install apps
 CONN2=dropbox.com;
 CONN3=crummy.com;
 
 DROPBOX=http://dl.dropbox.com/u/18712538/ 				#dropbox-adres
-SVN=http://periscope.googlecode.com/svn/trunk/periscope #svn adres
+SVN=http://periscope.googlecode.com/svn/trunk/periscope			#svn adres
 
 BS=http://www.crummy.com/software/BeautifulSoup/download/3.x/BeautifulSoup-3.2.0.tar.gz
 BSVERSION=BeautifulSoup-3.2.0;
 
-PACK1=subversion; 	#needed packages to run (using apt to check and install)
-PACK1_EXE=svn;		#name _exe when execute command differs from packagename.
+PACK1=subversion;		#needed packages to run (using apt to check and install)
+PACK1_EXE=svn;			#name_exe when execute command differs from packagename.
 PACK2=python;
 PACK2_EXE=$PACK2;
 PACK3=python-xdg
 PACK3_EXE=$PACK3
 
-INSTALLDIR=/home/$USER/.$APPLOW; #directory you want to install to.
+INSTALLDIR=/home/$USER/.$APPLOW;	#directory you want to install to.
 
 SCANPATH=scanPath.sh;			#script to batchsearch
 DOWN_SUB=downloadSub.py;		#Periscope CLI
 SABPER=SabtoPeriscope.sh;		#Postprocessingscript Sabnzbd
-SABPERSICK=SabtoPertoSick.sh;	#Postprocessingscript Sabnzbd to Periscope to Sickbeard
+SABPERSICK=SabtoPertoSick.sh;		#Postprocessingscript Sabnzbd to Periscope to Sickbeard
 
 
 
@@ -154,33 +154,51 @@ echo "LaSi $VERSION"
 	}
 
 
-#### CONFIRM_CONTINUE ####
-	cf_Continue () {
-	echo '--------'
-	echo 'You can take the blue pill if you want to, just answer no on the next question or press CTRL+C'
-	echo '--------'
-	echo ' '
-	
-		Question() {
-		echo "Are you sure you want to continue and install $APP?"
-		read -p "(yes/no)   :" REPLY
-		case $REPLY in
-     		[Yy]*)
-     			echo "Into the rabbit hole..."
-	    		;;
-     		[Nn]*)
-				LaSi_Menu
-			 	;;
-			*)
-				echo "Answer yes or no"
-				Question
-			  	;;
-		esac
-		}
-	Question		
-	}  
-	
-	
+#### PRESENT OPTIONS IN A MENU ####
+show_Menu (){
+LaSi_Logo 				#some basic info about installer
+show_Author				#creator of the app installed
+echo
+echo "1. (re)Install $APP"
+echo "2. Set a cronjob for $APP"
+echo "3. Set Sabnzbd postprocessing for $APP"
+echo "4. Update $APP"
+echo "5. Exit script"
+echo
+echo "Choose one of the above options"
+read -p "Enter 1, 2 or 3: " CHOICE
+case $CHOICE in
+	1)
+		check_Packs		#check dependencys
+		set_Dir			#choose installation directory
+		checkout_Svn		#check out SVN Repo and mv to $installdir
+		get_BS			#get BeautifulSoup
+		get_Scripts		#Download all scripts used
+		path_Python		#check which python is used and update scripts
+		path_Periscope		#check installdir and update scripts
+		cf_Language		#set languages
+		show_Menu
+		;;
+	2)
+		set_Path_Cron		#set cronjobs
+		show_Menu
+		;;
+	3)
+		use_Sabnzbd		#set sabnzbd postprocessingscript
+		show_Menu
+		;;
+	4)
+		
+	5)
+		LaSi_Menu		#Return to main script
+		;;
+	*)
+		echo "Enter 1, 2 or 3"
+		show_Menu
+		;;
+esac
+}
+
 #######################################################################################
 #### CHECK AND INSTALL PACKAGES #######################################################
 
@@ -604,20 +622,20 @@ echo "LaSi $VERSION"
     	 		;;
     	 	[2]*)
     	 		check_Cron &&
-				if ! grep -i -q "@hourly .$INSTALLDIR/$PREFIX-$SCANPATH" $INSTALLDIR/cronjobs.txt
+			if ! grep -i -q "@hourly .$INSTALLDIR/$PREFIX-$SCANPATH" $INSTALLDIR/cronjobs.txt
     		 		then
     		 		echo "@hourly .$INSTALLDIR/$PREFIX-$SCANPATH" >> $INSTALLDIR/cronjobs.txt
     		 	else 
 		     		echo "Cronjob allready exists, skipped"    		 	
     		 	fi
     	 	
-				import_Cron &&
+			import_Cron &&
     		 	echo "Do you want to set another path?"
     		 	Question_Path
     	 		;;
     	  	[3]*)
     	  		check_Cron &&
-   			   	if ! grep -i -q "@daily .$INSTALLDIR/$PREFIX-$SCANPATH" $INSTALLDIR/cronjobs.txt
+   			if ! grep -i -q "@daily .$INSTALLDIR/$PREFIX-$SCANPATH" $INSTALLDIR/cronjobs.txt
     		 		then
     		 		echo "@daily .$INSTALLDIR/$PREFIX-$SCANPATH" >> $INSTALLDIR/cronjobs.txt
     		 	else 
@@ -630,14 +648,14 @@ echo "LaSi $VERSION"
     	  		;;
     	  	[4]*)
     	  		check_Cron &&
-		  	  	if ! grep -i -q "@midnight .$INSTALLDIR/$PREFIX-$SCANPATH" $INSTALLDIR/cronjobs.txt
+		  	if ! grep -i -q "@midnight .$INSTALLDIR/$PREFIX-$SCANPATH" $INSTALLDIR/cronjobs.txt
 		     		then
 			      	echo "@midnight .$INSTALLDIR/$PREFIX-$SCANPATH" >> $INSTALLDIR/cronjobs.txt
 			    else 
 		     		echo "Cronjob allready exists, skipped"
 		     	fi
     		 	
-				import_Cron &&
+			import_Cron &&
     		 	echo "Do you want to set another path?"
     		 	Question_Path
     	  		;;   	
@@ -650,7 +668,7 @@ echo "LaSi $VERSION"
 		     		echo "Cronjob allready exists, skipped"
 		     	fi
     	 	
-				import_Cron &&
+			import_Cron &&
     		 	echo "Do you want to set another path?"
     		 	Question_Path
     	  		;;
@@ -761,7 +779,15 @@ echo "LaSi $VERSION"
 	Question		
 	}
 
-	
+
+#UPDATE periscope
+echo
+echo "===="
+echo "Checking for updates Periscope"
+cd $INSTALLDIR && svn update
+echo "===="
+
+
 #### RETURN TO MENU ####
 	LaSi_Menu () {
 		
@@ -769,32 +795,12 @@ echo "LaSi $VERSION"
 	read -sn 1 -p "Press a key to continue."
 	echo
 	exit
-	}			
-			
-		
-			
+	}
+
+
 #### ALL FUNCTIONS ####	
-	
-LaSi_Logo 		#some basic info about installer
-show_Author		#creator of the app installed
 conn_Test		#connection test for url's used in installation
-cf_Continue		#let user confirm to continue
 root_Test		#test user is not root but has sudo
-check_Packs		#check dependencys
-set_Dir			#choose installation directory
-checkout_Svn	#check out SVN Repo and mv to $installdir
-get_BS			#get BeautifulSoup
-get_Scripts		#Download all scripts used
-path_Python		#check which python is used and update scripts
-path_Periscope	#check installdir and update scripts
-cf_Language		#set languages
-set_Path_Cron	#set paths and cronjobs
-	#set_Path_Cron subfunctions
-	#Question_Path  #Returning question to set path for batchsearch
-	#set_Path		#set the path where to search for subs
-	#set_Age		#set how old files in days can be
-	#set_Cron		#add cronjobs for these searches
-use_Sabnzbd			#postprocessing options
-LaSi_Menu		#Return to main script
+show_Menu
 
 
