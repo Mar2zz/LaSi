@@ -161,7 +161,7 @@ show_Author				#creator of the app installed
 echo
 echo "1. (re)Install $APP"
 echo "2. Set a cronjob for $APP"
-echo "3. Set Sabnzbd postprocessing for $APP"
+echo "3. Set Sabnzbd and/or Sickbeard postprocessing for $APP"
 echo "4. Update $APP"
 echo "5. Exit script"
 echo
@@ -703,49 +703,49 @@ esac
 		echo "e.g. /home/$USER/.sabnzbd/scripts"
 		echo "or S to skip"
 		read -p ":" SABPATH
-    		if [ $SABPATH = S -o $SABPATH = s ]
-    			then
-    			Question
-    		elif [ ! -d $SABPATH ]
-    			then
-    			echo "$SABPATH doesn't exist, try again"
-    			set_Sabpath
+		if [ $SABPATH = S -o $SABPATH = s ]
+			then
+			Question
+		elif [ ! -d $SABPATH ]
+			then
+			echo "$SABPATH doesn't exist, try again"
+			set_Sabpath
 			fi
 		}
 		
 		set_Sabpost () {
 		ln -s -b $INSTALLDIR/$SABPER $SABPATH/$SABPER
-    	echo
-    	echo "Created symbolic link to $SABPATH/$SABPER" 
-    	echo "Make sure you enable this in Sabnzbd+ for your movies and TVshows" 
-    	}
-		
-	
+	echo
+	echo "Created symbolic link to $SABPATH/$SABPER" 
+	echo "Make sure you enable this in Sabnzbd+ for your movies and TVshows" 
+	}
+
+
 		set_Sickpath () {
 		echo
 		echo 'Please specify the full path to your Sickbeard folder'
 		echo "e.g. /home/$USER/.sickbeard"
 		echo "or S to skip"
 		read -p ":" SICKPATH
-    		if [ -d $SICKPATH ]
-    			then
-				sed -i "s!/PATH_SICK!$SICKPATH!g" $INSTALLDIR/$SABPERSICK
-                ln -s -b $INSTALLDIR/$SABPERSICK $SABPATH/$SABPERSICK
-                echo
-    			echo "Created symbolick link $SABPATH/$SABPERSICK" 
-    			echo "Make sure you enable this in Sabnzbd+ for your TVshows" 
-    		elif [ $SICKPATH = S -o $SICKPATH = s ]
-    			then
-    			echo "Skipped Sabnzbd+ to Periscope to Sickbeard postprocessing"
-    			echo "Tip: You can use the script $INSTALLDIR/$SABPERSICK anytime"
-    			echo "Edit it with the correct paths"
-    			echo "and symlink it to your Sabnzbd postprocessing folder"
-    		else	
-    			echo "$SICKPATH doesn't exist, try again"
-    			set_Sickpath
+		if [ -d $SICKPATH ]
+			then
+			sed -i "s!/PATH_SICKBEARD!$SICKPATH!g" $INSTALLDIR/$SABPERSICK
+			ln -s -b $INSTALLDIR/$SABPERSICK $SABPATH/$SABPERSICK
+			echo
+			echo "Created symbolick link $SABPATH/$SABPERSICK" 
+			echo "Make sure you enable this in Sabnzbd+ for your TVshows" 
+		elif [ $SICKPATH = S -o $SICKPATH = s ]
+			then
+			echo "Skipped Sabnzbd+ to Periscope to Sickbeard postprocessing"
+			echo "Tip: You can use the script $INSTALLDIR/$SABPERSICK anytime"
+			echo "Edit it with the correct paths"
+			echo "and symlink it to your Sabnzbd postprocessing folder"
+		else
+			echo "$SICKPATH doesn't exist, try again"
+			set_Sickpath
 			fi
 		}
-		
+
 		Question() {
 		echo
 		echo '--------'
