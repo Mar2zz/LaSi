@@ -291,6 +291,7 @@ esac
 			;;
 		2)
 			echo "Backup $INSTALLDIR naar /home/$USER/LaSi/$APP"
+			sudo chown -R $USER $INSTALLDIR
 			if [ -d LaSi ]
 				then
 				cp -af $INSTALLDIR /home/$USER/LaSi/$APP &&
@@ -367,7 +368,7 @@ esac
 	sudo mv -f $HOME/temp_$APPLOW $INSTALLDIR
 	echo "Changing ownership of /var/www/mediafrontpage to www-data"
 	echo "Remember to chown it to your normal user when gitpulling"
-	sudo chown -R www-data /var/www/mediafrontpage
+	sudo chown -R www-data $INSTALLDIR
 	echo
 	}
 
