@@ -133,6 +133,41 @@ echo "LaSi $VERSION"
 	}
 
 
+#### PRESENT OPTIONS IN A MENU ####
+show_Menu (){
+LaSi_Logo 				#some basic info about installer
+show_Author				#creator of the app installed
+echo
+echo "1. (re)Install $APP"
+echo "2. Update $APP"
+echo "3. Exit script"
+echo
+echo "Choose one of the above options"
+read -p "Enter 1, 2 or 3: " CHOICE
+case $CHOICE in
+	1)
+		check_Packs		#check dependencys
+		set_Dir			#choose installation directory
+		clone_Git		#clone the git repo into $installdir
+		restart_Ap		#reload apache for all changes to take effect
+		show_Menu
+		;;
+	2)
+		git_Update
+		show_Menu
+		;;
+		
+	3)
+		LaSi_Menu		#Return to main script
+		;;
+	*)
+		echo "Enter 1, 2 or 3"
+		show_Menu
+		;;
+esac
+}
+
+
 #######################################################################################
 #### CHECK AND INSTALL PACKAGES #######################################################
 
@@ -365,7 +400,17 @@ echo "LaSi $VERSION"
 		sudo /etc/init.d/apache2 reload
 	}
 
-
+git_Update () {
+	echo
+	echo "===="
+	echo "Checking for updates $APP"
+	sudo chown -R $USER $INSTALLDIR
+	cd $INSTALLDIR &&
+	git pull
+	sudo chown -R www-data $INSTALLDIR
+	read -sn 1 -p "Press a key to return to menu."
+	echo "===="
+}
 
 
 
@@ -384,17 +429,9 @@ echo "LaSi $VERSION"
 
 
 #### ALL FUNCTIONS ####
-
-LaSi_Logo 		#some basic info about installer
-show_Author		#creator of the app installed
 conn_Test		#connection test for url's used in installation
-cf_Continue		#let user confirm to continue
 root_Test		#test user is not root but has sudo
-check_Packs		#check dependencys
-set_Dir			#choose installation directory
-clone_Git		#clone the git repo into $installdir
 #add_MFP		#add mfp-site to sites-available
-restart_Ap		#restart apache for all changes to take effect
-LaSi_Menu		#Return to main script
+show_Menu
 
 
