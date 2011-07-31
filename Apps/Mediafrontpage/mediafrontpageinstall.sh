@@ -157,7 +157,6 @@ case $CHOICE in
 		git_Update
 		show_Menu
 		;;
-		
 	3)
 		LaSi_Menu		#Return to main script
 		;;
