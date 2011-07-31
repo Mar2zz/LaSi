@@ -149,6 +149,7 @@ case $CHOICE in
 		check_Packs		#check dependencys
 		set_Dir			#choose installation directory
 		clone_Git		#clone the git repo into $installdir
+		#add_MFP		#add mfp-site to sites-available (not done yet, using apache defaultsite)
 		restart_Ap		#reload apache for all changes to take effect
 		show_Menu
 		;;
@@ -431,7 +432,6 @@ git_Update () {
 #### ALL FUNCTIONS ####
 conn_Test		#connection test for url's used in installation
 root_Test		#test user is not root but has sudo
-#add_MFP		#add mfp-site to sites-available
 show_Menu
 
 
