@@ -84,7 +84,7 @@ echo
 show_Author () {
 echo '---------------------------------'
 echo 'MEDIAFRONTPAGE IS CREATED BY GUGAHOI'
-echo '---- https://github.com/Mediafrontpage/'
+echo '- https://github.com/Mediafrontpage/'
 echo
 echo "LaSi $VERSION"
 }
@@ -373,7 +373,10 @@ echo "LaSi $VERSION"
 	LaSi_Menu () {
 
 	echo
-	echo "Mediafrontpage installation is ready, go to: http://$HOSTNAME/mediafrontpage and have fun"
+	echo "
+	Mediafrontpage installation is ready, 
+	go to: http://$HOSTNAME/mediafrontpage and have fun!
+	"
 	read -sn 1 -p "Press a key to continue."
 	exit
 	}
