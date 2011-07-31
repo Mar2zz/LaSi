@@ -357,7 +357,7 @@ echo "
 #
 *############################################################
 #
-# Mediafrontpage is written by Gugahoi and others
+# Mediafrontpage is written by Nick8888 and others
 #
 # Visit https://github.com/Mediafrontpage/mediafrontpage	
 *#############################################################"

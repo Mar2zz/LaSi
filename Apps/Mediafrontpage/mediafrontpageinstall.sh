@@ -83,8 +83,8 @@ echo
 
 show_Author () {
 echo '---------------------------------'
-echo 'MEDIAFRONTPAGE IS CREATED BY GUGAHOI'
-echo '- https://github.com/Mediafrontpage/'
+echo 'MEDIAFRONTPAGE IS CREATED BY NICK8888 AND OTHERS'
+echo '------------- https://github.com/Mediafrontpage/'
 echo
 echo "LaSi $VERSION"
 }
