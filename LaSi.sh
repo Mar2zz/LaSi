@@ -62,6 +62,9 @@ APP5_INST=spotwebinstall.sh;
 APP6=Headphones;
 APP6_INST=headphonesinstall.sh;
 
+APP7=Mediafrontpage;
+APP7_INST=mediafrontpageinstall.sh;
+
 #######################################################################################
 
 LaSi_Menu (){
@@ -87,9 +90,10 @@ LaSi_Menu (){
 	
 		show_Menu () {
 		echo "Make a choice to see info or install these apps..."
-		echo "1. CouchPotato			4. AlbumIdentify"
-		echo "2. SickBeard			5. Spotweb (dutch only)"
-		echo "3. Periscope			6. Headphones"
+		echo "1. CouchPotato			5. Spotweb (dutch only)"
+		echo "2. SickBeard			6. Headphones"
+		echo "3. Periscope			7. Mediafrontpage"
+		echo "4. AlbumIdentify"
 		echo
 		echo "Q. Quit"
 	
@@ -113,11 +117,14 @@ LaSi_Menu (){
 			[6]*)
 				info_Head
 				;;
+			[7]*)
+				info_Mediafp
+				;;
 			[Qq]*)
 				exit
 				;;
 			*)
-				echo "Please make a selection..."
+				echo "Please make a selection (e.g. 1)"
 				echo
 				show_Menu
 				;;
@@ -332,6 +339,30 @@ echo "
 *#############################################################"
 SET_APP=$APP6
 SET_INST=$APP6_INST
+cf_Choice
+}
+
+
+#### MEDIAFRONTPAGE ####
+
+info_Mediafp () {
+clear
+echo "
+*###################### MEDIAFRONTPAGE ####################### 
+#
+# MediaFrontPage is a HTPC Web Program Organiser. Your HTPC 
+# utilises a number of different programs to do certain tasks. 
+# What MediaFrontPage does is creates a user specific web page 
+# that will be your nerve centre for everything you will need.
+#
+*############################################################
+#
+# Mediafrontpage is written by Gugahoi and others
+#
+# Visit https://github.com/Mediafrontpage/mediafrontpage	
+*#############################################################"
+SET_APP=$APP7
+SET_INST=$APP7_INST
 cf_Choice
 }
 
