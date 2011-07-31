@@ -166,7 +166,7 @@ prep_Scripts () {
 	sed -i "s#PATH_PERISCOPE#$INSTALLDIR/periscope#g" $INSTALLDIR/periscope/downloadSub.py
 	sed -i "
 		s#PATH_PERISCOPE#$INSTALLDIR/periscope#g
-		s#/PATH/TO/VIDEOS#$1#g
+		s#/PATH/TO/VIDEOS#\$1#g
 		s#/usr/bin/env bash#/bin/sh#g
 	" $INSTALLDIR/periscope/scanPath.sh
 	}
