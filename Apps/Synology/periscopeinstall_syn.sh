@@ -307,7 +307,7 @@ echo "Enter 6 to update every 6 hours, 12 for every twelve hours, etc...!"
 read -p "Enter a digit: " HOUR
 if [ $HOUR -eq $HOUR ]
 	then
-	echo "0	*/$HOUR	*	*	*	root	sh $INSTALLDIR/periscope/scanPath.sh \"$BATCHPATH\" > /dev/null" >> /etc/crontab &&
+	echo "0	\*/$HOUR	\*	\*	\*	root	sh $INSTALLDIR/periscope/scanPath.sh \"$BATCHPATH\" > /dev/null" >> /etc/crontab &&
 	echo "Cronjob added for Periscope to retrieve spots every $HOUR hour(s)"
 	/usr/syno/etc/rc.d/S04crond.sh stop &&
 	/usr/syno/etc/rc.d/S04crond.sh start

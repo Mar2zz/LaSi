@@ -26,7 +26,7 @@
 #######################################################################################
 #######################################################################################
 
-VERSION=v0.1
+VERSION=v0.2
                          
 TESTOS1=Ubuntu_10.4_Desktop
 TESTOS2=Ubuntu_10.4_Server
@@ -38,7 +38,7 @@ TESTOS3=XBMC_Live_Dharma
 
 #SET SOME VARIABLES (SOME VARIABLES WILL BE SET THROUGH LIVE USERINPUT IN TERMINAL)
 
-APP=Headphones; 	# name of app to install 
+APP=Headphones;		# name of app to install 
 			# APP needs to be exactly the same (caps) as on Github (App.git, without .git)
 APPLOW=headphones;	# lowercase appname
 
@@ -140,32 +140,47 @@ echo "LaSi $VERSION"
 	}
 
 
-#### CONFIRM_CONTINUE ####
-	cf_Continue () {
-	echo '--------'
-	echo 'You can take the blue pill if you want to, just answer no on the next question or press CTRL+C'
-	echo '--------'
-	echo
-	
-		Question() {
-		echo "Are you sure you want to continue and install $APP?"
-		read -p "(yes/no)   :" REPLY
-		case $REPLY in
-		[Yy]*)
-			echo "Into the rabbit hole..."
-			;;
-		[Nn]*)
-			echo 'Wake up in bed and believe this all was a dream...'
-			LaSi_Menu
-			;;
-		*)
-			echo "Answer yes or no"
-			Question
-			;;
-		esac
-		}
-	Question
-	}
+#### PRESENT OPTIONS IN A MENU ####
+show_Menu (){
+LaSi_Logo 				#some basic info about installer
+show_Author				#creator of the app installed
+echo
+echo "1. (re)Install $APP"
+echo "2. Update $APP"
+echo "3. Exit script"
+echo
+echo "Choose one of the above options"
+read -p "Enter 1, 2 or 3: " CHOICE
+case $CHOICE in
+	1)
+		check_Packs		#check dependencys
+		set_Dir			#choose installation directory
+		clone_Git		#clone the git repo and mv to $installdir
+		cf_Daemon 		#let user confirm to daemonize
+		path_Python		#test if necessary values are true and change if needed
+		adj_Initscript		#change values to match installscripts
+		cp_Initscript		#copy initscript to /etc/init.d/$applow
+		cf_Config		#Let user confirm to start configuration
+		new_Config		#import or download configurationfile
+		set_IP			#Set Ipadress:Port
+		set_UP			#Set Username:Password
+		start_App		#Start the application and gl!
+		show_Menu
+		;;
+	2)
+		git_Update
+		show_Menu
+		;;
+		
+	3)
+		LaSi_Menu		#Return to main script
+		;;
+	*)
+		echo "Enter 1, 2 or 3"
+		show_Menu
+		;;
+esac
+}
 
 
 #######################################################################################
@@ -173,7 +188,7 @@ echo "LaSi $VERSION"
 
 #### CHECK SOFTWARE: GIT-CORE AND PYTHON ####
 	check_Packs () {
-		
+
 		check_Pack1 () {
 		if ! which $PACK1_EXE
 			then
@@ -186,7 +201,7 @@ echo "LaSi $VERSION"
 			echo "$PACK1 installed"
 		fi
 		}
-		
+
 		check_Pack2 () {
 		if ! which $PACK2
 			then
@@ -207,7 +222,7 @@ echo "LaSi $VERSION"
 
 #### DETERMINE PACKAGEMANAGER ####
 	use_PM () {
-			
+
 		def_PM () {
 		[ -x "$(which $1)" ]
 		}
@@ -244,7 +259,7 @@ echo "LaSi $VERSION"
 			use_Manual
 		fi
 		}
-		
+
 	if def_PM apt-get
 		then 
 		use_Apt
@@ -259,42 +274,42 @@ echo "LaSi $VERSION"
 		use_Manual
 	fi
 	}
-	
-	
+
+
 #### CHOOSE INSTALLATION DIRECTORY ####
-	set_Dir () {	
-	
+	set_Dir () {
+
 		cf_Overwrite () {
 		echo "1. Choose another directory"
 		echo "2. Backup $INSTALLDIR to LaSi/$APP"
 		echo "3. Delete $INSTALLDIR"
 		echo "Q. Quit"
-		read -p "Press 1, 2, 3 or Q to select an option    :" REPLY
+		read -p "Press 1, 2, 3 or Q to select an option: " REPLY
 		case $REPLY in
-     		1)
-				choose_Dir
-     			;;
-     		2)
-     			echo "Backup $INSTALLDIR to /home/$USER/LaSi/$APP"
-     			if [ -d /home/$USER/LaSi ]
-     				then
-     				mv -f $INSTALLDIR /home/$USER/LaSi/$APP
-     			else
-     				mkdir LaSi
-     				mv -f $INSTALLDIR /home/$USER/LaSi/$APP
-     			fi
-     			;;
-     		3)
-     		    echo "Deleting $INSTALLDIR."
-     			rm -R -f $INSTALLDIR
-     			;;
-     		[Qq]*)
-     			echo "Fini..."
-     			LaSi_Menu
-     			;;
-      		*)
-				echo "Choose 1, 2, 3 or Q to quit"
-				cf_Dir
+		1)
+			choose_Dir
+			;;
+		2)
+			echo "Backup $INSTALLDIR to /home/$USER/LaSi/$APP"
+			if [ -d /home/$USER/LaSi ]
+				then
+				mv -f $INSTALLDIR /home/$USER/LaSi/$APP
+			else
+				mkdir LaSi
+				mv -f $INSTALLDIR /home/$USER/LaSi/$APP
+			fi
+			;;
+		3)
+			echo "Deleting $INSTALLDIR."
+			rm -R -f $INSTALLDIR
+			;;
+		[Qq]*)
+			echo "Fini..."
+			LaSi_Menu
+			;;
+		*)
+			echo "Choose 1, 2, 3 or Q to quit"
+			cf_Dir
 			;;
 		esac
 		}
@@ -311,7 +326,7 @@ echo "LaSi $VERSION"
 		fi
 		}
 
-		cf_Dir () { 
+		cf_Dir () {
 		if [ -d $INSTALLDIR ]
 			then
 			echo
@@ -320,7 +335,7 @@ echo "LaSi $VERSION"
 		else
 			echo "By default $APP will be installed in $INSTALLDIR."
 			echo "Do you want to change this?"
-			read -p "(yes/no)   :" REPLY
+			read -p "(yes/no): " REPLY
 			case $REPLY in
 			[Yy]*)
 				choose_Dir
@@ -329,8 +344,8 @@ echo "LaSi $VERSION"
 				echo "Installing $APP in $INSTALLDIR"
 				;;
 			*)
-					echo "Answer yes or no"
-					cf_Dir
+				echo "Answer yes or no"
+				cf_Dir
 				;;
 			esac
 		fi
@@ -360,45 +375,45 @@ echo "LaSi $VERSION"
 	echo "You can install $APP as a daemon, so it will start when your pc starts..."
 	echo '-------'
 	echo ' '
-		
+
 		Question() {
 		echo "Do you want to install $APP as a daemon?"
-		read -p "(yes/no)   :" REPLY
+		read -p "(yes/no): " REPLY
 		case $REPLY in
 	[Yy]*) # back to main
 		echo 'As you wish, master...'
 		;;
 	[Nn]*)
-			echo "You can start app manually by executing python $INSTALLDIR/$APP.py..."
-			echo "I prefer the LaSi way though...but have fun using $APP!"
-			LaSi_Menu
-			;;
+		echo "You can start app manually by executing python $INSTALLDIR/$APP.py..."
+		echo "I prefer the LaSi way though...but have fun using $APP!"
+		LaSi_Menu
+		;;
 	*)
-			echo "Answer yes or no"
-			Question
+		echo "Answer yes or no"
+		Question
 		;;
 		esac
 		}
 	Question
 	} 
-	
+
 
 #### TEST NECESSARY DEFAULT PATHS ####
 	path_Python() {
-		PATH_PYTHON=$(which python)	
+		PATH_PYTHON=$(which python)
 		sed -i "s#/usr/bin/python#$PATH_PYTHON#g" $INSTALLDIR/$INITD
 	}
 
 
-#### CHANGE VALUES IN INITSCRIPT ####	
+#### CHANGE VALUES IN INITSCRIPT ####
 	adj_Initscript () {
 	sed -i "
 		s#/usr/local/sbin/headphones#$INSTALLDIR#g
 		s/root/$USER/g
 		" /$INSTALLDIR/$INITD
 	}
-	
-	
+
+
 #### COPY INITSCRIPT TO /ETC/INIT.D/ ####
 	cp_Initscript () {
 	if [ -e /etc/init.d/$APPLOW ]
@@ -415,8 +430,8 @@ echo "LaSi $VERSION"
 		sudo update-rc.d $APPLOW defaults
 	fi
 	}
-	
-	
+
+
 #### LET USER CONFIRM CONFIGURATION ####
 	cf_Config() {
 	echo '-------'
@@ -425,23 +440,23 @@ echo "LaSi $VERSION"
 	echo "That's the same as http://localhost:$PORT or http://127.0.0.1:$PORT."
 	echo "It will not ask for a username and password."
 	echo 
-	
+
 		Question() {
 		echo "Do you want change the defaults or import your own configuration file?"
-		read -p "(yes/no)   :" REPLY
+		read -p "(yes/no): " REPLY
 		case $REPLY in
 		[Yy]*)
 			echo 'As you wish, master...'
 			;;
 		[Nn]*)
-				sudo /etc/init.d/$APPLOW start &&
-				echo "Point your webbrowser to http://$IPADRESS:$PORT and start configuring!"
-				LaSi_Menu
-				;;
-			*)
-				echo "Answer yes or no"
-				Question
-				;;
+			sudo /etc/init.d/$APPLOW start &&
+			echo "Point your webbrowser to http://$IPADRESS:$PORT and start configuring!"
+			LaSi_Menu
+			;;
+		*)
+			echo "Answer yes or no"
+			Question
+			;;
 		esac
 		}
 	Question
@@ -449,7 +464,7 @@ echo "LaSi $VERSION"
 
 #### GET NEW CONFIGFILE ####
 	new_Config(){
-		
+
 		get_Config () { #download new config.ini
 		if [ -e $INSTALLDIR/config.ini ]
 			then
@@ -459,106 +474,107 @@ echo "LaSi $VERSION"
 			wget -P $INSTALLDIR $DROPBOX/$APP/config.ini
 		fi
 		}
-		
+
 		import_Config() { # import config.ini
 		echo
 		echo 'Type the full path and filename of the configurationfile you want to import'
 		echo 'or s to skip:'
-		read -p ' :' IMPORTCONFIG
+		read -p ': ' IMPORTCONFIG
 		if [ $IMPORTCONFIG = S -o $IMPORTCONFIG = s ]
 			then
-			cf_Import     		
+			cf_Import
 		elif [ -e $IMPORTCONFIG ]
-				then
-				cp -f --suffix=.bak $IMPORTCONFIG $INSTALLDIR/config.ini &&
-				sudo /etc/init.d/$APPLOW start &&
-				echo "Point your webbrowser to you know where and have fun using $APP!"
-				LaSi_Menu				
-			else
-				echo 'File does not exist, enter correct path as /path/to/file.ext' &&
-				import_Config
-			fi
+			then
+			cp -f --suffix=.bak $IMPORTCONFIG $INSTALLDIR/config.ini &&
+			sudo /etc/init.d/$APPLOW start &&
+			echo "Point your webbrowser to you know where and have fun using $APP!"
+			show_Menu
+		else
+			echo 'File does not exist, enter correct path as /path/to/file.ext' &&
+			import_Config
+		fi
 		}
-		
+
 		cf_Import () { # Confirm import
 		echo "Do you want to import your own configurationfile?"
-		read -p "(yes/no)   :" REPLY
+		read -p "(yes/no): " REPLY
 		case $REPLY in
-     		[Yy]*)
-     			import_Config
-     			;;
-     		[Nn]*)
-     			echo "Downloading fresh config from dropbox.com"
-     			get_Config
-      		;;
-      		*)
+		[Yy]*)
+			import_Config
+			;;
+		[Nn]*)
+			echo "Downloading fresh config from dropbox.com"
+			get_Config
+			;;
+		*)
 			echo "Answer yes or no"
 			cf_Import
-      		;;
-			esac
+			;;
+		esac
 		}
 	cf_Import
 	}
-		
-#### CHANGE DEFAULTS IN CONFIGFILE ####		
+
+
+#### CHANGE DEFAULTS IN CONFIGFILE ####
 
 #### CHANGE IPADRESS AND PORT ####
 
 	set_IP () {
-		read -p 'Enter new ipadress, default is 0.0.0.0 ...    :' NEW_IP
-		read -p 'Enter new port, default is 8181 ...    :' NEW_PORT
+	read -p 'Enter new ipadress, default is 0.0.0.0 ...: ' NEW_IP
+	read -p 'Enter new port, default is 8181 ...: ' NEW_PORT
 
-			cf_IP () {
-			echo "You entered $NEW_IP:$NEW_PORT, is this correct?  :"
-			read -p "(yes/no)   :" REPLY
-			case $REPLY in
-     			[Yy]*)
-     				echo "Ok, adding $NEW_IP:$NEW_PORT to config.ini..."
-     				sed -i "
-     					s/http_host = 0.0.0.0/http_host = $NEW_IP/g
-   					s/http_port = 8181/http_port = $NEW_PORT/g 
-   				" $INSTALLDIR/config.ini
-				;;
-     			[Nn]*)
-     				set_IP
-      			;;
-      			*)
-					echo "Answer yes or no"
-					cf_IP
-      			;;
-			esac
-			}
+		cf_IP () {
+		echo "You entered $NEW_IP:$NEW_PORT, is this correct?"
+		read -p "(yes/no): " REPLY
+		case $REPLY in
+		[Yy]*)
+			echo "Ok, adding $NEW_IP:$NEW_PORT to config.ini..."
+			sed -i "
+				s/http_host = 0.0.0.0/http_host = $NEW_IP/g
+				s/http_port = 8181/http_port = $NEW_PORT/g 
+			" $INSTALLDIR/config.ini
+			;;
+		[Nn]*)
+			set_IP
+			;;
+		*)
+			echo "Answer yes or no"
+			cf_IP
+			;;
+		esac
+		}
 	cf_IP
 	}
 
 #### CHANGE USERNAME AND PASSWORD ####
 	set_UP () {
-		read -p 'Enter new username, leave blank for none ...    :' NEW_USER
-		read -p 'Enter new password, leave blank for none ...    :' NEW_PASS
+	read -p 'Enter new username, leave blank for none ...    :' NEW_USER
+	read -p 'Enter new password, leave blank for none ...    :' NEW_PASS
 
-			cf_UP () {
-			echo "You entered username '$NEW_USER' and password '$NEW_PASS', is this correct?  :"
-			read -p "(yes/no or skip)   :" REPLY
-			case $REPLY in
-     			[Yy]*)
-     				echo "Ok, adding username and password to config.ini..."
-     			    sed -i "
-  						s/http_username = \"\"/http_username = \"$NEW_USER\"/g
- 						s/http_password = \"\"/http_password = \"$NEW_PASS\"/g
-   					" $INSTALLDIR/config.ini
-				;;
-     			[Nn]*)
-     				set_UP
-      			;;
-      			[Ss]*)
-     				echo "Skipped that one, it stays blank"
-     			;;
-      			*)
-					echo "Answer yes or no or skip"
-					cf_UP
-      			;;
-			esac
-			}
+		cf_UP () {
+		echo "You entered username '$NEW_USER' and password '$NEW_PASS', is this correct?"
+		read -p "(yes/no or skip): " REPLY
+		case $REPLY in
+		[Yy]*)
+			echo "Adding username and password to config.ini..."
+			sed -i "
+				s/http_username = \"\"/http_username = \"$NEW_USER\"/g
+				s/http_password = \"\"/http_password = \"$NEW_PASS\"/g
+			" $INSTALLDIR/config.ini
+			;;
+		[Nn]*)
+			set_UP
+			;;
+		[Ss]*)
+			echo "Skipped that one, it stays blank"
+			;;
+		*)
+			echo "Answer yes or no or skip"
+			cf_UP
+			;;
+		esac
+		}
 	cf_UP
 	}
 
@@ -567,45 +583,43 @@ echo "LaSi $VERSION"
 	start_App() {
 		echo "Now starting $APP..."
 		if sudo /etc/init.d/$APPLOW start
-		then
+			then
 			echo "Point your webbrowser to http://$NEW_IP:$NEW_PORT and have fun!"
 		else
 			echo "Can't start $APP, try starting manually..."
 			echo "Execute sudo /etc/init.d/$APPLOW stop | start | restart | force-reload"
-			LaSi_Menu
 		fi
 	}
-			
-			
+
+
+#### UPDATE APP ####
+	git_Update () {
+	echo
+	echo "===="
+	echo "Checking for updates $APP"
+	cd $INSTALLDIR
+	if ! git pull | grep "Already up-to-date"
+		then
+		sudo /etc/init.d/$APPLOW restart
+	fi
+	read -sn 1 -p "Press a key to return to menu."
+	echo "===="
+	}
+
+
 #### RETURN TO MENU ####
 	LaSi_Menu () {
-		
+
 	echo 
 	read -sn 1 -p "Press a key to continue."
 	exit
-	}		
-			
-		
-			
+	}
+
+
+
 #### ALL FUNCTIONS ####	
-	
-LaSi_Logo		#intro
-show_Author		#creator of the app installed
 conn_Test		#connection test for url's used in installation
-cf_Continue		#let user confirm to continue
 root_Test		#test user is not root but has sudo
-check_Packs		#check dependencys
-set_Dir			#choose installation directory
-clone_Git		#clone the git repo and mv to $installdir
-cf_Daemon 		#let user confirm to daemonize
-path_Python		#test if necessary values are true and change if needed
-adj_Initscript		#change values to match installscripts
-cp_Initscript		#copy initscript to /etc/init.d/$applow
-cf_Config		#Let user confirm to start configuration
-new_Config		#import or download configurationfile
-set_IP			#Set Ipadress:Port
-set_UP			#Set Username:Password
-start_App		#Start the application and gl!
-LaSi_Menu 		#Return to main script
+show_Menu
 
 #### TEST OF MAPPEN AL BESTAAN EN STEL VOOR TE VERWIJDERN
