@@ -156,14 +156,14 @@ case $CHOICE in
 		check_Packs		#check dependencys
 		set_Dir			#choose installation directory
 		clone_Git		#clone the git repo and mv to $installdir
-		cf_Config		#Let user confirm to start configuration
-		new_Config		#import or download configurationfile
-		set_IP			#Set Ipadress:Port
-		set_UP			#Set Username:Password
 		cf_Daemon 		#let user confirm to daemonize
 		test_Initdefs		#test if necessary values are true and change if needed
 		adj_Initscript		#change values to match installscripts
 		cp_Initscript		#copy initscript to /etc/init.d/$applow
+		cf_Config		#Let user confirm to start configuration
+		new_Config		#import or download configurationfile
+		set_IP			#Set Ipadress:Port
+		set_UP			#Set Username:Password
 		start_App		#Start the application and gl!
 		show_Menu
 		;;
@@ -303,7 +303,7 @@ esac
      			;;
      		[Qq]*)
      			echo "Fini..."
-     			LaSi_Menu
+     			show_Menu
      			;;
       		*)
 				echo "Choose 1, 2, 3 or Q to quit"
@@ -384,7 +384,6 @@ esac
      	[Nn]*)
 			echo "You can start app manually by executing python $INSTALLDIR/$APP.py..."
 			echo "I prefer the LaSi way though...but have fun using $APP!"
-			LaSi_Menu
 			;;
       	*)
 			echo "Answer yes or no"
@@ -452,14 +451,12 @@ esac
      			echo 'As you wish, master...'
      			;;
      		[Nn]*)
-				sudo /etc/init.d/$APPLOW start &&
-				echo "Point your webbrowser to http://$IPADRESS:$PORT and start configuring!"
-				LaSi_Menu
-				;;
-		  	*)
-				echo "Answer yes or no"
-				Question
-		  		;;
+			echo "Point your webbrowser to http://$IPADRESS:$PORT and start configuring!"
+			;;
+		*)
+			echo "Answer yes or no"
+			Question
+			;;
 		esac
 		}
 	Question
@@ -483,15 +480,14 @@ esac
 		echo 'Type the full path and filename of the configurationfile you want to import'
 		echo 'or s to skip:'
 		read -p ' :' IMPORTCONFIG
-     		if [ $IMPORTCONFIG = S -o $IMPORTCONFIG = s ]
-     			then
-     			cf_Import     		
-     		elif [ -e $IMPORTCONFIG ]
+		if [ $IMPORTCONFIG = S -o $IMPORTCONFIG = s ]
+			then
+			cf_Import
+		elif [ -e $IMPORTCONFIG ]
 				then
 				cp -f --suffix=.bak $IMPORTCONFIG $INSTALLDIR/config.ini &&
 				sudo /etc/init.d/couchpotato start &&
 				echo "Point your webbrowser to you know where and have fun using $APP!"
-				LaSi_Menu				
 			else
 				echo 'File does not exist, enter correct path as /path/to/file.ext' &&
 				import_Config
@@ -508,10 +504,10 @@ esac
      		[Nn]*)
      			echo "Downloading fresh config from dropbox.com"
      			get_Config
-      		;;
+      			;;
       		*)
 			echo "Answer yes or no"
-				cf_Import
+			cf_Import
       		;;
 			esac
 		}
@@ -560,10 +556,10 @@ esac
 			case $REPLY in
      			[Yy]*)
      				echo "Ok, adding username and password to config.ini..."
-     			    sed -i "
-  						s/username = /username = $NEW_USER/g
+     				sed -i "
+  					s/username = /username = $NEW_USER/g
  						s/password = /password = $NEW_PASS/g
-   					" $INSTALLDIR/config.ini
+   				" $INSTALLDIR/config.ini
 				;;
      			[Nn]*)
      				set_UP
@@ -590,7 +586,6 @@ esac
 		else
 			echo "Can't start $APP, try starting manually..."
 			echo "Execute sudo /etc/init.d/$APPLOW stop | start | restart | force-reload"
-			LaSi_Menu
 		fi
 	}
 

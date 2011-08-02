@@ -156,15 +156,15 @@ case $CHOICE in
 		check_Packs		#check dependencys
 		set_Dir			#choose installation directory
 		clone_Git		#clone the git repo and mv to $installdir
-		cp_Sample		#rename .cfg.sample 
-		cf_Config		#Let user confirm to start configuration
-		new_Config		#import or download configurationfile
-		set_IP			#Set Ipadress:Port
-		set_UP			#Set Username:Password
+		cp_Sample		#rename .cfg.sample
 		cf_Daemon 		#let user confirm to daemonize
 		test_Initdefs		#test if necessary values are true and change if needed
 		adj_Initscript		#change values to match installscripts
 		cp_Initscript		#copy initscript to /etc/init.d/$applow
+		cf_Config		#Let user confirm to start configuration
+		new_Config		#import or download configurationfile
+		set_IP			#Set Ipadress:Port
+		set_UP			#Set Username:Password
 		start_App		#Start the application and gl!
 		show_Menu
 		;;
@@ -475,9 +475,7 @@ esac
 				echo 'As you wish, master...'
 				;;
 			[Nn]*)
-				sudo /etc/init.d/$APPLOW start &&
 				echo "Point your webbrowser to http://$IPADRESS:$PORT and start configuring!"
-				LaSi_Menu
 				;;
 			*)
 				echo "Answer yes or no"
@@ -514,7 +512,6 @@ esac
 			cp -f --suffix=.bak $IMPORTCONFIG $INSTALLDIR/config.ini &&
 			sudo /etc/init.d/couchpotato start &&
 			echo "Point your webbrowser to you know where and have fun using $APP!"
-			LaSi_Menu
 		else
 			echo 'File does not exist, enter correct path as /path/to/file.ext' &&
 			import_Config
