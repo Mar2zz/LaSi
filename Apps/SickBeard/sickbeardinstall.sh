@@ -510,7 +510,7 @@ esac
 		elif [ -e $IMPORTCONFIG ]
 			then
 			cp -f --suffix=.bak $IMPORTCONFIG $INSTALLDIR/config.ini &&
-			sudo /etc/init.d/couchpotato start &&
+			sudo /etc/init.d/sickbeard start &&
 			echo "Point your webbrowser to you know where and have fun using $APP!"
 		else
 			echo 'File does not exist, enter correct path as /path/to/file.ext' &&
