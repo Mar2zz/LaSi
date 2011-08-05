@@ -83,7 +83,7 @@ case $CHOICE in
 		show_Menu
 		;;
 	5)
-		echo "Have fun using spotweb @ http://$NAS/spotweb/"
+		exit
 		;;
 	*)
 		echo "Enter 1, 2, 3, 4 or 5"
@@ -133,12 +133,10 @@ if [ -d /volume1/web/spotweb ]
 		[YyJj]*)
 			mv -Rf /volume1/web/spotweb /volume1/web/spotweb_bak &&
 			echo "Moved /volume1/web/spotweb to /volume1/web/spotweb_bak"
-			git clone https://github.com/spotweb/spotweb.git /volume1/web/spotweb
 			;;
 		[Nn]*)
 			rm -Rf /volume1/web/spotweb
 			echo "Removed /volume1/web/spotweb"
-			git clone https://github.com/spotweb/spotweb.git /volume1/web/spotweb
 			;;
 		*)
 			echo "Answer yes or no"
@@ -147,9 +145,8 @@ if [ -d /volume1/web/spotweb ]
 	esac
 	}
 	backup_Spot
-else
-	git clone https://github.com/spotweb/spotweb.git /volume1/web/spotweb
 fi
+git clone git://github.com/spotweb/spotweb.git /volume1/web/spotweb
 }
 
 
@@ -176,7 +173,7 @@ case $REPLY in
 			/usr/syno/mysql/bin/mysqladmin -u root password $PASSWORD
 		fi
 		}
-	set_Pass
+		set_Pass
 		;;
 	*)
 		echo "Answer yes or no"
@@ -280,7 +277,7 @@ cd /volume1/web/spotweb
 echo "
 Now starting retrieval of spots, this can take hours!!
 If it errors and stops, just type:
-cd /volume1/web/spotweb && usr/bin/php retrieve.php 
+cd /volume1/web/spotweb && usr/bin/php retrieve.php -force
 to continue retrieving where it stopped. Have fun using Spotweb!
 "
 read -sn 1 -p "--- [press any key to start retrieving]---"
