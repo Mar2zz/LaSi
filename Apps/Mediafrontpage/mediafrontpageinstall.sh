@@ -369,6 +369,7 @@ esac
 	echo "Changing ownership of /var/www/mediafrontpage to www-data"
 	echo "Remember to chown it to your normal user when gitpulling"
 	sudo chown -R www-data $INSTALLDIR
+	sudo chmod -R 774 $INSTALLDIR
 	echo
 	}
 
@@ -405,10 +406,8 @@ git_Update () {
 	echo
 	echo "===="
 	echo "Checking for updates $APP"
-	sudo chown -R $USER $INSTALLDIR
 	cd $INSTALLDIR &&
 	git pull
-	sudo chown -R www-data $INSTALLDIR
 	read -sn 1 -p "Press a key to return to menu."
 	echo "===="
 }
