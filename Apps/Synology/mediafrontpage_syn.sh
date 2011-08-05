@@ -127,7 +127,6 @@ chown -R nobody:root /volume1/web/mediafrontpage
 chmod -R 774 /volume1/web/mediafrontpage
 echo "Have fun using mediafrontpage @ http://$NAS/mediafrontpage/"
 read -sn 1 -p "--- [continue]---"
-fi
 }
 
 
