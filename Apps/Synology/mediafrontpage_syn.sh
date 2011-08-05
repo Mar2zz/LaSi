@@ -123,6 +123,7 @@ if [ -d /volume1/web/mediafrontpage ]
 	backup_MFP
 fi
 git clone https://github.com/Mediafrontpage/mediafrontpage.git /volume1/web/mediafrontpage
+chown -R nobody:root /volume1/web/mediafrontpage
 chmod -R 774 /volume1/web/mediafrontpage
 echo "Have fun using mediafrontpage @ http://$NAS/mediafrontpage/"
 read -sn 1 -p "--- [continue]---"
