@@ -109,16 +109,10 @@ if [ -d /volume1/web/mediafrontpage ]
 		[YyJj]*)
 			mv -Rf /volume1/web/mediafrontpage /volume1/web/mediafrontpage_bak &&
 			echo "Moved /volume1/web/mediafrontpage to /volume1/web/mediafrontpage_bak"
-			git clone https://github.com/Mediafrontpage/mediafrontpage.git /volume1/web/mediafrontpage
-			echo "Have fun using mediafrontpage @ http://$NAS/mediafrontpage/"
-			read -sn 1 -p "--- [continue]---"
 			;;
 		[Nn]*)
 			rm -Rf /volume1/web/mediafrontpage
 			echo "Removed /volume1/web/mediafrontpage"
-			git clone https://github.com/Mediafrontpage/mediafrontpage.git /volume1/web/mediafrontpage
-			echo "Have fun using mediafrontpage @ http://$NAS/mediafrontpage/"
-			read -sn 1 -p "--- [continue]---"
 			;;
 		*)
 			echo "Answer yes or no"
@@ -127,10 +121,11 @@ if [ -d /volume1/web/mediafrontpage ]
 	esac
 	}
 	backup_MFP
-else
-	git clone https://github.com/Mediafrontpage/mediafrontpage.git /volume1/web/mediafrontpage
-	echo "Have fun using mediafrontpage @ http://$NAS/mediafrontpage/"
-	read -sn 1 -p "--- [continue]---"
+fi
+git clone https://github.com/Mediafrontpage/mediafrontpage.git /volume1/web/mediafrontpage
+chmod -R 774 /volume1/web/mediafrontpage
+echo "Have fun using mediafrontpage @ http://$NAS/mediafrontpage/"
+read -sn 1 -p "--- [continue]---"
 fi
 }
 
