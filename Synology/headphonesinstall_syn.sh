@@ -4,22 +4,35 @@
 # blogs: mar2zz.tweakblogs.net
 # License: GNU GPL v3
 
-## Headphones Install script for Synology by Mar2zz
+## headphones Install script for Synology by Mar2zz
 
-## v0.1.
+## v0.8.
 
 # please report bugs/issues @
 # https://github.com/Mar2zz/LaSi/issues
 
 # Based on the tutorials by J. van Emden (Brickman)
-# http://synology.brickman.nl/HowTo%20-%20install%20Spotweb.txt
+# http://synology.brickman.nl/HowTo%20-%20install%20headphones.txt
 
 
-######## INSTALLATION ########
 
-NAS=$(hostname);
-INSTALLDIR="/volume1/@appstore";
-DROPBOX=http://dl.dropbox.com/u/18712538/;
+#SET SOME VARIABLES (SOME VARIABLES WILL BE SET THROUGH LIVE USERINPUT IN TERMINAL)
+
+APP=Headphones; 	# name of app to install 
+			# APP needs to be exactly the same (caps) as on Github (App.git, without .git)
+APPLOW=headphones;	# lowercase appname
+
+CONN1=github.com; 	# to test connections needed to install apps
+CONN2=dropbox.com;
+
+GITHUB=git://github.com/rembo10/headphones.git; 	#github-adres
+DROPBOX=http://dl.dropbox.com/u/18712538/Synology	#dropbox-adres
+
+INSTALLDIR=/volume1/@appstore/$APPLOW;			#directory you want to install to.
+
+IPADRESS=0.0.0.0;					#default ipadress to listen on
+PORT=8081; 						#default port to listen on
+NAS=hostname;
 
 
 ## Check if ipkg is installed by updating the packagelist
@@ -53,38 +66,30 @@ echo
 echo
 }
 
-
 show_Menu (){
-echo "1. (re)Install Headphones"
-echo "2. Update Headphones"
+echo "1. (re)Install $APP"
+echo "2. Update $APP"
 echo "3. Exit script"
 echo
 echo "Choose one of the above options"
 read -p "Enter 1, 2 or 3: " CHOICE
 case $CHOICE in
 	1)
+		edit_DSM
 		install_Deps
 		cf_Config
+		start_App
 		show_Menu
 		;;
 	2)
-		enable_Api
+		git_Update
 		show_Menu
 		;;
-		
 	3)
-		echo "Have fun using Headphones @ http://$NAS:8181/"	
-		;;
-	4)
-		check_Cron
-		add_Cron
-		show_Menu
-		;;
-	5)
-		echo "Have fun using spotweb @ http://$NAS/spotweb/"
+		exit
 		;;
 	*)
-		echo "Enter 1, 2, 3, 4 or 5"
+		echo "Enter 1, 2 or 3"
 		show_Menu
 		;;
 esac
@@ -92,90 +97,243 @@ esac
 
 
 
-## Install software needed
+######## INSTALLATION ########
+
+edit_DSM () {
+## do some stuff in the webinterface
+echo '
+# Go to your DSM:
+# Control Panel -> Users -> Create user"
+# and create a user called "headphones"
+# Press the Ok button
+#
+# Press a button to continue this installer 
+(if you have done all of the above settings)'
+read -sn 1 -p "--- [continue]---"
+}
+
+
 install_Deps () {
-ipkg install git
-ipkg install textutils
+# Install the following if needed
+echo "Now checking if all dependency's are installed"
+ipkg install git			# Install git if it is not on your system
+ipkg install textutils			# Needed to use git pull to update from the source
+ipkg install python26			# Install Python 2.6 if it is not on your system
+#ipkg install py26-cheetah		# Install Cheetah - The Python-Powered Template Engine
 
-## make sure python 2.6 is present
-if ! $(which python | grep "python2.6")
+# Install from gitsource
+if [ -d $INSTALLDIR ]
 	then
-	ipkg install python26
-fi
-
-## Install git
-if [ -d $INSTALLDIR/headphones ]
-	then
-	backup_Head () {
-	echo "$INSTALLDIR/headphones allready exists..."
+	backup_Dir () {
+	echo "$INSTALLDIR allready exists..."
 	echo "Do you want to backup this folder?"
 	read -p "Answer yes or no: " REPLY
 	case $REPLY in
 		[YyJj]*)
-			mv -Rf $INSTALLDIR/headphones $INSTALLDIR/headphones_bak &&
-			echo "Moved $INSTALLDIR/headphones to $INSTALLDIR/headphones_bak"
-			git clone https://github.com/rembo10/headphones.git $INSTALLDIR/headphones
+			mv -Rf $INSTALLDIR backup_$INSTALLDIR &&
+			echo "Moved $INSTALLDIR to backup_$INSTALLDIR"
 			;;
 		[Nn]*)
-			rm -Rf $INSTALLDIR/headphones
-			echo "Removed $INSTALLDIR/headphones"
-			git clone https://github.com/rembo10/headphones.git $INSTALLDIR/headphones
+			rm -Rf $INSTALLDIR
+			echo "Removed $INSTALLDIR"
 			;;
 		*)
 			echo "Answer yes or no"
-			backup_Head
+			backup_Dir
 			;;
 	esac
 	}
-	backup_Head
-else
-	git clone https://github.com/rembo10/headphones.git $INSTALLDIR/headphones
+backup_Dir
 fi
+git clone $GITHUB $INSTALLDIR
+}
+
+# Install service to start @ boot
+echo "Grabbing startupscript provided by J. van Emden (Brickman)"
+wget -O /opt/etc/init.d/S99headphones.sh http://dl.dropbox.com/u/5653370/headphones/S99headphones.sh &&
+chmod a+x /opt/etc/init.d/S99headphones.sh
 }
 
 
-#### LET USER CONFIRM CONFIGURATION ####
-cf_Config() {
-echo '-------'
-echo "Now you can start Headphones with a clean configuration..."
-echo "By default Headphones webinterface adress is: http://$NAS:8181."
-echo 
+#### GET NEW CONFIGFILE ####
+new_Config(){
 
-	import_Config() { 
+	get_Config () { #download new config.ini
+	if [ -e $INSTALLDIR/config.ini ]
+		then
+		mv -f $INSTALLDIR/config.ini $INSTALLDIR/config.ini.bak
+	fi
+	wget -P $INSTALLDIR http://dl.dropbox.com/u/18712538/$APP/config.ini
+	}
+
+	import_Config() { # import config.ini
 	echo
 	echo 'Type the full path and filename of the configurationfile you want to import'
 	echo 'or s to skip:'
 	read -p ' :' IMPORTCONFIG
-	if [ -e $IMPORTCONFIG ]
+	if [ $IMPORTCONFIG = S -o $IMPORTCONFIG = s ]
 		then
-		cp -f --suffix=.bak $IMPORTCONFIG $INSTALLDIR/headphones/config.ini &&
-		echo "Point your webbrowser to you know where and have fun using Headphones!"
-		show_Menu
+		cf_Import
+	elif [ -e $IMPORTCONFIG ]
+		then
+		cp -f --suffix=.bak $IMPORTCONFIG $INSTALLDIR/config.ini
 	else
-		echo 'File does not exist, enter correct path as /path/to/config.ini' &&
+		echo 'File does not exist, enter correct path as /path/to/file.ext' &&
 		import_Config
 	fi
 	}
 
-	Question() {
-	echo "Do you want to import your own configuration file?"
+	cf_Import () { # Confirm import
+	echo "Do you want to import your own configurationfile?"
 	read -p "(yes/no): " REPLY
 	case $REPLY in
-	[Yy]*)
-		echo 'As you wish, master...'
-		import_Config
-		;;
-	[Nn]*)
-		echo "Point your webbrowser to http://$NAS:$8181 and start configuring!"
-		show_Menu
-		;;
-	*)
-		echo "Answer yes or no"
-		Question
-		;;
+		[Yy]*)
+			import_Config
+			;;
+		[Nn]*)
+			echo "Downloading fresh config from dropbox.com"
+			get_Config
+			;;
+		*)
+			echo "Answer yes or no"
+			cf_Import
+			;;
+	esac
+	}
+cf_Import
+}
+
+
+### CHANGE DEFAULTS IN CONFIGFILE ####
+
+#### CHANGE IPADRESS AND PORT ####
+
+set_IP () {
+read -p 'Enter new ipadress, default is 0.0.0.0 ...: ' NEW_IP
+read -p "Enter new port, default is $PORT ...: " NEW_PORT
+
+	cf_IP () {
+	echo "You entered $NEW_IP:$NEW_PORT, is this correct?"
+	read -p "(yes/no): " REPLY
+	case $REPLY in
+		[Yy]*)
+			echo "Ok, adding $NEW_IP:$NEW_PORT to config.ini..."
+			sed -i "
+				s/http_host = 0.0.0.0/http_host = $NEW_IP/g
+				s/http_port = 8181/http_port = $NEW_PORT/g 
+			" $INSTALLDIR/config.ini
+			;;
+		[Nn]*)
+			set_IP
+			;;
+		*)
+			echo "Answer yes or no"
+			cf_IP
+			;;
+	esac
+	}
+cf_IP
+}
+
+
+#### CHANGE USERNAME AND PASSWORD ####
+set_UP () {
+read -p 'Enter new username, leave blank for none ...    :' NEW_USER
+read -p 'Enter new password, leave blank for none ...    :' NEW_PASS
+
+	cf_UP () {
+	echo "You entered username '$NEW_USER' and password '$NEW_PASS', is this correct?  :"
+	read -p "(yes/no or skip)   :" REPLY
+	case $REPLY in
+		[Yy]*)
+			echo "Ok, adding username and password to config.ini..."
+			sed -i "
+				s/http_username = \"\"/http_username = \"$NEW_USER\"/g
+				s/http_password = \"\"/http_password = \"$NEW_PASS\"/g
+			" $INSTALLDIR/config.ini
+			;;
+		[Nn]*)
+			set_UP
+			;;
+		[Ss]*)
+			echo "Skipped that one, it stays blank"
+			;;
+		*)
+			echo "Answer yes or no or skip"
+			cf_UP
+			;;
+	esac
+	}
+cf_UP
+}
+
+#### LET USER CONFIRM CONFIGURATION ####
+cf_Config() {
+echo '-------'
+echo "Now you can start $APP with a clean configuration..."
+echo "By default $APP's webinterface adress is: http://$IPADRESS:$PORT."
+echo "That's the same as http://localhost:$PORT or http://$NAS:$PORT."
+echo "It will not ask for a username and password."
+echo 
+
+	Question() {
+	echo "Do you want change the defaults or import your own configuration file?"
+	read -p "(yes/no): " REPLY
+	case $REPLY in
+		[Yy]*)
+			echo 'As you wish, master...'
+			new_Config
+			set_IP
+			set_UP
+			;;
+		[Nn]*)
+			if [ -e $INSTALLDIR/config.ini ]
+				then
+				mv -f $INSTALLDIR/config.ini $INSTALLDIR/config.ini.bak
+			fi
+			wget -P $INSTALLDIR http://dl.dropbox.com/u/18712538/$APP/config.ini
+			;;
+		*)
+			echo "Answer yes or no"
+			Question
+			;;
 	esac
 	}
 Question
 }
 
 
+
+#### STARTING APP ####
+start_App() {
+echo "Now starting $APP..."
+chown -R headphones:users $INSTALLDIR
+/opt/etc/init.d/S99headphones.sh start
+
+CONFIGPORT=$(grep port $INSTALLDIR/config.ini | sed 's/http_port = //g')
+CONFIGIP=$(grep host $INSTALLDIR/config.ini | sed 's/http_host = //g')
+
+echo "Point your webbrowser to http://$CONFIGIP:$CONFIGPORT and have fun!"
+}
+
+
+#### UPDATE APP ####
+git_Update () {
+echo
+echo "===="
+echo "Checking for updates $APP"
+cd $INSTALLDIR
+if ! git pull | grep "Already up-to-date"
+	then
+	/opt/etc/init.d/S99headphones.sh stop &&
+	chown -R headphones:users $INSTALLDIR &&
+	/opt/etc/init.d/S99headphones.sh start
+fi
+read -sn 1 -p "Press a key to return to menu."
+echo "===="
+}
+
+#### Call functions
+ipkg_Test
+LaSi_Logo
+show_Menu

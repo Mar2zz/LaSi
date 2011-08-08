@@ -32,6 +32,7 @@ INSTALLDIR=/volume1/@appstore/$APPLOW;			#directory you want to install to.
 
 IPADRESS=0.0.0.0;					#default ipadress to listen on
 PORT=8081; 						#default port to listen on
+NAS=hostname;
 
 
 ## Check if ipkg is installed by updating the packagelist
@@ -121,8 +122,31 @@ ipkg install python26			# Install Python 2.6 if it is not on your system
 ipkg install py26-cheetah		# Install Cheetah - The Python-Powered Template Engine
 
 # Install from gitsource
-echo "Grabbing source from Github"
+if [ -d $INSTALLDIR ]
+	then
+	backup_Dir () {
+	echo "$INSTALLDIR allready exists..."
+	echo "Do you want to backup this folder?"
+	read -p "Answer yes or no: " REPLY
+	case $REPLY in
+		[YyJj]*)
+			mv -Rf $INSTALLDIR backup_$INSTALLDIR &&
+			echo "Moved $INSTALLDIR to backup_$INSTALLDIR"
+			;;
+		[Nn]*)
+			rm -Rf $INSTALLDIR
+			echo "Removed $INSTALLDIR"
+			;;
+		*)
+			echo "Answer yes or no"
+			backup_Dir
+			;;
+	esac
+	}
+backup_Dir
+fi
 git clone $GITHUB $INSTALLDIR
+}
 
 # Install service to start @ boot
 echo "Grabbing startupscript provided by J. van Emden (Brickman)"
@@ -296,8 +320,8 @@ echo "Now starting $APP..."
 chown -R sickbeard:users $INSTALLDIR
 /opt/etc/init.d/S99sickbeard.sh start
 
-CONFIGPORT=$(grep web_port $INSTALLDIR/config.ini | sed -i 's/web_port = //g')
-CONFIGIP=$(grep web_host $INSTALLDIR/config.ini | sed -i 's/web_host = //g')
+CONFIGPORT=$(grep web_port $INSTALLDIR/config.ini | sed 's/web_port = //g')
+CONFIGIP=$(grep web_host $INSTALLDIR/config.ini | sed 's/web_host = //g')
 
 echo "Point your webbrowser to http://$CONFIGIP:$CONFIGPORT and have fun!"
 read -sn 1 -p "Press a key to return to menu."
