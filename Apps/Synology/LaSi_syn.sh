@@ -46,6 +46,15 @@ APP1_INST=spotwebinstall_syn.sh;
 APP2=Periscope;
 APP2_INST=periscopeinstall_syn.sh;
 
+APP3=Mediafrontpage
+APP3=mediafrontpageinstall_syn.sh;
+
+APP4=SickBeard;
+APP4_INST=sickbeardinstall_syn.sh;
+
+APP5=CouchPotato;
+APP5_INST=couchpotatoinstall_syn.sh;
+
 #######################################################################################
 
 LaSi_Menu (){
@@ -71,8 +80,9 @@ LaSi_Menu (){
 	
 		show_Menu () {
 		echo "Make a choice to see info or install these apps..."
-		echo "1. Spotweb (Dutch Usenet Community)"
-		echo "2. Periscope (Subtitle downloader)"
+		echo "1. Spotweb (Dutch NZB Community)		4. SickBeard (TV Shows)"
+		echo "2. Periscope (Subtitles)			5. CouchPotato (Movies)"
+		echo "3. Mediafrontpage (HTPC Organiser)	"
 		echo
 		echo "Q. Quit"
 	
@@ -83,6 +93,15 @@ LaSi_Menu (){
 				;;
 			[2]*)
 				info_Periscope
+				;;
+			[3]*)
+				info_Mediafrontpage
+				;;
+			[4]*)
+				info_Sickbeard
+				;;
+			[5]*)
+				info_Couchpotato
 				;;
 			[Qq]*)
 				exit
@@ -176,6 +195,102 @@ cf_Choice
 }
 
 
+#### MEDIAFRONTPAGE ####
+info_Mediafrontpage () {
+clear
+echo "
+*###################### MEDIAFRONTPAGE ####################### 
+#
+# MediaFrontPage is a HTPC Web Program Organiser. Your HTPC 
+# utilises a number of different programs to do certain tasks. 
+# What MediaFrontPage does is creates a user specific web page 
+# that will be your nerve centre for everything you will need.
+#
+*############################################################
+#
+# Mediafrontpage is written by Nick8888 and others
+#
+# Visit https://github.com/Mediafrontpage/mediafrontpage	
+*#############################################################"
+SET_APP=$APP3
+SET_INST=$APP3_INST
+cf_Choice
+}
+
+
+#### SICKBEARD ####
+
+info_Sickbeard () {
+clear
+echo "
+*####################### SICKBEARD ######################### 
+#
+# Sick Beard is currently an alpha release. 
+# There may be severe bugs in it and at any given time it may not work at all.
+#
+# Sick Beard is a PVR for newsgroup users (with limited torrent support). 
+# It watches for new episodes of your favorite shows and when they are posted
+# and it downloads them, sorts and renames them, and optionally generates 
+# metadata for them. It currently supports NZBs.org, NZBMatrix, Bin-Req, 
+# NZBs'R'Us,  EZTV.it, and any Newznab installation and retrieves 
+# show information from theTVDB.com and TVRage.com.
+
+#Features include:
+* automatically retrieves new episode torrent or nzb files
+* can scan your existing library and then download any old seasons 
+  or episodes you're missing"
+echo
+read -sn 1 -p "--- [more]---"
+echo
+echo "
+* can watch for better versions and upgrade your existing episodes 
+  (to from TV DVD/BluRay for example)
+* XBMC library updates, poster/fanart downloads, and NFO/TBN generation
+* configurable episode renaming
+* sends NZBs directly to SABnzbd, prioritizes and categorizes them properly
+* available for any platform, uses simple HTTP interface
+* can notify XBMC, Growl, or Twitter when new episodes are downloaded
+* specials and double episode support
+#
+*############################################################
+#
+# SickBeard is written by midgetspy
+#
+# Visit http://www.sickbeard.com
+*#############################################################"	
+SET_APP=$APP4
+SET_INST=$APP4_INST
+cf_Choice
+}
+
+
+#### COUCHPOTATO ####
+
+info_Couchpotato () {
+clear
+echo "
+*###################### COUCHPOTATO ######################### 
+#
+# CouchPotato is an automatic NZB and torrent downloader. 
+# You can keep a 'movies I want'-list and it will search 
+# for NZBs/torrents of these movies every X hours.	
+#
+# Once a movie is found, it will send it to SABnzbd
+# or download the .nzb or .torrent to a	# specified directory.
+#
+*############################################################
+#
+# CouchPotato is written by Ruud Burger in his spare time...
+# ..so buy him a coke to support him.
+#
+# Visit http://www.couchpotatoapp.com
+*#############################################################"
+SET_APP=$APP5
+SET_INST=$APP5_INST
+cf_Choice
+}
+
+
 #### BACKTOMENU OR INSTALL ####
 cf_Choice () {
 echo
@@ -205,7 +320,7 @@ read -p "Choose an option: " SELECT
 
 #### INSTALL APPLICATION
 inst_App () {
-	
+
 	dropbox_Test () {
 	if ! ping -c 1 $CONN2 > /dev/null 2>&1 
 		then
@@ -216,7 +331,7 @@ inst_App () {
 		get_Installer
 	fi
 	}
-		
+
 		get_Installer () {
 		if [ -e $SET_INST ]
 			then
@@ -232,7 +347,7 @@ inst_App () {
 			LaSi_Menu
 		fi
 		} 
-	
+
 	Question() {
 	echo
 	echo "Are you sure you want to continue and install $SET_APP?"
