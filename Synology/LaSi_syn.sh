@@ -335,17 +335,11 @@ inst_App () {
 		get_Installer () {
 		if [ -e $SET_INST ]
 			then
-			rm -f $SET_INST &&
-			wget $DROPBOX/$SET_INST &&
-			chmod +x $SET_INST &&
-			./$SET_INST &&
-			LaSi_Menu
-		else
-			wget $DROPBOX/$SET_INST
-			chmod +x $SET_INST &&
-			./$SET_INST &&
-			LaSi_Menu
+			rm -f $SET_INST
 		fi
+		wget $DROPBOX/$SET_INST &&
+		sh $SET_INST
+		LaSi_Menu
 		} 
 
 	Question() {
@@ -360,18 +354,18 @@ inst_App () {
 		dropbox_Test
 		;;
 	[Nn]*)
-			LaSi_Menu
-			;;
-		[Qq]*)
-			exit
-			;;
-		*)
-			echo "Answer yes to install" 
-			echo "no for menu"
-			echo "or Q to quit"
-			Question
-			;;
-		esac
+		LaSi_Menu
+		;;
+	[Qq]*)
+		exit
+		;;
+	*)
+		echo "Answer yes to install" 
+		echo "no for menu"
+		echo "or Q to quit"
+		Question
+		;;
+	esac
 	}
 Question
 }

@@ -21,6 +21,7 @@ NAS=$(hostname);
 
 
 ## Check if ipkg is installed by updating the packagelist
+ipkg_Test () {
 if ! ipkg update
 	then
 	echo "Bootstrap is not installed, please install it before using this script"
@@ -28,6 +29,7 @@ if ! ipkg update
 	echo "http://forum.synology.com/wiki/index.php/Overview_on_modifying_the_Synology_Server,_bootstrap,_ipkg_etc#How_to_install_ipkg"
 	exit
 fi
+}
 
 LaSi_Logo (){
 clear
@@ -137,6 +139,7 @@ git pull
 
 
 ### Start with the menu ###
+ipkg_Test
 LaSi_Logo
 show_Menu
 

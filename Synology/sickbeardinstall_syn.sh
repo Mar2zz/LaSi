@@ -4,7 +4,7 @@
 # blogs: mar2zz.tweakblogs.net
 # License: GNU GPL v3
 
-## couchpotato Install script for Synology by Mar2zz
+## sickbeard Install script for Synology by Mar2zz
 
 ## v0.8.
 
@@ -12,26 +12,26 @@
 # https://github.com/Mar2zz/LaSi/issues
 
 # Based on the tutorials by J. van Emden (Brickman)
-# http://synology.brickman.nl/HowTo%20-%20install%20couchpotato.txt
+# http://synology.brickman.nl/HowTo%20-%20install%20sickbeard.txt
 
 
 
 #SET SOME VARIABLES (SOME VARIABLES WILL BE SET THROUGH LIVE USERINPUT IN TERMINAL)
 
-APP=CouchPotato; 	# name of app to install 
+APP=SickBeard; 	# name of app to install 
 			# APP needs to be exactly the same (caps) as on Github (App.git, without .git)
-APPLOW=couchpotato;	# lowercase appname
+APPLOW=sickbeard;	# lowercase appname
 
 CONN1=github.com; 	# to test connections needed to install apps
 CONN2=dropbox.com;
 
-GITHUB=git://github.com/RuudBurger/CouchPotato.git; 	#github-adres
+GITHUB=git://github.com/RuudBurger/SickBeard.git; 	#github-adres
 DROPBOX=http://dl.dropbox.com/u/18712538/Synology	#dropbox-adres
 
 INSTALLDIR=/volume1/@appstore/$APPLOW;			#directory you want to install to.
 
 IPADRESS=0.0.0.0;					#default ipadress to listen on
-PORT=5050; 						#default port to listen on
+PORT=8081; 						#default port to listen on
 
 
 ## Check if ipkg is installed by updating the packagelist
@@ -103,7 +103,7 @@ edit_DSM () {
 echo '
 # Go to your DSM:
 # Control Panel -> Users -> Create user"
-# and create a user called "couchpotato"
+# and create a user called "sickbeard"
 # Press the Ok button
 #
 # Press a button to continue this installer 
@@ -126,8 +126,8 @@ git clone $GITHUB $INSTALLDIR
 
 # Install service to start @ boot
 echo "Grabbing startupscript provided by J. van Emden (Brickman)"
-wget -O /opt/etc/init.d/S99couchpotato.sh http://dl.dropbox.com/u/5653370/couchpotato/S99couchpotato.sh &&
-chmod a+x /opt/etc/init.d/S99couchpotato.sh
+wget -O /opt/etc/init.d/S99sickbeard.sh http://dl.dropbox.com/u/5653370/sickbeard/S99sickbeard.sh &&
+chmod a+x /opt/etc/init.d/S99sickbeard.sh
 }
 
 
@@ -186,7 +186,7 @@ cf_Import
 
 set_IP () {
 read -p 'Enter new ipadress, default is 0.0.0.0 ...: ' NEW_IP
-read -p 'Enter new port, default is 5050 ...: ' NEW_PORT
+read -p "Enter new port, default is $PORT ...: " NEW_PORT
 
 	cf_IP () {
 	echo "You entered $NEW_IP:$NEW_PORT, is this correct?"
@@ -195,9 +195,14 @@ read -p 'Enter new port, default is 5050 ...: ' NEW_PORT
 		[Yy]*)
 			echo "Ok, adding $NEW_IP:$NEW_PORT to config.ini..."
 			sed -i "
-				s/host = 0.0.0.0/host = $NEW_IP/g
-				s/port = 5000/port = $NEW_PORT/g 
+				s/web_host = 0.0.0.0/web_host = $NEW_IP/g
+				s/web_port = 8081/web_port = $NEW_PORT/g 
 			" $INSTALLDIR/config.ini
+			echo "and autoProcessTV.cfg..."
+			sed -i "
+				s/host=/host=$NEW_IP/g
+				s/port=/port=$NEW_PORT/g
+			" $INSTALLDIR/autoProcessTV/autoProcessTV.cfg
 			;;
 		[Nn]*)
 			set_IP
@@ -222,11 +227,16 @@ read -p 'Enter new password, leave blank for none ...    :' NEW_PASS
 	read -p "(yes/no or skip)   :" REPLY
 	case $REPLY in
 		[Yy]*)
-			echo "Ok, adding username and password to config.ini..."
+			echo "Adding username and password to config.ini..."
 			sed -i "
-				s/username = /username = $NEW_USER/g
-				s/password = /password = $NEW_PASS/g
+				s/web_username = \"\"/web_username = $NEW_USER/g
+				s/web_password = \"\"/web_password = $NEW_PASS/g
 			" $INSTALLDIR/config.ini
+			echo "and autoProcessTV.cfg..."
+			sed -i "
+				s/username=/username=$NEW_USER/g
+				s/password=/password=$NEW_PASS/g
+			" $INSTALLDIR/autoProcessTV/autoProcessTV.cfg
 			;;
 		[Nn]*)
 			set_UP
@@ -268,9 +278,6 @@ echo
 				mv -f $INSTALLDIR/config.ini $INSTALLDIR/config.ini.bak
 			fi
 			wget -P $INSTALLDIR http://dl.dropbox.com/u/18712538/$APP/config.ini
-			sed -i "
-				s/port = 5000/port = $PORT/g 
-			" $INSTALLDIR/config.ini
 			;;
 		*)
 			echo "Answer yes or no"
@@ -286,13 +293,14 @@ Question
 #### STARTING APP ####
 start_App() {
 echo "Now starting $APP..."
-chown -R couchpotato:users $INSTALLDIR
-/opt/etc/init.d/S99couchpotato.sh start
+chown -R sickbeard:users $INSTALLDIR
+/opt/etc/init.d/S99sickbeard.sh start
 
-CONFIGPORT=$(grep port $INSTALLDIR/config.ini | sed -i 's/port = //g')
-CONFIGIP=$(grep host $INSTALLDIR/config.ini | sed -i 's/host = //g')
+CONFIGPORT=$(grep web_port $INSTALLDIR/config.ini | sed -i 's/web_port = //g')
+CONFIGIP=$(grep web_host $INSTALLDIR/config.ini | sed -i 's/web_host = //g')
 
 echo "Point your webbrowser to http://$CONFIGIP:$CONFIGPORT and have fun!"
+read -sn 1 -p "Press a key to return to menu."
 }
 
 
@@ -304,9 +312,9 @@ echo "Checking for updates $APP"
 cd $INSTALLDIR
 if ! git pull | grep "Already up-to-date"
 	then
-	/opt/etc/init.d/S99couchpotato.sh stop &&
-	chown -R couchpotato:users $INSTALLDIR &&
-	/opt/etc/init.d/S99couchpotato.sh start
+	/opt/etc/init.d/S99sickbeard.sh stop &&
+	chown -R sickbeard:users $INSTALLDIR &&
+	/opt/etc/init.d/S99sickbeard.sh start
 fi
 read -sn 1 -p "Press a key to return to menu."
 echo "===="
