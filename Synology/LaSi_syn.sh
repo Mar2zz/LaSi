@@ -46,7 +46,7 @@ APP2=Periscope;
 APP2_INST=periscopeinstall_syn.sh;
 
 APP3=Mediafrontpage
-APP3=mediafrontpageinstall_syn.sh;
+APP3_INST=mediafrontpageinstall_syn.sh;
 
 APP4=SickBeard;
 APP4_INST=sickbeardinstall_syn.sh;
