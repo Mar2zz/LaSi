@@ -21,7 +21,7 @@ APP_PATH=/volume1/@appstore/sickbeard
 DAEMON=/opt/bin/python2.6
 
 # startup args
-DAEMON_OPTS=" SickBeard.py -d"
+DAEMON_OPTS="SickBeard.py -d"
 
 # app name
 DESC=SickBeard
@@ -59,7 +59,7 @@ echo "Starting $DESC ..."
 	}
 python_check
 
-su $RUN_AS -s /bin/sh -c "$DAEMON $DAEMON_OPTS &"
+su $RUN_AS -s /bin/sh -c "$DAEMON $APP_PATH/$DAEMON_OPTS &"
 }
 
 
