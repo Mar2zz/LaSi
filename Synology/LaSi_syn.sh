@@ -33,8 +33,7 @@
 
 DROPBOX=http://dl.dropbox.com/u/18712538/Synology;	# dropbox-adres
 CONN2=dropbox.com;					# to test connections needed
-
-NAS=$(hostname)
+NAS=hostname;
 
 
 #######################################################################################
@@ -54,6 +53,9 @@ APP4_INST=sickbeardinstall_syn.sh;
 
 APP5=CouchPotato;
 APP5_INST=couchpotatoinstall_syn.sh;
+
+APP6=Headphones
+APP6_INST=headphonesinstall_syn.sh;
 
 #######################################################################################
 
@@ -82,7 +84,7 @@ LaSi_Menu (){
 		echo "Make a choice to see info or install these apps..."
 		echo "1. Spotweb (Dutch NZB Community)		4. SickBeard (TV Shows)"
 		echo "2. Periscope (Subtitles)			5. CouchPotato (Movies)"
-		echo "3. Mediafrontpage (HTPC Organiser)	"
+		echo "3. Mediafrontpage (HTPC Organiser)	6. Headphones (Music)"
 		echo
 		echo "Q. Quit"
 	
@@ -102,6 +104,9 @@ LaSi_Menu (){
 				;;
 			[5]*)
 				info_Couchpotato
+				;;
+			[6]*)
+				info_Headphones
 				;;
 			[Qq]*)
 				exit
@@ -291,6 +296,32 @@ cf_Choice
 }
 
 
+#### HEADPHONES ####
+
+info_Headphones () {
+clear
+echo "
+*###################### HEADPHONES ########################## 
+#
+# Headphones is an automatic NZB downloader. 
+# You can keep a 'musicalbums I want'-list and it will search 
+# for NZBs of these albums every X hours.
+#
+# It is also possible to 'follow' artists for upcoming albums.	
+#
+# Once an album is found, it will send it to SABnzbd.
+#
+*############################################################
+#
+# Headphones is written by Rembo10 in his spare time...
+#
+# Visit https://github.com/rembo10/headphones	
+*#############################################################"
+SET_APP=$APP6
+SET_INST=$APP6_INST
+cf_Choice
+}
+
 #### BACKTOMENU OR INSTALL ####
 cf_Choice () {
 echo
@@ -338,7 +369,8 @@ inst_App () {
 			rm -f $SET_INST
 		fi
 		wget $DROPBOX/$SET_INST &&
-		sh $SET_INST
+		chmod +x $SET_INST &&
+		./$SET_INST &&
 		LaSi_Menu
 		} 
 
