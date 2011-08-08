@@ -25,7 +25,7 @@ APPLOW=sickbeard;	# lowercase appname
 CONN1=github.com; 	# to test connections needed to install apps
 CONN2=dropbox.com;
 
-GITHUB=git://github.com/RuudBurger/SickBeard.git; 	#github-adres
+GITHUB=git://github.com/midgetspy/Sick-Beard.git; 	#github-adres
 DROPBOX=http://dl.dropbox.com/u/18712538/Synology	#dropbox-adres
 
 INSTALLDIR=/volume1/@appstore/$APPLOW;			#directory you want to install to.
