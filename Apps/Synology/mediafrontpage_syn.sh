@@ -121,7 +121,7 @@ if [ -d /volume1/web/mediafrontpage ]
 	}
 	backup_MFP
 fi
-git clone git://github.com/Mediafrontpage/mediafrontpage.git /volume1/web/mediafrontpage
+git clone git://github.com/MediaFrontPage/mediafrontpage.git /volume1/web/mediafrontpage
 chown -R nobody:root /volume1/web/mediafrontpage
 chmod -R 774 /volume1/web/mediafrontpage
 echo "Have fun using mediafrontpage @ http://$NAS/mediafrontpage/"
