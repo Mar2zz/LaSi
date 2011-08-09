@@ -17,7 +17,7 @@
 
 ######## INSTALLATION ########
 
-NAS=$(hostname);
+NAS=hostname;
 
 
 ## Check if ipkg is installed by updating the packagelist

@@ -77,6 +77,7 @@ case $CHOICE in
 	1)
 		edit_DSM
 		install_Deps
+		make_Daemon
 		cf_Config
 		start_App
 		show_Menu
@@ -149,6 +150,7 @@ git clone $GITHUB $INSTALLDIR
 }
 
 # Install service to start @ boot
+make_Daemon () {
 echo "Grabbing startupscript provided by J. van Emden (Brickman)"
 wget -O /opt/etc/init.d/S99couchpotato.sh http://dl.dropbox.com/u/5653370/couchpotato/S99couchpotato.sh &&
 chmod a+x /opt/etc/init.d/S99couchpotato.sh

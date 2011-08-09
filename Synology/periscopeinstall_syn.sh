@@ -17,7 +17,7 @@
 
 ######## INSTALLATION ########
 
-NAS=$(hostname);
+NAS=hostname;
 INSTALLDIR="/volume1/@appstore";
 
 
