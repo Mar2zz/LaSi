@@ -85,9 +85,10 @@ LaSi_Menu (){
 		echo "1. Spotweb (Dutch NZB Community)		4. SickBeard (TV Shows)"
 		echo "2. Periscope (Subtitles)			5. CouchPotato (Movies)"
 		echo "3. Mediafrontpage (HTPC Organiser)	6. Headphones (Music)"
-		echo
 		echo "Q. Quit"
-	
+		echo
+		echo "Warning: You need to have bootstrap installed to install these applications!"
+
 		read -p "Choose an option: " SELECT
 		case "$SELECT" in
 			[1]*)
