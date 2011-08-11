@@ -38,27 +38,23 @@ TESTOS3=XBMC_Live_Dharma
 
 #SET SOME VARIABLES (SOME VARIABLES WILL BE SET THROUGH LIVE USERINPUT IN TERMINAL)
 
-APP=SickBeard; 		# name of app to install (also for Dropboxfolders)
-APPLOW=sickbeard;	# lowercase appname
+APP=SickBeard; 						# name of app to install (also for Dropboxfolders)
+APPLOW=sickbeard;					# lowercase appname
 
-CONN1=github.com; 	# to test connections needed to install apps
+CONN1=github.com; 					# to test connections needed to install apps
 CONN2=dropbox.com;
 
 GITHUB=https://github.com/midgetspy/Sick-Beard.git;	#github-adres
 DROPBOX=http://dl.dropbox.com/u/18712538/ 		#dropbox-adres
 
-PACK1=git-core; 	#needed packages to run (using apt to check and install)
-PACK1_EXE=git;		#EXE only needed when packagename differs from executable
-PACK2=python;		#names can be changed to distrospecific in IF=statements
-PACK3=python-cheetah;
-PACK3_EXE=cheetah;
+PACKAGES="git python python-cheetah";			#needed packages to run (using apt to check and install)
 
-INSTALLDIR=/home/$USER/.$APPLOW; #directory you want to install to.
-DAEMONUSER=$USER; 	#the user the app is started with
-INITD=init.ubuntu;	#name of default init-script
+INSTALLDIR=/home/$USER/.$APPLOW;			#directory you want to install to.
+DAEMONUSER=$USER; 					#the user the app is started with
+INITD=init.ubuntu;					#name of default init-script
 
-IPADRESS=0.0.0.0; 	#default ipadress to listen on
-PORT=8081; 		#default port to listen on
+IPADRESS=0.0.0.0; 					#default ipadress to listen on
+PORT=8081; 						#default port to listen on
 
 
 
@@ -101,43 +97,46 @@ echo "LaSi $VERSION"
 
 
 #### 1ST TEST IF USER CAN SUDO ####
-	root_Test() {
-	if [ "$(id -u)" = "0" ] 
+root_Test() {
+if [ "$(id -u)" = "0" ]
+	then
+	echo "Do not use this installer when logged in as root, it will mess things up!"
+	LaSi_Menu
+fi
+
+
+if [ "$(sudo id -u)" != "0" ] 
+then
+	echo "...but that's not gonna work, you need to sudo to install $APP, now exiting" &&
+	LaSi_Menu
+fi
+}
+
+
+#### 2ND TEST IF USER IS ONLINE ####
+conn_Test () {
+
+	git_test () {
+	if ! ping -c 1 $CONN1 > /dev/null 2>&1
 		then
-		echo "Do not use this installer when logged in as root, it will mess things up!"
+		echo "Hmmm $CONN1 seems down..." &&
+		echo "Need $CONN1 to install... Now exiting" &&
 		LaSi_Menu
 	fi
-	echo "Provide password to continue with this installation..."
-	if [ "$(sudo id -u)" != "0" ] 
+	}
+
+	dropbox_test () {
+	if ! ping -c 1 $CONN2 > /dev/null 2>&1
 		then
-	    echo "...but that's not gonna work, you need to sudo to install $APP, now exiting" &&
-	    LaSi_Menu
+		echo "Hmmm $CONN2 seems down..."
+		echo "Need $CONN2 to install... Now exiting"
+		LaSi_Menu
 	fi
 	}
-	
-#### 2ND TEST IF USER IS ONLINE ####
-	conn_Test () {
-		
-		git_test () {
-		if ! ping -c 1 $CONN1 > /dev/null 2>&1
-			then
-			echo "Hmmm $CONN1 seems down..." &&
-			echo "Need $CONN1 to install... Now exiting" &&
-			LaSi_Menu
-		fi
-		}
-		
-		dropbox_test () {
-		if ! ping -c 1 $CONN2 > /dev/null 2>&1 
-			then
-			echo "Hmmm $CONN2 seems down..."
-			echo "Need $CONN2 to install... Now exiting"
-			LaSi_Menu
-		fi
-		}
-	git_test
-	dropbox_test
-	}
+
+git_test
+dropbox_test
+}
 
 
 #### PRESENT OPTIONS IN A MENU ####
@@ -153,7 +152,7 @@ echo "Choose one of the above options"
 read -p "Enter 1, 2 or 3: " CHOICE
 case $CHOICE in
 	1)
-		check_Packs		#check dependencys
+		install_Packages	#check dependencys
 		set_Dir			#choose installation directory
 		clone_Git		#clone the git repo and mv to $installdir
 		cp_Sample		#rename .cfg.sample
@@ -169,7 +168,7 @@ case $CHOICE in
 		;;
 		
 	3)
-		LaSi_Menu		#Return to main script
+		def_PM
 		;;
 	*)
 		echo "Enter 1, 2 or 3"
@@ -177,141 +176,76 @@ case $CHOICE in
 		;;
 esac
 }
+
+
 #######################################################################################
 #### CHECK AND INSTALL PACKAGES #######################################################
 
-#### CHECK SOFTWARE: GIT-CORE AND PYTHON AND PYTHON-CHEETAH ####
-	check_Packs () {
-		
-		check_Pack1 () {
-		if ! which $PACK1_EXE
-			then
-			echo "Cannot find if $PACK1 is installed"
-			echo "Trying to install..."
-			echo
-			INST_PACK=$PACK1
-			use_PM
-		else
-			echo "$PACK1 installed"
-		fi
-		}
-		
-		check_Pack2 () {
-		if ! which $PACK2
-			then
-			echo
-			echo "Cannot find if $PACK2 is installed"
-			echo "Trying to install..."
-			echo
-			INST_PACK=$PACK2
-			use_PM
-		else
-			echo "$PACK2 installed"
-		fi
-		}
-		
-		check_Pack3 () {
-		if ! which $PACK3_EXE
-			then
-			echo
-			echo "Cannot find if $PACK3 is installed"
-			echo "Trying to install..."
-			echo
-			INST_PACK=$PACK3
-			use_PM
-		else
-			echo "$PACK3 installed"
-		fi
-		}
-		
-	check_Pack1
-	check_Pack2
-	check_Pack3
-	}
-	
-	
-#### DETERMINE PACKAGEMANAGER ####
-	use_PM () {
-			
-		def_PM () {
-		[ -x "$(which $1)" ]
-		}
+#### DEFINE PACKAGEMANAGER
+def_PM () {
+[ -x "$(which $1)" ]
+}
 
-		use_Apt () {
-		sudo apt-get install $INST_PACK ||
-		use_Manual
-		}
-	
-		use_Yum () {
-		sudo yum install $INST_PACK ||
-		use_Manual
-		}
-		
-		use_Pac () {
-		sudo pacman -S $INST_PACK ||
-		use_Manual
-		}
-		
-		use_Manual () {
-		echo
-		echo "Installing $INST_PACK failed"
-		echo "Please install manually..."
-		echo
-		echo "Type the command to install $INST_PACK"
-		echo "e.g. sudo apt-get install $INST_PACK"
-		read -p "   :" MAN_INST
-		if $MAN_INST 
+#### INSTALL NEEDED PACKAGES ####
+install_Packages() {
+echo
+for PACKAGE in $PACKAGES
+do
+	if ! which $PACKAGE > /dev/null
+		then
+		if def_PM apt-get
 			then
-			echo "Succes!"
+			sudo apt-get install $PACKAGE
+		elif def_PM yum
+			then
+			sudo yum install $PACKAGE
+		elif def_PM pacman
+			then
+			sudo pacman -S $SPACKAGE
+		elif def_PM emerge
+			then
+			sudo emerge $PACKAGE
 		else
-			echo "Failed! Solve this before continuing installation"
-			echo "Try again or press CTRL+C to quit"
+			echo "Could not determine packagemanager or packagename for your distro"
+			echo "Type the command to install $PACKAGE"
+			echo "e.g. sudo apt-get install $PACKAGE"
+			use_Manual () {
+			read -p ": " MAN_INST
+			if ! $MAN_INST 
+				then
+				echo "Failed! Solve this before continuing installation"
+				echo "Try command again or press CTRL+C to quit"
+				use_Manual
+			fi
+			}
 			use_Manual
 		fi
-		}
-		
-	if def_PM apt-get
-		then 
-		use_Apt
-	elif def_PM yum
-		then
-		use_Yum
-	elif def_PM pacman 
-		then 
-		use_Pac
-	else
-		echo 'No package manager found!'
-		use_Manual
 	fi
-	}
-	
-	
+done
+}
+
+
 #### CHOOSE INSTALLATION DIRECTORY ####
-	set_Dir () {
-	
-		cf_Overwrite () {
-		echo "1. Choose another directory"
-		echo "2. Backup $INSTALLDIR to LaSi/$APP"
-		echo "3. Delete $INSTALLDIR"
-		echo "Q. Quit"
-		read -p "Press 1, 2, 3 or Q to select an option    :" REPLY
-		case $REPLY in
+set_Dir () {
+echo
+	cf_Overwrite () {
+	echo "1. Choose another directory"
+	echo "2. Backup $INSTALLDIR to LaSi/$APP"
+	echo "3. Delete $INSTALLDIR"
+	echo "Q. Quit"
+	read -p "Press 1, 2, 3 or Q to select an option    :" REPLY
+	case $REPLY in
 		1)
 			choose_Dir
-				;;
-			2)
+			;;
+		2)
 			echo "Backup $INSTALLDIR to LaSi/$APP"
-			if [ -d /home/$USER/LaSi ]
-				then
-				mv -f $INSTALLDIR /home/$USER/LaSi/$APP
-			else
-				mkdir LaSi
-				mv -f $INSTALLDIR /home/$USER/LaSi/$APP
-			fi
+			mkdir -p LaSi
+			mv -f $INSTALLDIR /home/$USER/LaSi/$APP
 			;;
 		3)
 			echo "Deleting $INSTALLDIR."
-			rm -R -f $INSTALLDIR
+			rm -Rf $INSTALLDIR
 			;;
 		[Qq]*)
 			echo "Fini..."
@@ -321,33 +255,33 @@ esac
 			echo "Choose 1, 2, 3 or Q to quit"
 			cf_Dir
 			;;
-		esac
-		}
-	
-		choose_Dir() { 
-		read -p 'Type the path of the directory you want to install in...   :' INSTALLDIR
-		if [ -d $INSTALLDIR ]
-			then
-			echo
-			echo "$INSTALLDIR allready exists, please choose an option:"
-			cf_Overwrite
-		else
-			echo "Installing $APP in $INSTALLDIR."
-		fi
-		}
-		
-		cf_Dir () { 
-		if [ -d $INSTALLDIR ]
-			then 
-			echo
-			echo "$INSTALLDIR allready exists, please choose an option:"
-			cf_Overwrite
-		else
-			echo "By default $APP will be installed in $INSTALLDIR."
-			echo "Do you want to change this?"
-			read -p "(yes/no): " REPLY
-			case $REPLY in
-			[Yy]*)
+	esac
+	}
+
+	choose_Dir() { 
+	read -p 'Type the path of the directory you want to install in...   :' INSTALLDIR
+	if [ -d $INSTALLDIR ]
+		then
+		echo
+		echo "$INSTALLDIR allready exists, please choose an option:"
+		cf_Overwrite
+	else
+		echo "Installing $APP in $INSTALLDIR."
+	fi
+	}
+
+	cf_Dir () {
+	if [ -d $INSTALLDIR ]
+		then 
+		echo
+		echo "$INSTALLDIR allready exists, please choose an option:"
+		cf_Overwrite
+	else
+		echo "By default $APP will be installed in $INSTALLDIR."
+		echo "Do you want to change this?"
+		read -p "(yes/no): " REPLY
+		case $REPLY in
+			[YyJj]*)
 				choose_Dir
 				;;
 			[Nn]*)
@@ -357,263 +291,255 @@ esac
 				echo "Answer yes or no"
 				cf_Dir
 				;;
-			esac
-		fi
-		}
-	cf_Dir
+		esac
+	fi
 	}
+cf_Dir
+}
 
 
 #### CLONING INTO GIT ####
-	clone_Git () {
-	echo ' '
-	echo '-------'
-	echo "Download and install the most recent version of $APP from GitHub"
-	echo '-------'
-	echo ' '
-	command git clone $GITHUB $INSTALLDIR
-	echo
-	}
+clone_Git () {
+echo
+echo '-------'
+echo "Download and install the most recent version of $APP from GitHub"
+echo '-------'
+echo
+git clone $GITHUB $INSTALLDIR
+echo
+}
 
 
 #### CONFIRM DAEMON INSTALL ####
-	cf_Daemon () {
-	echo
-	echo '-------'
-	echo "You can install $APP as a daemon, so it will start when your pc starts..."
-	echo "daemoninstall works only Ubuntu or Debian, I need commands for other OS's"
-	echo "So if you want this script to work on your *nix, email me the commands needed"
-	echo '-------'
-	echo
-		
-		Question() {
-		echo "Do you want to install $APP as a daemon?"
-		read -p "(yes/no)   :" REPLY
-		case $REPLY in
-			[Yy]*) # back to main
-				echo 'As you wish, master...'
-				path_Python		#test if necessary values are true and change if needed
-				adj_Initscript		#change values to match installscripts
-				cp_Initscript		#copy initscript to /etc/init.d/$applow
-				;;
-			[Nn]*)
-				echo "You can start app manually by executing python $INSTALLDIR/$APP.py..."
-				echo "I prefer the LaSi way though...but have fun using $APP!"
-				show_Menu
-				;;
-			*)
-				echo "Answer yes or no"
-				Question
-				;;
+cf_Daemon () {
+echo
+echo '-------'
+echo "You can install $APP as a daemon, so it will start when your pc starts..."
+echo "daemoninstall works only Ubuntu or Debian, I need commands for other OS's"
+echo "So if you want this script to work on your *nix, email me the commands needed"
+echo '-------'
+echo
+
+	Question() {
+	echo "Do you want to install $APP as a daemon?"
+	read -p "(yes/no): " DAEMON
+	case $DAEMON in
+		[YyJj]*)
+			echo 'As you wish, master...'
+			adj_Initscript		#change values to match installscripts
+			cp_Initscript		#copy initscript to /etc/init.d/$applow
+			;;
+		[Nn]*)
+			echo "You can start app manually by executing python $INSTALLDIR/$APP.py..."
+			show_Menu
+			;;
+		*)
+			echo "Answer yes or no"
+			Question
+			;;
 		esac
-		}
-	Question
 	}
-
-
-#### TEST NECESSARY DEFAULT PATHS ####
-	test_Initdefs () {
-		
-		path_Python() {
-		PATH_PYTHON=$(which python)
-		sed -i "s#/usr/bin/python#$PATH_PYTHON#g" $INSTALLDIR/$INITD
-		}
-	path_Python
-	}
+Question
+}
 
 
 #### CHANGE VALUES IN INITSCRIPT ####
-	adj_Initscript () {
-	cp -f $INSTALLDIR/$INITD $INSTALLDIR/$INITD.bak
-	sed -i "
-		s#PATH_TO_SICKBEARD_DIRECTORY#$INSTALLDIR#g
-		s/SICKBEARD_USER/$USER/g
-	" $INSTALLDIR/$INITD
-	}
-
-
-#### RENAME CFG.SAMPLE ####
-	cp_Sample () {
-	cp $INSTALLDIR/autoProcessTV/autoProcessTV.cfg.sample $INSTALLDIR/autoProcessTV/autoProcessTV.cfg
-	}
+adj_Initscript () {
+PATH_PYTHON=$(which python)
+cp -f $INSTALLDIR/$INITD $INSTALLDIR/$INITD.bak
+sed -i "
+	s#/usr/bin/python#$PATH_PYTHON#g
+	s#PATH_TO_SICKBEARD_DIRECTORY#$INSTALLDIR#g
+	s#SICKBEARD_USER#$USER#g
+" $INSTALLDIR/$INITD
+}
 
 
 #### COPY INITSCRIPT TO /ETC/INIT.D/ ####
-	cp_Initscript () {
-	if [ -e /etc/init.d/$APPLOW ]
+cp_Initscript () {
+echo
+if [ -e /etc/init.d/$APPLOW ]
+	then
+	echo "Making backup of /etc/init.d/$APPLOW to $APPLOW.bak"
+fi
+echo "Copying $INSTALLDIR/$INITD to /etc/init.d/$APPLOW..."
+sudo cp -f --suffix=.bak $INSTALLDIR/$INITD /etc/init.d/$APPLOW &&
+sudo chmod +x /etc/init.d/$APPLOW &&
+sudo update-rc.d $APPLOW defaults
+}
+
+
+#### RENAME CFG.SAMPLE ####
+cp_Sample () {
+cp $INSTALLDIR/autoProcessTV/autoProcessTV.cfg.sample $INSTALLDIR/autoProcessTV/autoProcessTV.cfg
+}
+
+
+#### HANDLE CONFIGFILE ####
+new_Config(){
+echo
+
+	get_Config () { #download new config.ini
+	if [ -e $INSTALLDIR/config.ini ]
 		then
-		echo "Making backup of /etc/init.d/$APPLOW to $APPLOW.bak"
-		echo "Copying $INSTALLDIR/$INITD to /etc/init.d/$APPLOW..."
-		sudo cp -f --suffix=.bak $INSTALLDIR/$INITD /etc/init.d/$APPLOW &&
-		sudo chmod +x /etc/init.d/$APPLOW &&
-		sudo update-rc.d $APPLOW defaults
-	else 
-		echo "Copying $INSTALLDIR/$INITD to /etc/init.d/$APPLOW..."
-		sudo cp -f $INSTALLDIR/$INITD /etc/init.d/$APPLOW &&
-		sudo chmod +x /etc/init.d/$APPLOW &&
-		sudo update-rc.d $APPLOW defaults
+		mv -f $INSTALLDIR/config.ini $INSTALLDIR/config.ini.bak &&
+		echo "Copied config.in to $INSTALLDIR/config.ini.bak"
+	fi
+	wget -P $INSTALLDIR $DROPBOX/$APP/config.ini
+	}
+
+	import_Config() { # import config.ini
+	echo
+	echo 'Type the full path and filename of the configurationfile you want to import'
+	echo 'or s to skip:'
+	read -p ': ' IMPORTCONFIG
+	if [ $IMPORTCONFIG = S -o $IMPORTCONFIG = s ]
+		then
+		cf_Import
+	elif [ -e $IMPORTCONFIG ]
+		then
+		cp -f --suffix=.bak $IMPORTCONFIG $INSTALLDIR/config.ini &&
+		echo "Copied $IMPORTCONFIG to $INSTALLDIR/config.ini"
+	else
+		echo 'File does not exist, enter correct path as /path/to/file.ext' &&
+		import_Config
 	fi
 	}
 
-
-#### GET NEW CONFIGFILE ####
-	new_Config(){
-
-		get_Config () { #download new config.ini
-		if [ -e $INSTALLDIR/config.ini ]
-			then
-			mv -f $INSTALLDIR/config.ini $INSTALLDIR/config.ini.bak &&
-			wget -P $INSTALLDIR $DROPBOX/$APP/config.ini
-		else
-			wget -P $INSTALLDIR $DROPBOX/$APP/config.ini
-		fi
-		}
-		
-		import_Config() { # import config.ini
-		echo
-		echo 'Type the full path and filename of the configurationfile you want to import'
-		echo 'or s to skip:'
-		read -p ' :' IMPORTCONFIG
-		if [ $IMPORTCONFIG = S -o $IMPORTCONFIG = s ]
-			then
-			cf_Import
-		elif [ -e $IMPORTCONFIG ]
-			then
-			cp -f --suffix=.bak $IMPORTCONFIG $INSTALLDIR/config.ini &&
-			echo "Copied $IMPORTCONFIG to $INSTALLDIR/config.ini"
-		else
-			echo 'File does not exist, enter correct path as /path/to/file.ext' &&
+	cf_Import () { # Confirm import
+	echo "Do you want to import your own configurationfile?"
+	read -p "(yes/no): " REPLY
+	case $REPLY in
+		[YyJj]*)
 			import_Config
-		fi
-		}
-		
-		cf_Import () { # Confirm import
-		echo "Do you want to import your own configurationfile?"
-		read -p "(yes/no): " REPLY
-		case $REPLY in
-			[Yy]*)
-				import_Config
-				;;
-			[Nn]*)
-				echo "Downloading fresh config from dropbox.com"
-				get_Config
-				cf_Config
-				;;
-			*)
-				echo "Answer yes or no"
-				cf_Import
-				;;
-		esac
-		}
-	cf_Import
+			;;
+		[Nn]*)
+			echo "Downloading fresh config from dropbox.com"
+			get_Config
+			cf_Config
+			;;
+		*)
+			echo "Answer yes or no"
+			cf_Import
+			;;
+	esac
 	}
+cf_Import
+}
 
 
 #### LET USER CONFIRM CONFIGURATION ####
-	cf_Config() {
-	echo '++++++++'
-	echo "Now you can start $APP with a clean configuration..."
-	echo "By default $APP's webinterface adress is: http://$IPADRESS:$PORT."
-	echo "That's the same as http://localhost:$PORT or http://127.0.0.1:$PORT."
-	echo "It will not ask for a username and password."
-	echo 
-	
-		Question() {
-		echo "Do you want change the defaults?"
-		read -p "(yes/no): " REPLY
-		case $REPLY in
-			[Yy]*)
-				set_IP			#Set Ipadress:Port
-				set_UP			#Set Username:Password
-				;;
-			[Nn]*)
-				echo "Starting fresh"
-				;;
-			*)
-				echo "Answer yes or no"
-				Question
-				;;
-		esac
-		}
-	Question
+cf_Config() {
+echo
+echo
+echo "Now you can start $APP with a clean configuration..."
+echo "By default $APP's webinterface adress is: http://$IPADRESS:$PORT."
+echo "That's the same as http://localhost:$PORT or http://127.0.0.1:$PORT."
+echo "It will not ask for a username and password."
+echo
+
+	Question() {
+	echo "Do you want change the defaults?"
+	read -p "(yes/no): " REPLY
+	case $REPLY in
+		[YyJj]*)
+			set_IP			#Set Ipadress:Port
+			set_UP			#Set Username:Password
+			;;
+		[Nn]*)
+			echo "Starting fresh"
+			;;
+		*)
+			echo "Answer yes or no"
+			Question
+			;;
+	esac
 	}
+Question
+}
 
 #### CHANGE DEFAULTS IN CONFIGFILE ####
 
 #### CHANGE IPADRESS AND PORT ####
+set_IP () {
+echo
+read -p "Enter new ipadress, default is $IPADRESS: " NEW_IP
+read -p "Enter new port, default is $PORT: " NEW_PORT
 
-	set_IP () {
-	read -p "Enter new ipadress, default is $IPADRESS: " NEW_IP
-	read -p "Enter new port, default is $PORT: " NEW_PORT
-
-		cf_IP () {
-		echo "You entered $NEW_IP:$NEW_PORT, is this correct?: "
-		read -p "(yes/no): " REPLY
-		case $REPLY in
-			[Yy]*)
-				echo "Adding $NEW_IP:$NEW_PORT to config.ini..."
-				sed -i "
-					s/web_host = 0.0.0.0/web_host = $NEW_IP/g
-					s/web_port = 8081/web_port = $NEW_PORT/g 
-				" $INSTALLDIR/config.ini
-				echo "and autoProcessTV.cfg..."
-				sed -i "
-					s/host=/host=$NEW_IP/g
-					s/port=/port=$NEW_PORT/g
-				" $INSTALLDIR/autoProcessTV/autoProcessTV.cfg
-				;;
-			[Nn]*)
-				set_IP
-				;;
-			*)
-				echo "Answer yes or no"
-				cf_IP
-				;;
-		esac
-		}
-	cf_IP
+	cf_IP () {
+	echo "You entered $NEW_IP:$NEW_PORT, is this correct?: "
+	read -p "(yes/no): " REPLY
+	case $REPLY in
+		[YyJj]*)
+			echo "Adding $NEW_IP:$NEW_PORT to config.ini and autoProcessTV.cfg..."
+			IP=$NEW_IP
+			PORT=$NEW_PORT
+			sed -i "
+				s/web_host = 0.0.0.0/web_host = $NEW_IP/g
+				s/web_port = 8081/web_port = $NEW_PORT/g 
+			" $INSTALLDIR/config.ini
+			echo "and autoProcessTV.cfg..."
+			sed -i "
+				s/host=/host=$NEW_IP/g
+				s/port=/port=$NEW_PORT/g
+			" $INSTALLDIR/autoProcessTV/autoProcessTV.cfg
+			;;
+		[Nn]*)
+			set_IP
+			;;
+		*)
+			echo "Answer yes or no"
+			cf_IP
+			;;
+	esac
 	}
+cf_IP
+
+}
+
 
 #### CHANGE USERNAME AND PASSWORD ####
-	set_UP () {
-	read -p 'Enter new username, leave blank for none : ' NEW_USER
-	read -p 'Enter new password, leave blank for none : ' NEW_PASS
+set_UP () {
+echo
+read -p 'Enter new username, leave blank for none : ' NEW_USER
+read -p 'Enter new password, leave blank for none : ' NEW_PASS
 
-		cf_UP () {
-		echo "You entered username '$NEW_USER' and password '$NEW_PASS', is this correct?: "
-		read -p "(yes/no or skip): " REPLY
-		case $REPLY in
-			[Yy]*)
-				echo "Adding username and password to config.ini..."
-				sed -i "
-					s/web_username = \"\"/web_username = $NEW_USER/g
-					s/web_password = \"\"/web_password = $NEW_PASS/g
-				" $INSTALLDIR/config.ini
-				echo "and autoProcessTV.cfg..."
-				sed -i "
-					s/username=/username=$NEW_USER/g
-					s/password=/password=$NEW_PASS/g
-				" $INSTALLDIR/autoProcessTV/autoProcessTV.cfg
-				;;
-			[Nn]*)
-				set_UP
-				;;
-			[Ss]*)
-				echo "Skipped that one, it stays blank"
-				;;
-			*)
-				echo "Answer yes or no or skip"
-				cf_UP
-				;;
-		esac
-		}
-	cf_UP
+	cf_UP () {
+	echo "You entered username '$NEW_USER' and password '$NEW_PASS', is this correct?: "
+	read -p "(yes/no or skip): " REPLY
+	case $REPLY in
+		[YyJj]*)
+			echo "Adding username and password to config.ini..."
+			sed -i "
+				s/web_username = \"\"/web_username = $NEW_USER/g
+				s/web_password = \"\"/web_password = $NEW_PASS/g
+			" $INSTALLDIR/config.ini
+			echo "and autoProcessTV.cfg..."
+			sed -i "
+				s/username=/username=$NEW_USER/g
+				s/password=/password=$NEW_PASS/g
+			" $INSTALLDIR/autoProcessTV/autoProcessTV.cfg
+			;;
+		[Nn]*)
+			set_UP
+			;;
+		[Ss]*)
+			echo "Skipped that one, it stays blank"
+			;;
+		*)
+			echo "Answer yes or no or skip"
+			cf_UP
+			;;
+	esac
 	}
+
+cf_UP
+}
 
 
 #### IMPORT DATABASE
 use_Database () {
-
+echo
 	import_Database() { # import database
 	echo
 	echo 'Type the full path and filename of the database you want to import'
@@ -647,36 +573,49 @@ use_Database () {
 			;;
 	esac
 	}
+
 cf_Database
 }
 
 #### STARTING APP ####
-	start_App() {
-	echo "Now starting $APP..."
-	if sudo /etc/init.d/$APPLOW start
-		then
-		echo "Point your webbrowser to http://$NEW_IP:$NEW_PORT and have fun!"
-	else
-		echo "Can't start $APP, try starting manually..."
-		echo "Execute sudo /etc/init.d/$APPLOW stop | start | restart | force-reload"
-	fi
-	read -sn 1 -p "Press a key to return to menu."
-	}
+start_App () {
+echo
+case $DAEMON in
+	[YyJj]*)
+		if sudo /etc/init.d/$APPLOW start
+			then
+			echo "Point your webbrowser to http://$NEW_IP:$NEW_PORT and have fun!"
+		else
+			echo "Can't start $APP, try starting manually..."
+			echo "Execute sudo /etc/init.d/$APPLOW stop | start | restart | force-reload"
+		fi
+		;;
+	[Nn]*)
+		if $PATH_PYTHON $INSTALLDIR/$APP.py
+			then
+			echo "Point your webbrowser to http://$NEW_IP:$NEW_PORT and have fun!"
+		else
+			echo "Can't start $APP, try starting manually..."
+			echo "Type $PATH_PYTHON $INSTALLDIR/$APP.py"
+		fi
+		;;
+esac
+}
 
 
 #### UPDATE APP ####
-	git_Update () {
-	echo
-	echo "===="
-	echo "Checking for updates $APP"
-	cd $INSTALLDIR
-	if ! git pull | grep "Already up-to-date"
-		then
-		sudo /etc/init.d/$APPLOW restart
-	fi
-	read -sn 1 -p "Press a key to return to menu."
-	echo "===="
-	}
+git_Update () {
+echo
+echo "===="
+echo "Checking for updates $APP"
+cd $INSTALLDIR
+if ! git pull | grep "Already up-to-date"
+	then
+	sudo /etc/init.d/$APPLOW restart
+fi
+read -sn 1 -p "Press a key to return to menu."
+echo "===="
+}
 
 
 
