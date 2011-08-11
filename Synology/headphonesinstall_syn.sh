@@ -79,6 +79,7 @@ case $CHOICE in
 		install_Deps
 		make_Daemon
 		cf_Config
+		use_Database
 		start_App
 		show_Menu
 		;;
@@ -304,6 +305,45 @@ echo
 Question
 }
 
+
+#### IMPORT DATABASE ####
+use_Database () {
+
+	import_Database() { # import database
+	echo
+	echo 'Type the full path and filename of the database you want to import'
+	echo 'or s to skip:'
+	read -p ' :' IMPORTDB
+	if [ $IMPORTDB = S -o $IMPORTDB = s ]
+		then
+		cf_Database
+	elif [ -e $IMPORTDB ]
+		then
+		cp -f $IMPORTDB $INSTALLDIR/headphones.db
+	else
+		echo 'File does not exist, enter correct path as /path/to/headphones.db' &&
+		import_Database
+	fi
+	}
+
+	cf_Database () { # Confirm import database
+	echo "Do you want to import your own database?"
+	read -p "(yes/no): " REPLY
+	case $REPLY in
+		[Yy]*)
+			import_Database
+			;;
+		[Nn]*)
+			echo "Starting fresh"
+			;;
+		*)
+			echo "Answer yes or no"
+			cf_Database
+			;;
+	esac
+	}
+cf_Database
+}
 
 
 #### STARTING APP ####
