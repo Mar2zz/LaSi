@@ -353,27 +353,29 @@ read -p "Choose an option: " SELECT
 #### INSTALL APPLICATION
 inst_App () {
 
-	dropbox_Test () {
-	if ! ping -c 1 $CONN2 > /dev/null 2>&1 
+	get_Installer () {
+	if [ -e $SET_INST ]
 		then
-		echo "Hmmm $CONN2 seems down..."
-		echo "Need $CONN2 to install... Now exiting"
-		LaSi_Menu
-	else
-		get_Installer
+		rm -f $SET_INST
 	fi
-	}
-
-		get_Installer () {
-		if [ -e $SET_INST ]
-			then
-			rm -f $SET_INST
-		fi
-		wget $DROPBOX/$SET_INST &&
+	if wget $DROPBOX/$SET_INST
+		then
 		chmod +x $SET_INST &&
 		./$SET_INST &&
 		LaSi_Menu
-		} 
+	else
+		echo "Download failed, testing $CONN2..."
+		dropbox_Test () {
+		if ! ping -c 1 $CONN2 > /dev/null 2>&1 
+			then
+			echo "$CONN2 seems down..."
+			echo "Need $CONN2 to install... Now exiting"
+			LaSi_Menu
+		fi
+		}
+		dropbox_Test
+	fi
+	}
 
 	Question() {
 	echo
@@ -384,7 +386,7 @@ inst_App () {
 		echo
 		echo "Say hello to my little friend!"
 		echo
-		dropbox_Test
+		get_Installer
 		;;
 	[Nn]*)
 		LaSi_Menu

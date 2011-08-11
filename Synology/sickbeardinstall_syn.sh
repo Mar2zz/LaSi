@@ -178,7 +178,7 @@ new_Config(){
 		cf_Import
 	elif [ -e $IMPORTCONFIG ]
 		then
-		cp -f --suffix=.bak $IMPORTCONFIG $INSTALLDIR/config.ini
+		cp -f $IMPORTCONFIG $INSTALLDIR/config.ini
 	else
 		echo 'File does not exist, enter correct path as /path/to/file.ext' &&
 		import_Config
