@@ -157,13 +157,8 @@ case $CHOICE in
 		set_Dir			#choose installation directory
 		clone_Git		#clone the git repo and mv to $installdir
 		cf_Daemon 		#let user confirm to daemonize
-		path_Python		#test if necessary values are true and change if needed
-		adj_Initscript		#change values to match installscripts
-		cp_Initscript		#copy initscript to /etc/init.d/$applow
-		cf_Config		#Let user confirm to start configuration
 		new_Config		#import or download configurationfile
-		set_IP			#Set Ipadress:Port
-		set_UP			#Set Username:Password
+		use_Database		#Import database from backup
 		start_App		#Start the application and gl!
 		show_Menu
 		;;
@@ -376,22 +371,23 @@ esac
 	echo '-------'
 	echo ' '
 
-		Question() {
-		echo "Do you want to install $APP as a daemon?"
-		read -p "(yes/no): " REPLY
-		case $REPLY in
-	[Yy]*) # back to main
-		echo 'As you wish, master...'
-		;;
-	[Nn]*)
-		echo "You can start app manually by executing python $INSTALLDIR/$APP.py..."
-		echo "I prefer the LaSi way though...but have fun using $APP!"
-		LaSi_Menu
-		;;
-	*)
-		echo "Answer yes or no"
-		Question
-		;;
+	Question() {
+	echo "Do you want to install $APP as a daemon?"
+	read -p "(yes/no): " REPLY
+	case $REPLY in
+		[Yy]*) # back to main
+			echo 'As you wish, master...'
+			path_Python		#test if necessary values are true and change if needed
+			adj_Initscript		#change values to match installscripts
+			cp_Initscript		#copy initscript to /etc/init.d/$applow
+			;;
+		[Nn]*)
+			echo "You can start app manually by executing python $INSTALLDIR/$APP.py..."
+			;;
+		*)
+			echo "Answer yes or no"
+			Question
+			;;
 		esac
 		}
 	Question
@@ -432,35 +428,7 @@ esac
 	}
 
 
-#### LET USER CONFIRM CONFIGURATION ####
-	cf_Config() {
-	echo '-------'
-	echo "Now you can start $APP with a clean configuration..."
-	echo "By default $APP's webinterface adress is: http://$IPADRESS:$PORT."
-	echo "That's the same as http://localhost:$PORT or http://127.0.0.1:$PORT."
-	echo "It will not ask for a username and password."
-	echo 
 
-		Question() {
-		echo "Do you want change the defaults or import your own configuration file?"
-		read -p "(yes/no): " REPLY
-		case $REPLY in
-		[Yy]*)
-			echo 'As you wish, master...'
-			;;
-		[Nn]*)
-			sudo /etc/init.d/$APPLOW start &&
-			echo "Point your webbrowser to http://$IPADRESS:$PORT and start configuring!"
-			LaSi_Menu
-			;;
-		*)
-			echo "Answer yes or no"
-			Question
-			;;
-		esac
-		}
-	Question
-	}
 
 #### GET NEW CONFIGFILE ####
 	new_Config(){
@@ -486,9 +454,7 @@ esac
 		elif [ -e $IMPORTCONFIG ]
 			then
 			cp -f --suffix=.bak $IMPORTCONFIG $INSTALLDIR/config.ini &&
-			sudo /etc/init.d/$APPLOW start &&
-			echo "Point your webbrowser to you know where and have fun using $APP!"
-			show_Menu
+			echo "Copied $IMPORTCONFIG to $INSTALLDIR/config.ini"
 		else
 			echo 'File does not exist, enter correct path as /path/to/file.ext' &&
 			import_Config
@@ -505,6 +471,7 @@ esac
 		[Nn]*)
 			echo "Downloading fresh config from dropbox.com"
 			get_Config
+			cf_Config
 			;;
 		*)
 			echo "Answer yes or no"
@@ -513,6 +480,36 @@ esac
 		esac
 		}
 	cf_Import
+	}
+
+
+#### LET USER CONFIRM CONFIGURATION ####
+	cf_Config() {
+	echo '-------'
+	echo "Now you can start $APP with a clean configuration..."
+	echo "By default $APP's webinterface adress is: http://$IPADRESS:$PORT."
+	echo "That's the same as http://localhost:$PORT or http://127.0.0.1:$PORT."
+	echo "It will not ask for a username and password."
+	echo 
+
+		Question() {
+		echo "Do you want change the defaults?"
+		read -p "(yes/no): " REPLY
+		case $REPLY in
+		[Yy]*)
+			set_IP			#Set Ipadress:Port
+			set_UP			#Set Username:Password
+			;;
+		[Nn]*)
+			echo "Starting fresh"
+			;;
+		*)
+			echo "Answer yes or no"
+			Question
+			;;
+		esac
+		}
+	Question
 	}
 
 
@@ -579,7 +576,47 @@ esac
 	}
 
 
-#### STARTING APP ####		
+#### IMPORT DATABASE
+use_Database () {
+
+	import_Database() { # import database
+	echo
+	echo 'Type the full path and filename of the database you want to import'
+	echo 'or s to skip:'
+	read -p ' :' IMPORTDB
+	if [ $IMPORTDB = S -o $IMPORTDB = s ]
+		then
+		cf_Import
+	elif [ -e $IMPORTDB ]
+		then
+		cp -f $IMPORTDB $INSTALLDIR/headphones.db
+	else
+		echo 'File does not exist, enter correct path as /path/to/headphones.db' &&
+		import_Database
+	fi
+	}
+
+	cf_Database () { # Confirm import database
+	echo "Do you want to import your own database?"
+	read -p "(yes/no): " REPLY
+	case $REPLY in
+		[Yy]*)
+			import_Database
+			;;
+		[Nn]*)
+			echo "Starting fresh"
+			;;
+		*)
+			echo "Answer yes or no"
+			cf_Database
+			;;
+	esac
+	}
+cf_Database
+}
+
+
+#### STARTING APP ####
 	start_App() {
 		echo "Now starting $APP..."
 		if sudo /etc/init.d/$APPLOW start

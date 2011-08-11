@@ -158,13 +158,8 @@ case $CHOICE in
 		clone_Git		#clone the git repo and mv to $installdir
 		cp_Sample		#rename .cfg.sample
 		cf_Daemon 		#let user confirm to daemonize
-		test_Initdefs		#test if necessary values are true and change if needed
-		adj_Initscript		#change values to match installscripts
-		cp_Initscript		#copy initscript to /etc/init.d/$applow
-		cf_Config		#Let user confirm to start configuration
 		new_Config		#import or download configurationfile
-		set_IP			#Set Ipadress:Port
-		set_UP			#Set Username:Password
+		use_Database		#import database from backup
 		start_App		#Start the application and gl!
 		show_Menu
 		;;
@@ -397,6 +392,9 @@ esac
 		case $REPLY in
 			[Yy]*) # back to main
 				echo 'As you wish, master...'
+				path_Python		#test if necessary values are true and change if needed
+				adj_Initscript		#change values to match installscripts
+				cp_Initscript		#copy initscript to /etc/init.d/$applow
 				;;
 			[Nn]*)
 				echo "You can start app manually by executing python $INSTALLDIR/$APP.py..."
@@ -430,7 +428,7 @@ esac
 	sed -i "
 		s#PATH_TO_SICKBEARD_DIRECTORY#$INSTALLDIR#g
 		s/SICKBEARD_USER/$USER/g
-		" $INSTALLDIR/$INITD
+	" $INSTALLDIR/$INITD
 	}
 
 
@@ -458,34 +456,6 @@ esac
 	}
 
 
-#### LET USER CONFIRM CONFIGURATION ####
-	cf_Config() {
-	echo '++++++++'
-	echo "Now you can start $APP with a clean configuration..."
-	echo "By default $APP's webinterface adress is: http://$IPADRESS:$PORT."
-	echo "That's the same as http://localhost:$PORT or http://127.0.0.1:$PORT."
-	echo "It will not ask for a username and password."
-	echo 
-	
-		Question() {
-		echo "Do you want change the defaults or import your own configuration file?"
-		read -p "(yes/no)   :" REPLY
-		case $REPLY in
-			[Yy]*)
-				echo 'As you wish, master...'
-				;;
-			[Nn]*)
-				echo "Point your webbrowser to http://$IPADRESS:$PORT and start configuring!"
-				;;
-			*)
-				echo "Answer yes or no"
-				Question
-				;;
-		esac
-		}
-	Question
-	}
-
 #### GET NEW CONFIGFILE ####
 	new_Config(){
 
@@ -510,8 +480,7 @@ esac
 		elif [ -e $IMPORTCONFIG ]
 			then
 			cp -f --suffix=.bak $IMPORTCONFIG $INSTALLDIR/config.ini &&
-			sudo /etc/init.d/sickbeard start &&
-			echo "Point your webbrowser to you know where and have fun using $APP!"
+			echo "Copied $IMPORTCONFIG to $INSTALLDIR/config.ini"
 		else
 			echo 'File does not exist, enter correct path as /path/to/file.ext' &&
 			import_Config
@@ -528,6 +497,7 @@ esac
 			[Nn]*)
 				echo "Downloading fresh config from dropbox.com"
 				get_Config
+				cf_Config
 				;;
 			*)
 				echo "Answer yes or no"
@@ -538,6 +508,35 @@ esac
 	cf_Import
 	}
 
+
+#### LET USER CONFIRM CONFIGURATION ####
+	cf_Config() {
+	echo '++++++++'
+	echo "Now you can start $APP with a clean configuration..."
+	echo "By default $APP's webinterface adress is: http://$IPADRESS:$PORT."
+	echo "That's the same as http://localhost:$PORT or http://127.0.0.1:$PORT."
+	echo "It will not ask for a username and password."
+	echo 
+	
+		Question() {
+		echo "Do you want change the defaults?"
+		read -p "(yes/no): " REPLY
+		case $REPLY in
+			[Yy]*)
+				set_IP			#Set Ipadress:Port
+				set_UP			#Set Username:Password
+				;;
+			[Nn]*)
+				echo "Starting fresh"
+				;;
+			*)
+				echo "Answer yes or no"
+				Question
+				;;
+		esac
+		}
+	Question
+	}
 
 #### CHANGE DEFAULTS IN CONFIGFILE ####
 
@@ -611,6 +610,45 @@ esac
 	cf_UP
 	}
 
+
+#### IMPORT DATABASE
+use_Database () {
+
+	import_Database() { # import database
+	echo
+	echo 'Type the full path and filename of the database you want to import'
+	echo 'or s to skip:'
+	read -p ' :' IMPORTDB
+	if [ $IMPORTDB = S -o $IMPORTDB = s ]
+		then
+		cf_Import
+	elif [ -e $IMPORTDB ]
+		then
+		cp -f $IMPORTDB $INSTALLDIR/sickbeard.db
+	else
+		echo 'File does not exist, enter correct path as /path/to/sickbeard.db' &&
+		import_Database
+	fi
+	}
+
+	cf_Database () { # Confirm import database
+	echo "Do you want to import your own database?"
+	read -p "(yes/no): " REPLY
+	case $REPLY in
+		[Yy]*)
+			import_Database
+			;;
+		[Nn]*)
+			echo "Starting fresh"
+			;;
+		*)
+			echo "Answer yes or no"
+			cf_Database
+			;;
+	esac
+	}
+cf_Database
+}
 
 #### STARTING APP ####
 	start_App() {
