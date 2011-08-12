@@ -48,7 +48,7 @@ CONN2=dropbox.com;
 GITHUB=https://github.com/RuudBurger/CouchPotato.git;	#github-adres
 DROPBOX=http://dl.dropbox.com/u/18712538/;		#dropbox-adres
 
-PACKAGES="git python python-cheetah";
+PACKAGES="git python python-cheetah";			#needed packages to run (using apt to check and install)
 
 PACK1=git-core;						#needed packages to run (using apt to check and install)
 PACK1_EXE=git;						#EXE only needed when packagename differs from executable
@@ -118,7 +118,7 @@ echo "LaSi $VERSION"
 
 #### 2ND TEST IF USER IS ONLINE ####
 	conn_Test () {
-		
+
 		git_test () {
 		if ! ping -c 1 $CONN1 > /dev/null 2>&1
 			then
@@ -127,7 +127,7 @@ echo "LaSi $VERSION"
 			LaSi_Menu
 		fi
 		}
-		
+
 		dropbox_test () {
 		if ! ping -c 1 $CONN2 > /dev/null 2>&1 
 			then
@@ -177,6 +177,8 @@ case $CHOICE in
 		;;
 esac
 }
+
+
 #######################################################################################
 #### CHECK AND INSTALL PACKAGES #######################################################
 
@@ -499,8 +501,8 @@ read -p 'Enter new password, leave blank for none : ' NEW_PASS
 		[YyJj]*)
 			echo "Adding username and password to config.ini..."
 			sed -i "
-				s/username = \"\"/username = $NEW_USER/g
-				s/password = \"\"/password = $NEW_PASS/g
+				s/username = /username = $NEW_USER/g
+				s/password = /password = $NEW_PASS/g
 			" $INSTALLDIR/config.ini
 			;;
 		[Nn]*)
