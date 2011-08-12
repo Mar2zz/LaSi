@@ -38,22 +38,17 @@ TESTOS3=XBMC_Live_Dharma
 
 #SET SOME VARIABLES (SOME VARIABLES WILL BE SET THROUGH LIVE USERINPUT IN TERMINAL)
 
-APP=Mediafrontpage; 		# name of app to install (also for Dropboxfolders)
-APPLOW=mediafrontpage;		# lowercase appname
+APP=Mediafrontpage;						# name of app to install (also for Dropboxfolders)
+APPLOW=mediafrontpage;						# lowercase appname
 
-CONN1=github.com; 		# to test connections needed to install apps
+CONN1=github.com;						# to test connections needed to install apps
 CONN2=dropbox.com;
 
 GITHUB=https://github.com/MediaFrontPage/mediafrontpage.git;	#github-adres
 DROPBOX=http://dl.dropbox.com/u/18712538/ 			#dropbox-adres
 
-
-PACK1=git-core; 	#needed packages to run (using apt to check and install)
-PACK1_EXE=git;		#EXE optional needed when packagename differs from executable
-PACK2=apache2;
-PACK3="php5 php5-curl";
-
-INSTALLDIR=/var/www/$APPLOW; #directory you want to install to.
+PACKAGES="git apache2 php5 php5-curl"				#packages that must be installed
+INSTALLDIR=/var/www/$APPLOW;					#directory you want to install to.
 
 
 #######################################################################################
@@ -171,121 +166,60 @@ esac
 #######################################################################################
 #### CHECK AND INSTALL PACKAGES #######################################################
 
-#### CHECK SOFTWARE ####
-	check_Packs () {
+#### DEFINE PACKAGEMANAGER
+def_PM () {
+[ -x "$(which $1)" ]
+}
 
-		check_Pack1 () {
-		if ! which $PACK1_EXE
+#### INSTALL NEEDED PACKAGES ####
+install_Packages() {
+echo
+for PACKAGE in $PACKAGES
+do
+	if ! which $PACKAGE > /dev/null
+		then
+		if def_PM apt-get
 			then
-			echo "Cannot find if $PACK1 is installed"
-			echo "Trying to install..."
-			echo
-			INST_PACK=$PACK1
-			use_PM
-		else
-			echo "$PACK1 installed"
-		fi
-		}
-
-		check_Pack2 () {
-		if ! which $PACK2
+			sudo apt-get install $PACKAGE
+		elif def_PM yum
 			then
-			echo
-			echo "Cannot find if $PACK2 is installed"
-			echo "Trying to install..."
-			echo
-			INST_PACK=$PACK2
-			use_PM
-		else
-			echo "$PACK2 installed"
-		fi
-		}
-
-		check_Pack3 () {
-		if ! which $PACK3
+			sudo yum install $PACKAGE
+		elif def_PM pacman
 			then
-			echo
-			echo "Cannot find if $PACK3 is installed"
-			echo "Trying to install..."
-			echo
-			INST_PACK=$PACK3
-			use_PM
-		else
-			echo "$PACK3 installed"
-		fi
-		}
-	check_Pack1
-	check_Pack2
-	check_Pack3
-	}
-
-
-#### DETERMINE PACKAGEMANAGER ####
-	use_PM () {
-
-		def_PM () {
-		[ -x "$(which $1)" ]
-		}
-
-		use_Apt () {
-		sudo apt-get install $INST_PACK ||
-		use_Manual
-		}
-
-		use_Yum () {
-		sudo yum install $INST_PACK ||
-		use_Manual
-		}
-
-		use_Pac () {
-		sudo pacman -S $INST_PACK ||
-		use_Manual
-		}
-
-		use_Manual () {
-		echo
-		echo "Installing $INST_PACK failed"
-		echo "Please install manually..."
-		echo
-		echo "Type the command to install $INST_PACK"
-		echo "e.g. sudo apt-get install $INST_PACK"
-		read -p "   :" MAN_INST
-		if $MAN_INST
+			sudo pacman -S $SPACKAGE
+		elif def_PM emerge
 			then
-			echo "Succes!"
+			sudo emerge $PACKAGE
 		else
-			echo "Failed! Solve this before continuing installation"
-			echo "Try again or press CTRL+C to quit"
+			echo "Could not determine packagemanager or packagename for your distro"
+			echo "Type the command to install $PACKAGE"
+			echo "e.g. sudo apt-get install $PACKAGE"
+			use_Manual () {
+			read -p ": " MAN_INST
+			if ! $MAN_INST 
+				then
+				echo "Failed! Solve this before continuing installation"
+				echo "Try command again or press CTRL+C to quit"
+				use_Manual
+			fi
+			}
 			use_Manual
 		fi
-		}
-
-	if def_PM apt-get
-		then
-		use_Apt
-	elif def_PM yum
-		then
-		use_Yum
-	elif def_PM pacman
-		then
-		use_Pac
-	else
-		echo 'No package manager found!'
-		use_Manual
 	fi
-	}
+done
+}
 
 
 #### CHOOSE INSTALLATION DIRECTORY ####
-	set_Dir () {
+set_Dir () {
 
-		cf_Overwrite () {
-		echo "1. Choose another folder"
-		echo "2. Backup $INSTALLDIR to LaSi/$APP"
-		echo "3. Delete $INSTALLDIR"
-		echo "Q. Quit"
-		read -p "Choose 1, 2, 3 or Q to quit: " REPLY
-		case $REPLY in
+	cf_Overwrite () {
+	echo "1. Choose another folder"
+	echo "2. Backup $INSTALLDIR to LaSi/$APP"
+	echo "3. Delete $INSTALLDIR"
+	echo "Q. Quit"
+	read -p "Choose 1, 2, 3 or Q to quit: " REPLY
+	case $REPLY in
 		1)
 			choose_Dir
 			;;
@@ -314,65 +248,64 @@ esac
 			echo "Choose 1, 2, 3 or Q to quit"
 			cf_Dir
 			;;
-		esac
-		}
-
-		choose_Dir() {
-		read -p "Enter the path you want to install $APP in: " INSTALLDIR
-		if [ -d $INSTALLDIR ]
-			then
-			echo
-			echo "$INSTALLDIR allready exists, choose an option"
-			cf_Overwrite
-		else
-			echo "Installing $APP in $INSTALLDIR."
-		fi
-		}
-
-		cf_Dir () {
-		if [ -d $INSTALLDIR ]
-			then
-			echo
-			echo "$INSTALLDIR allready exists, please choose an option:"
-			cf_Overwrite
-		else
-			echo "By default $APP will be installed in $INSTALLDIR."
-			echo "Do you want to change this? (only change when you know what you are doing)"
-			read -p "(yes/no): " REPLY
-			case $REPLY in
-				[YyJj]*)
-					choose_Dir
-					;;
-				[Nn]*)
-					echo "Installing $APP in $INSTALLDIR"
-					;;
-				*)
-					echo "Answer yes or no"
-					cf_Dir
-				;;
-			esac
-		fi
-		}
-	cf_Dir
+	esac
 	}
+
+	choose_Dir() {
+	read -p "Enter the path you want to install $APP in: " INSTALLDIR
+	if [ -d $INSTALLDIR ]
+		then
+		echo
+		echo "$INSTALLDIR allready exists, choose an option"
+		cf_Overwrite
+	else
+		echo "Installing $APP in $INSTALLDIR."
+	fi
+	}
+
+	cf_Dir () {
+	if [ -d $INSTALLDIR ]
+		then
+		echo
+		echo "$INSTALLDIR allready exists, please choose an option:"
+		cf_Overwrite
+	else
+		echo "By default $APP will be installed in $INSTALLDIR."
+		echo "Do you want to change this? (only change when you know what you are doing)"
+		read -p "(yes/no): " REPLY
+		case $REPLY in
+			[YyJj]*)
+				choose_Dir
+				;;
+			[Nn]*)
+				echo "Installing $APP in $INSTALLDIR"
+				;;
+			*)
+				echo "Answer yes or no"
+				cf_Dir
+				;;
+		esac
+	fi
+	}
+
+cf_Dir
+}
 
 
 #### CLONING INTO GIT ####
-	clone_Git () {
-	echo
-	echo '-------'
-	echo "Download and install most recent $APP from GitHub"
-	echo '-------'
-	echo
-	command git clone $GITHUB $HOME/temp_$APPLOW &&
-	sudo mv -f $HOME/temp_$APPLOW $INSTALLDIR
-	echo "Changing ownership of /var/www/mediafrontpage to www-data"
-	echo "Remember to chown it to your normal user when gitpulling"
-	sudo chown -R www-data $INSTALLDIR
-	sudo chmod -R 774 $INSTALLDIR
-	echo
-	}
-
+clone_Git () {
+echo
+echo '-------'
+echo "Download and install most recent $APP from GitHub"
+echo '-------'
+echo
+command git clone $GITHUB $HOME/temp_$APPLOW &&
+sudo mv -f $HOME/temp_$APPLOW $INSTALLDIR
+echo "Changing ownership of /var/www/mediafrontpage to www-data"
+sudo chown -R www-data $INSTALLDIR
+sudo chmod -R 774 $INSTALLDIR
+echo
+}
 
 ######################################################
 
@@ -395,36 +328,36 @@ esac
 
 
 #### HERSTART APACHE ####
-	restart_Ap() {
-		LOCATION=$(hostname)
-		echo "Installation is ready..."
-		echo "Reload Apache for all changes..."
-		sudo /etc/init.d/apache2 reload
-	}
+restart_Ap() {
+echo "Installation is ready..."
+echo "Reload Apache for all changes..."
+sudo /etc/init.d/apache2 reload
+}
+
 
 git_Update () {
-	echo
-	echo "===="
-	echo "Checking for updates $APP"
-	cd $INSTALLDIR &&
-	git pull
-	read -sn 1 -p "Press a key to return to menu."
-	echo "===="
+echo
+echo "===="
+echo "Checking for updates $APP"
+cd $INSTALLDIR &&
+git pull
+read -sn 1 -p "Press a key to return to menu."
+echo "===="
 }
 
 
 
 #### RETURN TO MENU ####
-	LaSi_Menu () {
+LaSi_Menu () {
 
-	echo
-	echo "
-	Mediafrontpage installation is ready, 
-	go to: http://$HOSTNAME/mediafrontpage and have fun!
-	"
-	read -sn 1 -p "Press a key to continue."
-	exit
-	}
+echo
+echo "
+Mediafrontpage installation is ready, 
+go to: http://$HOSTNAME/mediafrontpage and have fun!
+"
+read -sn 1 -p "Press a key to continue."
+exit
+}
 
 
 
