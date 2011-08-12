@@ -48,7 +48,7 @@ CONN2=dropbox.com;
 GITHUB=https://github.com/rembo10/headphones.git;	#github-adres
 DROPBOX=http://dl.dropbox.com/u/18712538/;		#dropbox-adres
 
-PACKAGES="git python";					#needed packages to run (using apt to check and install)
+PACKAGES="git python";					#needed packages to run (use a space as delimiter)
 
 INSTALLDIR=/home/$USER/.$APPLOW;			#directory you want to install to.
 DAEMONUSER=$USER;					#the user the app is started with
