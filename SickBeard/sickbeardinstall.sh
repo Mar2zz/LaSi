@@ -50,7 +50,6 @@ DROPBOX=http://dl.dropbox.com/u/18712538/ 		#dropbox-adres
 PACKAGES="git python python-cheetah";			#needed packages to run (using apt to check and install)
 
 INSTALLDIR=/home/$USER/.$APPLOW;			#directory you want to install to.
-DAEMONUSER=$USER; 					#the user the app is started with
 INITD=init.ubuntu;					#name of default init-script
 
 IPADRESS=0.0.0.0; 					#default ipadress to listen on
@@ -331,7 +330,6 @@ echo
 			;;
 		[Nn]*)
 			echo "You can start app manually by executing python $INSTALLDIR/$APP.py..."
-			show_Menu
 			;;
 		*)
 			echo "Answer yes or no"
