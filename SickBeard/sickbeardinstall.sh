@@ -587,6 +587,7 @@ case $DAEMON in
 			echo "Can't start $APP, try starting manually..."
 			echo "Execute sudo /etc/init.d/$APPLOW stop | start | restart | force-reload"
 		fi
+		read -sn 1 -p "Press a key to return to menu."
 		;;
 	[Nn]*)
 		if $PATH_PYTHON $INSTALLDIR/$APP.py
@@ -596,6 +597,7 @@ case $DAEMON in
 			echo "Can't start $APP, try starting manually..."
 			echo "Type $PATH_PYTHON $INSTALLDIR/$APP.py"
 		fi
+		read -sn 1 -p "Press a key to return to menu."
 		;;
 esac
 }

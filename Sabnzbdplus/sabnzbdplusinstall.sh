@@ -45,8 +45,6 @@ CONN2=dropbox.com;
 
 DROPBOX=http://dl.dropbox.com/u/18712538/			#dropbox-adres
 
-PACKAGES="$APPLOW";						#needed packages to run (using apt to check and install)
-
 IPADRESS=0.0.0.0;						#default ipadress to listen on
 PORT=8080;							#default port to listen on
 
