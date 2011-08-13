@@ -141,7 +141,7 @@ echo "Choose one of the above options"
 read -p "Enter 1, 2 or 3: " CHOICE
 case $CHOICE in
 	1)
-		check_Packs		#check dependencys
+		install_Packages	#check dependencys
 		set_Dir			#choose installation directory
 		clone_Git		#clone the git repo into $installdir
 		#add_MFP		#add mfp-site to sites-available (not done yet, using apache defaultsite)

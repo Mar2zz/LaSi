@@ -546,7 +546,7 @@ LaSi_Logo 		#some basic info about installer
 show_Author		#creator of the app installed
 conn_Test		#connection test for url's used in installation
 root_Test		#test user is not root but has sudo
-check_Packs		#check dependencys
+install_Packages	#check dependencys
 set_NNTP		# Pear install NNTP
 set_Dir			#choose installation directory
 clone_Git		#clone the git repo into $installdir
