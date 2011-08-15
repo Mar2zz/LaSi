@@ -65,6 +65,9 @@ APP6_INST=headphonesinstall.sh;
 APP7=Mediafrontpage;
 APP7_INST=mediafrontpageinstall.sh;
 
+APP8=Sabnzbdplus
+APP8_INST=sabnzbdplusinstall.sh;
+
 #######################################################################################
 
 LaSi_Menu (){
@@ -366,6 +369,34 @@ SET_INST=$APP7_INST
 cf_Choice
 }
 
+
+
+#### SABNZBDPLUS ####
+info_Sabnzbd () {
+clear
+echo "
+*###################### SABNZBDPLUS ######################### 
+#
+# SABnzbd is an Open Source Binary Newsreader written in Python.
+#
+# It's totally free, incredibly easy to use, and works practically everywhere.
+#
+# SABnzbd makes Usenet as simple and streamlined as possible by 
+# automating everything we can. All you have to do is add an .nzb.
+# SABnzbd takes over from there, where it will be automatically downloaded,
+# verified, repaired, extracted and filed away with zero human interaction.
+#
+*############################################################
+#
+# Sabnzbdplus is written by the Sabnzbd-team...
+# Donate if you like it.
+#
+# Visit http://sabnzbd.org
+*#############################################################"
+SET_APP=$APP8
+SET_INST=$APP8_INST
+cf_Choice
+}
 
 #### BACKTOMENU OR INSTALL ####
 cf_Choice () {
