@@ -89,17 +89,17 @@ LaSi_Menu (){
 	echo "----------------------------------------------- Mar2zz "
 	echo
 	echo
-	
-	
+
+
 		show_Menu () {
 		echo "Make a choice to see info or install these apps..."
 		echo "1. CouchPotato			5. Spotweb (dutch only)"
 		echo "2. SickBeard			6. Headphones"
 		echo "3. Periscope			7. Mediafrontpage"
-		echo "4. AlbumIdentify"
+		echo "4. AlbumIdentify			8. Sabnzbdplus"
 		echo
 		echo "Q. Quit"
-	
+
 		read SELECT
 		case "$SELECT" in
 			[1]*)
@@ -122,6 +122,9 @@ LaSi_Menu (){
 				;;
 			[7]*)
 				info_Mediafp
+				;;
+			[8]*)
+				info_Sabnzbd
 				;;
 			[Qq]*)
 				exit
@@ -407,27 +410,27 @@ echo "2. Back to menu"
 echo "Q. Quit"
 
 read SELECT
-	case "$SELECT" in
-		[1]*)
-			inst_App
-			;;
-		[2]*)
-			LaSi_Menu
-			;;
-		[Qq]*)
-			exit
-			;;
-		*)
-			echo "Please choose..."
-			echo
-			cf_Choice
-			;;
-	esac
+case "$SELECT" in
+	[1]*)
+		inst_App
+		;;
+	[2]*)
+		LaSi_Menu
+		;;
+	[Qq]*)
+		exit
+		;;
+	*)
+		echo "Please choose..."
+		echo
+		cf_Choice
+		;;
+esac
 }
 
 #### INSTALL APPLICATION
 inst_App () {
-	
+
 	dropbox_Test () {
 	if ! ping -c 1 $CONN2 > /dev/null 2>&1 
 		then
@@ -441,29 +444,22 @@ inst_App () {
 	mkdir_LaSi () {
 	if [ ! -d LaSi ]
 		then
-		mkdir LaSi &&
-		get_Installer
-	else
-		get_Installer
+		mkdir LaSi
 	fi
+	get_Installer
 	}
-		
-		get_Installer () {
-		if [ -e LaSi/$SET_INST ]
-			then
-			mv -f LaSi/$SET_INST LaSi/$SET_INST.bak &&
-			wget -P LaSi $DROPBOX/$SET_APP/$SET_INST &&
-			sudo chmod +x LaSi/$SET_INST &&
-			./LaSi/$SET_INST &&
-			LaSi_Menu
-		else
-			wget -P LaSi $DROPBOX/$SET_APP/$SET_INST
-			sudo chmod +x LaSi/$SET_INST &&
-			./LaSi/$SET_INST &&
-			LaSi_Menu
-		fi
-		} 
-	
+
+	get_Installer () {
+	if [ -e LaSi/$SET_INST ]
+		then
+		rm -f LaSi/$SET_INST
+	fi
+	wget -P LaSi $DROPBOX/$SET_APP/$SET_INST
+	sudo chmod +x LaSi/$SET_INST &&
+	./LaSi/$SET_INST &&
+	LaSi_Menu
+	} 
+
 	Question() {
 	echo
 	echo "Are you sure you want to continue and install $SET_APP?"
@@ -476,19 +472,20 @@ inst_App () {
 		dropbox_Test
 		;;
 	[Nn]*)
-			LaSi_Menu
-			;;
-		[Qq]*)
-			exit
-			;;
-		*)
-			echo "Answer yes to install" 
-			echo "no for menu"
-			echo "or Q to quit"
-			Question
-			;;
-		esac
+		LaSi_Menu
+		;;
+	[Qq]*)
+		exit
+		;;
+	*)
+		echo "Answer yes to install" 
+		echo "no for menu"
+		echo "or Q to quit"
+		Question
+		;;
+	esac
 	}
+
 Question
 }
 
