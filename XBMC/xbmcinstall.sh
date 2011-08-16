@@ -147,12 +147,12 @@ echo "Choose one of the above options"
 read -p "Enter 1, 2, 3 or 4: " CHOICE
 case $CHOICE in
 	1)
-		add_Source
+		cf_Version
 		install_Desktop
 		show_Menu
 		;;
 	2)
-		add_Source
+		cf_Version
 		install_Standalone
 		show_Menu
 		;;
@@ -172,16 +172,80 @@ esac
 }
 
 
+
+#### CHOOSE STABLE/UNSTABLE ####
+cf_Version () {
+echo
+echo '-------'
+echo "You can install $APP as a stable or unstable version..."
+echo "The unstable version has more and new features, but also more bugs"
+echo "Install unstable only if you want to test it. If you don't like it, rerun this"
+echo "installer to install the stable version"
+echo '-------'
+echo
+
+	Question() {
+	echo "Choose a version to install"
+	echo "1. Stable"
+	echo "2. Unstable"
+	read -p ": " VERSION
+	case $DAEMON in
+		[1]*)
+			echo 'Installing the stable version'
+			add_Stable
+			;;
+		[2]*)
+			echo 'Installing the unstable version'
+			add_Unstable
+			;;
+		*)
+			echo "Answer 1 or 2"
+			Question
+			;;
+		esac
+	}
+Question
+}
+
+
 #### ADD SOURCE ####
-add_Source () {
+#### STABLE
+add_Stable () {
 echo
 
 # Check if ppa is used as a source
-if ! ls /etc/apt/sources.list.d | grep team-xbmc > /dev/null
+if ls /etc/apt/sources.list.d | grep team-xbmc-unstable > /dev/null
+	then
+	sudo rm -f /etc/apt/sources.list.d/team-xbmc-unstable*
+fi
+if ! ls /etc/apt/sources.list.d | grep team-xbmc-ppa > /dev/null
 	then
 	echo
 	echo "Adding Team XBMC ppa-repo..."
 	sudo add-apt-repository ppa:team-xbmc
+	echo
+	echo "XBMC Repo added"
+	echo
+fi
+# Now update it
+echo "Updating sources.list..."
+sudo apt-get update > /dev/null
+echo "Updated all sources"
+echo
+}
+
+#### UNSTABLE
+add_Unstable () {
+# Check if ppa is used as a source
+if ls /etc/apt/sources.list.d | grep team-xbmc-ppa > /dev/null
+	then
+	sudo rm -f /etc/apt/sources.list.d/team-xbmc-ppa*
+fi
+if ! ls /etc/apt/sources.list.d | grep team-xbmc-unstable > /dev/null
+	then
+	echo
+	echo "Adding Team XBMC ppa-repo..."
+	sudo add-apt-repository ppa:team-xbmc/unstable
 	echo
 	echo "XBMC Repo added"
 	echo
