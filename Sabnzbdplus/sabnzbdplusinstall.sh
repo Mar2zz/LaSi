@@ -48,6 +48,38 @@ DROPBOX=http://dl.dropbox.com/u/18712538/			#dropbox-adres
 IPADRESS=0.0.0.0;						#default ipadress to listen on
 PORT=8080;							#default port to listen on
 
+
+#######################################################################################
+
+LaSi_Logo (){
+clear
+echo
+echo " Lazy admin Scripted installers -----------------------"
+echo "                    ___           ___                  "
+echo "                   /\  \         /\__\                 "
+echo "                  /::\  \       /:/ _/_       ___      "
+echo "                 /:/\:\  \     /:/ /\  \     /\__\     "
+echo "  ___     ___   /:/ /::\  \   /:/ /::\  \   /:/__/     "
+echo " /\  \   /\__\ /:/_/:/\:\__\ /:/_/:/\:\__\ /::\  \     "
+echo " \:\  \ /:/  / \:\/:/  \/__/ \:\/:/ /:/  / \/\:\  \__  "
+echo "  \:\  /:/  /   \::/__/       \::/ /:/  /     \:\/\__\ "
+echo "   \:\/:/  /     \:\  \        \/_/:/  /       \::/  / "
+echo "    \::/  /       \:\__\         /:/  /        /:/  /  "
+echo "     \/__/         \/__/         \/__/         \/__/   "
+echo 
+echo "----------------------------------------------- Mar2zz "
+echo 
+echo
+}
+
+show_Author () {
+echo '-------------------------------------'
+echo 'SABNZBDPLUS IS CREATED BY THE SABNZBDPLUS-TEAM'
+echo '------------------------------ www.sabnzbd.org'
+echo 
+echo "LaSi $VERSION"
+}
+
 #######################################################################################
 ####################### TEST IF USER CAN COMPLETE THIS INSTALL ########################
 
@@ -135,12 +167,18 @@ add_Source () {
 echo
 
 # Check if ppa is used as a source
-if ! grep -i jcfp/ppa /etc/apt/sources.list
+if ! ls /etc/apt/sources.list.d | grep jcfp-ppa > /dev/null
 	then
-	sudo add-apt-repository ppa:jcfp/ppa &&
+	echo
+	echo "Adding jcfp ppa-repo.."
+	sudo add-apt-repository ppa:jcfp/ppa
+	echo
+	echo "jcfp ppa repo added"
 fi
 # Now install (or update) it
-sudo apt-get update &&
+echo
+echo "Updating sources.list..."
+sudo apt-get update > /dev/null &&
 sudo apt-get install $APPLOW
 }
 
@@ -224,7 +262,7 @@ echo
 		cf_Import
 	elif [ -e $IMPORTCONFIG ]
 		then
-		cp -f --suffix=.bak $IMPORTCONFIG $HOME/.sabnzbd/sabnzbd.ini &&
+		cp -f --suffix=.bak $IMPORTCONFIG $HOME/.sabnzbd/sabnzbd.ini
 	else
 		echo 'File does not exist, enter correct path as /path/to/sabnzbd.ini' &&
 		import_Config
