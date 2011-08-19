@@ -47,7 +47,7 @@ CONN2=dropbox.com;
 GITHUB=https://github.com/midgetspy/Sick-Beard.git;	#github-adres
 DROPBOX=http://dl.dropbox.com/u/18712538/ 		#dropbox-adres
 
-PACKAGES="git python python-cheetah";			#needed packages to run (using apt to check and install)
+PACKAGES="git-core python python-cheetah";			#needed packages to run (using apt to check and install)
 
 INSTALLDIR=/home/$USER/.$APPLOW;			#directory you want to install to.
 INITD=init.ubuntu;					#name of default init-script

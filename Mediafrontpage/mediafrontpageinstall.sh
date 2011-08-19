@@ -47,7 +47,7 @@ CONN2=dropbox.com;
 GITHUB=https://github.com/MediaFrontPage/mediafrontpage.git;	#github-adres
 DROPBOX=http://dl.dropbox.com/u/18712538/ 			#dropbox-adres
 
-PACKAGES="git apache2 php5 php5-curl"				#packages that must be installed
+PACKAGES="git-core apache2 php5 php5-curl"				#packages that must be installed
 INSTALLDIR=/var/www/$APPLOW;					#directory you want to install to.
 
 

@@ -45,7 +45,7 @@ CONN2=dropbox.com;
 GITHUB=https://github.com/RuudBurger/CouchPotato.git;	#github-adres
 DROPBOX=http://dl.dropbox.com/u/18712538/;		#dropbox-adres
 
-PACKAGES="git python python-cheetah";			#needed packages to run (use a space as delimiter)
+PACKAGES="git-core python python-cheetah";			#needed packages to run (use a space as delimiter)
 
 INSTALLDIR=/home/$USER/.$APPLOW;			#directory you want to install to.
 INITD=initd;						#name of default init-script

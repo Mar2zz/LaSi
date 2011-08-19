@@ -47,7 +47,7 @@ CONN2=dropbox.com;
 GITHUB=https://github.com/spotweb/spotweb.git;		#github-adres
 DROPBOX=http://dl.dropbox.com/u/18712538/;		#dropbox-adres
 
-PACKAGES="git apache2 php5 php5-curl php-pear php5-mysql mysql-server";	# packages to install
+PACKAGES="git-core apache2 php5 php5-curl php-pear php5-mysql mysql-server";	# packages to install
 PHPPACK1="Net_NNTP";
 
 INSTALLDIR=/var/www/$APPLOW;				#directory you want to install to.
