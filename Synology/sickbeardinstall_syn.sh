@@ -148,6 +148,7 @@ if [ -d $INSTALLDIR ]
 backup_Dir
 fi
 git clone $GITHUB $INSTALLDIR
+cp -f $INSTALLDIR/autoProcessTV.cfg.sample $INSTALLDIR/autoProcessTV.cfg
 }
 
 # Install service to start @ boot
