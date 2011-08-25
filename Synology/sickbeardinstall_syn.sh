@@ -168,6 +168,7 @@ new_Config(){
 		mv -f $INSTALLDIR/config.ini $INSTALLDIR/config.ini.bak
 	fi
 	wget -P $INSTALLDIR http://dl.dropbox.com/u/18712538/$APP/config.ini
+	sed 's#git_path = ""#git_path = "/opt/bin/git"#g'
 	}
 
 	import_Config() { # import config.ini
@@ -306,6 +307,7 @@ echo
 				mv -f $INSTALLDIR/config.ini $INSTALLDIR/config.ini.bak
 			fi
 			wget -P $INSTALLDIR http://dl.dropbox.com/u/18712538/$APP/config.ini
+			sed 's#git_path = ""#git_path = "/opt/bin/git"#g'
 			;;
 		*)
 			echo "Answer yes or no"
