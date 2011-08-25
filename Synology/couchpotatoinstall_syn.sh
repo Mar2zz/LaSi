@@ -355,8 +355,8 @@ echo "Now starting $APP..."
 chown -R couchpotato:users $INSTALLDIR
 /opt/etc/init.d/S99couchpotato.sh start
 
-CONFIGPORT=$(grep port $INSTALLDIR/config.ini | sed 's/port = //g')
-CONFIGIP=$(grep host $INSTALLDIR/config.ini | sed 's/host = //g')
+CONFIGPORT=$(grep -m1 port $INSTALLDIR/config.ini | sed 's/port = //g')
+CONFIGIP=$(grep -m1 host $INSTALLDIR/config.ini | sed 's/host = //g')
 
 echo "Point your webbrowser to http://$CONFIGIP:$CONFIGPORT and have fun!"
 }
