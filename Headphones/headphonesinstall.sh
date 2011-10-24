@@ -52,7 +52,7 @@ PACKAGES="git-core python";					#needed packages to run (use a space as delimite
 
 INSTALLDIR=/home/$USER/.$APPLOW;			#directory you want to install to.
 DAEMONUSER=$USER;					#the user the app is started with
-INITD=headphonesinit.d;					#name of default init-script
+INITD=init.ubuntu;					#name of default init-script
 
 IPADRESS=0.0.0.0; 					#default ipadress to listen on
 PORT=8181; 						#default port to listen on
