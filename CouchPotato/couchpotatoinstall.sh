@@ -142,7 +142,6 @@ show_Menu (){
         1)
             install_Packages    #check dependencys
             install_Program     #download and install with .deb file
-            start_App           #Start the application and gl!
             show_Menu
             ;;
         2)
