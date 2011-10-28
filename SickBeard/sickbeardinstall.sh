@@ -170,6 +170,8 @@ echo
 echo "Installing $APP"
 wget -O /tmp/$APP_LOW.deb $DROPBOX/LaSi_repo/$APP_LOW.deb &&
 if sudo dpkg -i /tmp/$APP_LOW.deb | grep "daemon not enabled"; then cf_Daemon; fi
+echo "Type $APP_LOW --help for a list of options."
+read -sn 1 -p "Press a key to continue."
 }
 
 
