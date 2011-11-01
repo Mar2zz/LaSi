@@ -93,7 +93,7 @@ LaSi_Menu (){
 
         show_Menu () {
         echo "Make a choice to see info or install these apps..."
-        echo "1. CouchPotato            5. Spotweb (dutch only)"
+        echo "1. CouchPotato          5. Spotweb (dutch only)"
         echo "2. SickBeard            6. Headphones"
         echo "3. Periscope            7. Mediafrontpage"
         echo "4. AlbumIdentify        8. Sabnzbdplus"
@@ -447,6 +447,67 @@ inst_App () {
         Headphones)
             wget -P /tmp $DROPBOX/LaSi_Repo/headphones.deb || echo "Connection to dropbox failed, try again later"
             sudo dpkg -i /tmp/headphones.deb
+            ;;
+        Spotweb)
+            sudo apt-get -y install apache2 php5 php5-curl php5-mysql mysql-server php-pear
+            sudo pear install Net_NNTP
+            sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/apache2/php.ini
+            sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/cli/php.ini
+
+            # this function creates a mysql database for spotweb
+            config_SQL () {
+
+                cf_SQL () {
+                    echo
+                    echo "Do you want to create a new database?"
+                    echo "Warning: All existing info in database Spotweb will be lost"
+                    read -p "(yes/no): " DBREPLY
+                    case $DBREPLY in
+                    [YyJj]*)
+                        input_PW
+                        ;;
+                    [Nn]*)
+                        ;;
+                    *)
+                        echo "Answer yes or no"
+                        ;;
+                    esac
+                }
+
+                input_PW () {
+                    echo
+                    echo "What is your MySQL Password?"
+                    read -p "Type password:" SQLPASSWORD
+                    create_DB
+                }
+
+                create_DB () {
+                    MYSQL=$(which mysql)
+
+                    # check password
+                    if ! $($MYSQL mysql -u root --password="$SQLPASSWORD" -e "SHOW DATABASES;" > /dev/null); then
+                        echo "Password is wrong, try again"
+                        input_PW
+                    fi
+
+                    # drop DB if it exists
+                    if $($MYSQL mysql -u root --password="$SQLPASSWORD" -e "USE spotweb;" > /dev/null); then
+                        $($MYSQL mysql -u root --password="$SQLPASSWORD" -e "DROP DATABASE spotweb;")
+                    fi
+
+                    # create DB
+                    $MYSQL mysql -u root --password="$SQLPASSWORD" -e "
+                    CREATE DATABASE spotweb
+                    CREATE USER 'spotweb'@'localhost' IDENTIFIED BY 'spotweb';
+                    GRANT ALL PRIVILEGES ON spotweb.* TO spotweb @'localhost' IDENTIFIED BY 'spotweb';"
+                    echo "Database created named spotweb, user spotweb and password spotweb"
+                }
+            cf_SQL
+            }
+
+            config_SQL
+            wget -P /tmp $DROPBOX/LaSi_Repo/spotweb.deb || echo "Connection to dropbox failed, try again later"
+            sudo dpkg -i /tmp/spotweb.deb
             ;;
         *)
             wget -O $SET_INST $DROPBOX/$SET_APP/$SET_INST || echo "Connection to dropbox failed, try again later"
