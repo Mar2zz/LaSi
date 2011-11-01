@@ -37,8 +37,8 @@
 
 #SET SOME VARIABLES (SOME VARIABLES WILL BE SET THROUGH LIVE USERINPUT IN TERMINAL)
 
-DROPBOX=http://dl.dropbox.com/u/18712538/ 		# dropbox-adres
-CONN2=dropbox.com					# to test connections needed
+DROPBOX=http://dl.dropbox.com/u/18712538/         # dropbox-adres
+CONN2=dropbox.com                    # to test connections needed
 
 
 #######################################################################################
@@ -71,71 +71,71 @@ APP8_INST=sabnzbdplusinstall.sh;
 #######################################################################################
 
 LaSi_Menu (){
-	
-	clear
-	echo " Lazy admin Scripted installers -----------------------"
-	echo "                    ___           ___                  "
-	echo "                   /\  \         /\__\                 "
-	echo "                  /::\  \       /:/ _/_       ___      "
-	echo "                 /:/\:\  \     /:/ /\  \     /\__\     "
-	echo "  ___     ___   /:/ /::\  \   /:/ /::\  \   /:/__/     "
-	echo " /\  \   /\__\ /:/_/:/\:\__\ /:/_/:/\:\__\ /::\  \     "
-	echo " \:\  \ /:/  / \:\/:/  \/__/ \:\/:/ /:/  / \/\:\  \__  "
-	echo "  \:\  /:/  /   \::/__/       \::/ /:/  /     \:\/\__\ "
-	echo "   \:\/:/  /     \:\  \        \/_/:/  /       \::/  / "
-	echo "    \::/  /       \:\__\         /:/  /        /:/  /  "
-	echo "     \/__/         \/__/         \/__/         \/__/   "
-	echo 
-	echo "----------------------------------------------- Mar2zz "
-	echo
-	echo
+    
+    clear
+    echo " Lazy admin Scripted installers -----------------------"
+    echo "                    ___           ___                  "
+    echo "                   /\  \         /\__\                 "
+    echo "                  /::\  \       /:/ _/_       ___      "
+    echo "                 /:/\:\  \     /:/ /\  \     /\__\     "
+    echo "  ___     ___   /:/ /::\  \   /:/ /::\  \   /:/__/     "
+    echo " /\  \   /\__\ /:/_/:/\:\__\ /:/_/:/\:\__\ /::\  \     "
+    echo " \:\  \ /:/  / \:\/:/  \/__/ \:\/:/ /:/  / \/\:\  \__  "
+    echo "  \:\  /:/  /   \::/__/       \::/ /:/  /     \:\/\__\ "
+    echo "   \:\/:/  /     \:\  \        \/_/:/  /       \::/  / "
+    echo "    \::/  /       \:\__\         /:/  /        /:/  /  "
+    echo "     \/__/         \/__/         \/__/         \/__/   "
+    echo 
+    echo "----------------------------------------------- Mar2zz "
+    echo
+    echo
 
 
-		show_Menu () {
-		echo "Make a choice to see info or install these apps..."
-		echo "1. CouchPotato			5. Spotweb (dutch only)"
-		echo "2. SickBeard			6. Headphones"
-		echo "3. Periscope			7. Mediafrontpage"
-		echo "4. AlbumIdentify			8. Sabnzbdplus"
-		echo
-		echo "Q. Quit"
+        show_Menu () {
+        echo "Make a choice to see info or install these apps..."
+        echo "1. CouchPotato            5. Spotweb (dutch only)"
+        echo "2. SickBeard            6. Headphones"
+        echo "3. Periscope            7. Mediafrontpage"
+        echo "4. AlbumIdentify        8. Sabnzbdplus"
+        echo
+        echo "Q. Quit"
 
-		read SELECT
-		case "$SELECT" in
-			[1]*)
-				info_Couch
-				;;
-			[2]*)
-				info_Sick
-				;;
-			[3]*)
-				info_Peris
-				;;
-			[4]*)
-				info_Album
-				;;
-			[5]*)
-				info_Spot
-				;;
-			[6]*)
-				info_Head
-				;;
-			[7]*)
-				info_Mediafp
-				;;
-			[8]*)
-				info_Sabnzbd
-				;;
-			[Qq]*)
-				exit
-				;;
-			*)
-				echo "Please make a selection (e.g. 1)"
-				echo
-				show_Menu
-				;;
-		esac
-		}
+        read SELECT
+        case "$SELECT" in
+            [1]*)
+                info_Couch
+                ;;
+            [2]*)
+                info_Sick
+                ;;
+            [3]*)
+                info_Peris
+                ;;
+            [4]*)
+                info_Album
+                ;;
+            [5]*)
+                info_Spot
+                ;;
+            [6]*)
+                info_Head
+                ;;
+            [7]*)
+                info_Mediafp
+                ;;
+            [8]*)
+                info_Sabnzbd
+                ;;
+            [Qq]*)
+                exit
+                ;;
+            *)
+                echo "Please make a selection (e.g. 1)"
+                echo
+                show_Menu
+                ;;
+        esac
+        }
 show_Menu
 }
 
@@ -149,10 +149,10 @@ echo "
 #
 # CouchPotato is an automatic NZB and torrent downloader. 
 # You can keep a 'movies I want'-list and it will search 
-# for NZBs/torrents of these movies every X hours.	
+# for NZBs/torrents of these movies every X hours.    
 #
 # Once a movie is found, it will send it to SABnzbd
-# or download the .nzb or .torrent to a	# specified directory.
+# or download the .nzb or .torrent to a    # specified directory.
 #
 *############################################################
 #
@@ -206,7 +206,7 @@ echo "
 # SickBeard is written by midgetspy
 #
 # Visit http://www.sickbeard.com
-*#############################################################"	
+*#############################################################"    
 SET_APP=$APP2
 SET_INST=$APP2_INST
 cf_Choice
@@ -247,7 +247,7 @@ echo "
 # Periscope is written by patrick@gmail.com...
 # ..so buy him a coke to support him.
 #
-# Visit http://code.google.com/p/periscope/	
+# Visit http://code.google.com/p/periscope/    
 *#############################################################"
 SET_APP=$APP3
 SET_INST=$APP3_INST
@@ -278,7 +278,7 @@ echo "
 #
 # AlbumIdentify is written by the albumidentify-team..
 #
-# Visit https://github.com/scottr/albumidentify	
+# Visit https://github.com/scottr/albumidentify    
 *#############################################################"
 SET_APP=$APP4
 SET_INST=$APP4_INST
@@ -333,7 +333,7 @@ echo "
 # You can keep a 'musicalbums I want'-list and it will search 
 # for NZBs of these albums every X hours.
 #
-# It is also possible to 'follow' artists for upcoming albums.	
+# It is also possible to 'follow' artists for upcoming albums.    
 #
 # Once an album is found, it will send it to SABnzbd.
 #
@@ -341,7 +341,7 @@ echo "
 #
 # Headphones is written by Rembo10 in his spare time...
 #
-# Visit https://github.com/rembo10/headphones	
+# Visit https://github.com/rembo10/headphones    
 *#############################################################"
 SET_APP=$APP6
 SET_INST=$APP6_INST
@@ -365,7 +365,7 @@ echo "
 #
 # Mediafrontpage is written by Nick8888 and others
 #
-# Visit https://github.com/Mediafrontpage/mediafrontpage	
+# Visit https://github.com/Mediafrontpage/mediafrontpage    
 *#############################################################"
 SET_APP=$APP7
 SET_INST=$APP7_INST
@@ -411,80 +411,75 @@ echo "Q. Quit"
 
 read SELECT
 case "$SELECT" in
-	[1]*)
-		inst_App
-		;;
-	[2]*)
-		LaSi_Menu
-		;;
-	[Qq]*)
-		exit
-		;;
-	*)
-		echo "Please choose..."
-		echo
-		cf_Choice
-		;;
+    1*)
+        inst_App
+        ;;
+    2*)
+        LaSi_Menu
+        ;;
+    Qq*)
+        exit
+        ;;
+    *)
+        echo "Please choose..."
+        echo
+        cf_Choice
+        ;;
 esac
 }
 
 #### INSTALL APPLICATION
 inst_App () {
 
-	dropbox_Test () {
-	if ! ping -c 1 $CONN2 > /dev/null 2>&1 
-		then
-		echo "Hmmm $CONN2 seems down..."
-		echo "Need $CONN2 to install... Now exiting"
-	else
-		mkdir_LaSi
-	fi
-	}
-	
-	mkdir_LaSi () {
-	if [ ! -d LaSi ]
-		then
-		mkdir LaSi
-	fi
-	get_Installer
-	}
+    get_Installer () {
+    # remove any existing .deb files in tmp
+    rm -f /tmp/*.deb
+    case $SET_APP in
+        CouchPotato)
+            wget -P /tmp $DROPBOX/LaSi_Repo/couchpotato.deb || echo "Connection to dropbox failed, try again later"
+            sudo dpkg -i /tmp/couchpotato.deb
+            ;;
+        SickBeard)
+            sudo apt-get -y install python-cheetah
+            wget -P /tmp $DROPBOX/LaSi_Repo/sickbeard.deb || echo "Connection to dropbox failed, try again later"
+            sudo dpkg -i /tmp/sickbeard.deb
+            ;;
+        Headphones)
+            wget -P /tmp $DROPBOX/LaSi_Repo/headphones.deb || echo "Connection to dropbox failed, try again later"
+            sudo dpkg -i /tmp/headphones.deb
+            ;;
+        *)
+            wget -O $SET_INST $DROPBOX/$SET_APP/$SET_INST || echo "Connection to dropbox failed, try again later"
+            sudo chmod +x $SET_INST &&
+            ./$SET_INST
+            rm -f $SET_INST
+            ;;
+    esac
+LaSi_Menu
+}
 
-	get_Installer () {
-	if [ -e LaSi/$SET_INST ]
-		then
-		rm -f LaSi/$SET_INST
-	fi
-	wget -P LaSi $DROPBOX/$SET_APP/$SET_INST
-	sudo chmod +x LaSi/$SET_INST &&
-	./LaSi/$SET_INST &&
-	LaSi_Menu
-	} 
-
-	Question() {
-	echo
-	echo "Are you sure you want to continue and install $SET_APP?"
-	read -p "(yes/no)   :" REPLY
-	case $REPLY in
-	[Yy]*)
-		echo
-		echo "Say hello to my little friend!"
-		echo
-		dropbox_Test
-		;;
-	[Nn]*)
-		LaSi_Menu
-		;;
-	[Qq]*)
-		exit
-		;;
-	*)
-		echo "Answer yes to install" 
-		echo "no for menu"
-		echo "or Q to quit"
-		Question
-		;;
-	esac
-	}
+    Question() {
+    echo
+    echo "Are you sure you want to continue and install $SET_APP?"
+    read -p "(yes/no)   :" REPLY
+    case $REPLY in
+    [Yy]*)
+        get_Installer
+        ;;
+    [Nn]*)
+        LaSi_Menu
+        ;;
+    [Qq]*)
+        exit
+        ;;
+    *)
+        echo "Answer yes to install" 
+        echo "no for menu"
+        echo "or Q to quit"
+        Question
+        ;;
+    esac
+    }
 
 Question
 }
