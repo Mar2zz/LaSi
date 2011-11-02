@@ -566,13 +566,13 @@ inst_App () {
 
             wget -O /tmp/spotweb.deb $DROPBOX/LaSi_Repo/spotweb.deb || echo "Connection to dropbox failed, try again later"
             sudo dpkg -i /tmp/spotweb.deb
-            /usr/bin/php /var/www/spotweb/upgrade-db.php
 
-            # launch editor if first time
-            if ! [ -e /tmp/ownsettings.php ]; then
-                sudo editor /etc/default/spotweb/ownsettings.php
-                echo "Settings are saved in /etc/default/spotweb/ownsettings.php."
-            fi
+            # change servername to hostname in ownsettings.
+            sudo sed -i "s/mijnserver/$HOSTNAME/g" /etc/default/spotweb/ownsettings.php
+            
+            # update database
+            cd /var/www/spotweb && /usr/bin/php /var/www/spotweb/upgrade-db.php
+            cd - > /dev/null
 
             echo
             echo "Spotweb is now located @ http://$HOSTNAME/spotweb"
