@@ -48,7 +48,7 @@ APP1=CouchPotato;
 
 APP2=SickBeard;
 
-APP3=Periscope;
+APP3=Subliminal;
 APP3_INST=periscopeinstall.sh;
 
 APP4=AlbumIdentify;
@@ -64,6 +64,8 @@ APP7_INST=mediafrontpageinstall.sh;
 APP8=Sabnzbdplus;
 
 APP9=XBMC;
+
+
 
 #######################################################################################
 
@@ -92,7 +94,7 @@ LaSi_Menu (){
         echo "Make a choice to see info or install these apps..."
         echo "1. CouchPotato          6. Headphones"
         echo "2. SickBeard            7. Mediafrontpage"
-        echo "3. Periscope            8. Sabnzbdplus"
+        echo "3. Subliminal           8. Sabnzbdplus"
         echo "4. AlbumIdentify        9. XBMC (desktop)"
         echo "5. Spotweb"
         echo
@@ -107,7 +109,7 @@ LaSi_Menu (){
                 info_Sick
                 ;;
             3*)
-                info_Peris
+                info_Subli
                 ;;
             4*)
                 info_Album
@@ -212,44 +214,29 @@ cf_Choice
 }
 
 
-#### PERISCOPE ####
+#### SUBLIMINAL ####
 
-info_Peris () {
+info_Subli () {
 clear
 echo "
-*###################### PERISCOPE ######################### 
+*###################### SUBLIMINAL ######################### 
 #
 # Periscope is a subtitles searching module written in python 
 # that tries to find a correct match for a given video file. 
-# The goal behind periscope is that it will only return only 
+# The goal behind subliminal is that it will only return only 
 # correct subtitles so that you can simply relax and 
 # enjoy your video without having to double-check that 
 # the subtitles match your video before watching it.
 
-# This is done by using as much info as available from your file
-# and on the websites. Some websites allow you to use hash of the files,
-# the size/length of the video or the exact file name.
-
-# As a python module, periscope should be easily integrated in many 
-# projects that allow plugins to be written in python. 
-# The fact that the plugin is shared between all the applications 
-# means that separate application and their plugin 
-# (file browser, video player, media center application, ...) 
-# don't have to maintain the code to search, parse and download 
-# subtitles and the user preference about languages.
-#"
-echo
-read -sn 1 -p "--- [more]---"
-echo "
-*############################################################
+# Type subliminal --help in console after install to see options
+# and learn how to search for subs.
 #
-# Periscope is written by patrick@gmail.com...
+# Subliminal is written by Diaoul...
 # ..so buy him a coke to support him.
 #
-# Visit http://code.google.com/p/periscope/    
+# https://github.com/Diaoul/subliminal
 *#############################################################"
 SET_APP=$APP3
-SET_INST=$APP3_INST
 cf_Choice
 }
 
@@ -474,6 +461,9 @@ inst_App () {
                 sudo editor /etc/default/couchpotato &&
                 sudo /etc/init.d/couchpotato start
             fi
+
+            echo
+            echo "Type couchpotato --help for options."
             ;;
         Headphones)
             wget -O /tmp/headphones.deb $DROPBOX/LaSi_Repo/headphones.deb || echo "Connection to dropbox failed, try again later"
@@ -481,6 +471,9 @@ inst_App () {
                 sudo editor /etc/default/headphones &&
                 sudo /etc/init.d/headphones start
             fi
+
+            echo
+            echo "Type headphones --help for options"
             ;;
         Sabnzbdplus)
             # Check if ppa is used as a source
@@ -495,6 +488,9 @@ inst_App () {
                 sudo editor /etc/default/sabnzbdplus
                 sudo /etc/init.d/sabnzbdplus start
             fi
+
+            echo
+            echo "Type sabnzbdplus --help for options"
             ;;
         SickBeard)
             sudo apt-get -y install python-cheetah
@@ -503,6 +499,9 @@ inst_App () {
                 sudo editor /etc/default/sickbeard &&
                 sudo /etc/init.d/sickbeard start
             fi
+
+            echo
+            echo "Type headphones --help for options"
             ;;
         Spotweb)
             sudo apt-get -y install apache2 php5 php5-curl php5-mysql mysql-server php-pear
@@ -573,6 +572,13 @@ inst_App () {
                 echo \"Settings are saved in /etc/default/$app/ownsettings.php.\"
             fi
             ;;
+        Subliminal)
+            sudo apt-get -y install python-pip
+            wget -O /tmp/subliminal.deb $DROPBOX/LaSi_Repo/subliminal.deb || echo "Connection to dropbox failed, try again later"
+            sudo dpkg -i /tmp/subliminal.deb
+
+            echo "Type subliminal --help for options"
+            ;;
         XBMC)
             # remove source to prevent installing wrong version
             if ls /etc/apt/sources.list.d | grep "team-xbmc*" > /dev/null; then
@@ -634,6 +640,7 @@ inst_App () {
     esac
 
     # give time to read output from above installprocess before returning to menu
+    echo
     read -sn 1 -p "Press a key to continue"
 
 LaSi_Menu
