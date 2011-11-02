@@ -49,7 +49,6 @@ APP1=CouchPotato;
 APP2=SickBeard;
 
 APP3=Subliminal;
-APP3_INST=periscopeinstall.sh;
 
 APP4=AlbumIdentify;
 APP4_INST=albumidentify.sh;
@@ -221,18 +220,20 @@ clear
 echo "
 *###################### SUBLIMINAL ######################### 
 #
-# Periscope is a subtitles searching module written in python 
+# Subliminal is a subtitles searching module written in python 
 # that tries to find a correct match for a given video file. 
 # The goal behind subliminal is that it will only return only 
 # correct subtitles so that you can simply relax and 
 # enjoy your video without having to double-check that 
 # the subtitles match your video before watching it.
-
+#
 # Type subliminal --help in console after install to see options
 # and learn how to search for subs.
 #
-# Subliminal is written by Diaoul...
-# ..so buy him a coke to support him.
+# It works great in a sabnzbd-postprocessingscript or when set
+# as a cronjob. Also checkout Sickbeards Subliminal branch!
+#
+# Subliminal is written by Diaoul and based on Patrick's Periscope.
 #
 # https://github.com/Diaoul/subliminal
 *#############################################################"
@@ -359,6 +360,7 @@ cf_Choice
 
 
 #### SABNZBDPLUS ####
+
 info_Sabnzbd () {
 clear
 echo "
@@ -413,31 +415,31 @@ SET_APP=$APP9
 cf_Choice
 }
 
+
 #### BACKTOMENU OR INSTALL ####
 cf_Choice () {
-echo
-echo "Options:"
-echo "1. Install $SET_APP"
-echo "2. Back to menu"
-echo "Q. Quit"
+    echo
+    echo "Options:"
+    echo "1. Install $SET_APP"
+    echo "2. Back to menu"
+    echo "Q. Quit"
 
-read SELECT
-case "$SELECT" in
-    1*)
-        inst_App
-        ;;
-    2*)
-        LaSi_Menu
-        ;;
-    Qq*)
-        exit
-        ;;
-    *)
-        echo "Please choose..."
-        echo
-        cf_Choice
-        ;;
-esac
+    read SELECT
+    case "$SELECT" in
+        1*)
+            inst_App
+            ;;
+        2*)
+            LaSi_Menu
+            ;;
+        Qq*)
+            exit
+            ;;
+        *)
+            echo "Please choose..."
+            cf_Choice
+            ;;
+    esac
 }
 
 #### INSTALL APPLICATION
@@ -649,7 +651,7 @@ LaSi_Menu
     Question() {
     echo
     echo "Are you sure you want to continue and install $SET_APP?"
-    read -p "(yes/no):   " REPLY
+    read -p "(yes/no): " REPLY
     case $REPLY in
     [Yy]*)
         get_Installer
