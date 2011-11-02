@@ -45,10 +45,8 @@ CONN2=dropbox.com                    # to test connections needed
 #################### LIST APPS USED ###################################################
 
 APP1=CouchPotato;
-APP1_INST=couchpotatoinstall.sh;
 
 APP2=SickBeard;
-APP2_INST=sickbeardinstall.sh;
 
 APP3=Periscope;
 APP3_INST=periscopeinstall.sh;
@@ -57,16 +55,15 @@ APP4=AlbumIdentify;
 APP4_INST=albumidentify.sh;
 
 APP5=Spotweb;
-APP5_INST=spotwebinstall.sh;
 
 APP6=Headphones;
-APP6_INST=headphonesinstall.sh;
 
 APP7=Mediafrontpage;
 APP7_INST=mediafrontpageinstall.sh;
 
-APP8=Sabnzbdplus
-APP8_INST=sabnzbdplusinstall.sh;
+APP8=Sabnzbdplus;
+
+APP9=XBMC;
 
 #######################################################################################
 
@@ -93,38 +90,42 @@ LaSi_Menu (){
 
         show_Menu () {
         echo "Make a choice to see info or install these apps..."
-        echo "1. CouchPotato          5. Spotweb (dutch only)"
-        echo "2. SickBeard            6. Headphones"
-        echo "3. Periscope            7. Mediafrontpage"
-        echo "4. AlbumIdentify        8. Sabnzbdplus"
+        echo "1. CouchPotato          6. Headphones"
+        echo "2. SickBeard            7. Mediafrontpage"
+        echo "3. Periscope            8. Sabnzbdplus"
+        echo "4. AlbumIdentify        9. XBMC (desktop)"
+        echo "5. Spotweb"
         echo
         echo "Q. Quit"
 
         read SELECT
         case "$SELECT" in
-            [1]*)
+            1*)
                 info_Couch
                 ;;
-            [2]*)
+            2*)
                 info_Sick
                 ;;
-            [3]*)
+            3*)
                 info_Peris
                 ;;
-            [4]*)
+            4*)
                 info_Album
                 ;;
-            [5]*)
+            5*)
                 info_Spot
                 ;;
-            [6]*)
+            6*)
                 info_Head
                 ;;
-            [7]*)
+            7*)
                 info_Mediafp
                 ;;
-            [8]*)
+            8*)
                 info_Sabnzbd
+                ;;
+            9*)
+                info_XBMC
                 ;;
             [Qq]*)
                 exit
@@ -162,7 +163,6 @@ echo "
 # Visit http://www.couchpotatoapp.com
 *#############################################################"
 SET_APP=$APP1
-SET_INST=$APP1_INST
 cf_Choice
 }
 
@@ -208,7 +208,6 @@ echo "
 # Visit http://www.sickbeard.com
 *#############################################################"    
 SET_APP=$APP2
-SET_INST=$APP2_INST
 cf_Choice
 }
 
@@ -317,7 +316,6 @@ echo "
 # Visit https://github.com/spotweb/spotweb
 *#############################################################"
 SET_APP=$APP5
-SET_INST=$APP5_INST
 cf_Choice
 }
 
@@ -344,7 +342,6 @@ echo "
 # Visit https://github.com/rembo10/headphones    
 *#############################################################"
 SET_APP=$APP6
-SET_INST=$APP6_INST
 cf_Choice
 }
 
@@ -397,7 +394,35 @@ echo "
 # Visit http://sabnzbd.org
 *#############################################################"
 SET_APP=$APP8
-SET_INST=$APP8_INST
+cf_Choice
+}
+
+
+#### XBMC ####
+
+info_XBMC () {
+clear
+echo "
+*############################# XBMC ######################### 
+#
+# XBMC is an award-winning free and open source (GPL) software 
+# media player and entertainment hub for digital media.
+# 
+# Created in 2003 by a group of like minded programmers, 
+# XBMC is a non-profit project run and developed by volunteers 
+# located around the world.
+#
+# More than 50 software developers have contributed to XBMC,
+# and 100-plus translators have worked to expand its reach,
+# making it available in more than 30 languages.
+#
+*############################################################
+#
+# XBMC is written by the XBMC-Team
+#
+# Visit http://www.xbmc.org
+*#############################################################"
+SET_APP=$APP9
 cf_Choice
 }
 
@@ -459,7 +484,7 @@ inst_App () {
             ;;
         Sabnzbdplus)
             # Check if ppa is used as a source
-            if ! ls jcfp-ppa* > /dev/null
+            if ! ls /etc/apt/sources.list.d/jcfp-ppa* > /dev/null; then
                 sudo add-apt-repository ppa:jcfp/ppa
             fi
 
@@ -548,6 +573,58 @@ inst_App () {
                 echo \"Settings are saved in /etc/default/$app/ownsettings.php.\"
             fi
             ;;
+        XBMC)
+            # remove source to prevent installing wrong version
+            if ls /etc/apt/sources.list.d | grep "team-xbmc*" > /dev/null; then
+                sudo rm -f /etc/apt/sources.list.d/team-xbmc*
+            fi
+
+            # ask which source to use
+            Question () {
+                echo "Choose a version to install"
+                echo "1. Stable"
+                echo "2. Unstable, but has newer features"
+                read -p ": " VERSION
+                case $VERSION in
+                    1*)
+                        sudo add-apt-repository ppa:team-xbmc
+                        distro=$(ls /etc/apt/sources.list.d/team-xbmc* | sed "s/.*ppa-\|\.list//g")
+                        ;;
+                    2*)
+                        sudo add-apt-repository ppa:team-xbmc/unstable
+                        distro=$(ls /etc/apt/sources.list.d/team-xbmc* | sed "s/.*unstable-\|\.list//g")
+                        ;;
+                    *)
+                        echo "Answer 1 or 2"
+                        Question
+                        ;;
+                esac
+            }
+            Question
+
+            # Highest available distro is Maverick, change oneiric, natty and precise to maverick
+            ppa=$(ls /etc/apt/sources.list.d/team-xbmc*)
+            case $distro in
+                oneiric|natty|precise)
+                sudo sed -i "s/$distro/maverick/g" $ppa
+                ;;
+            esac
+
+            # Update list, install and configure
+            echo "Checking for newest version..."
+            sudo apt-get update > /dev/null
+            case $VERSION in
+                1*)
+                    sudo apt-get -y install xbmc xbmc-standalone
+                    echo "XBMC can now be started from the menu"
+                    echo "or can be set in the loginscreen as a desktopmanager."
+                    ;;
+                2*)
+                    sudo apt-get -y install xbmc
+                    echo "XBMC can now be started from the menu"
+                    ;;
+            esac
+            ;;
         *)
             wget -O $SET_INST $DROPBOX/$SET_APP/$SET_INST || echo "Connection to dropbox failed, try again later"
             sudo chmod +x $SET_INST &&
@@ -565,7 +642,7 @@ LaSi_Menu
     Question() {
     echo
     echo "Are you sure you want to continue and install $SET_APP?"
-    read -p "(yes/no)   :" REPLY
+    read -p "(yes/no):   " REPLY
     case $REPLY in
     [Yy]*)
         get_Installer
