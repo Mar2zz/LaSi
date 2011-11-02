@@ -554,7 +554,7 @@ inst_App () {
 
                     # create DB
                     $MYSQL mysql -u root --password="$SQLPASSWORD" -e "
-                    CREATE DATABASE spotweb
+                    CREATE DATABASE spotweb;
                     CREATE USER 'spotweb'@'localhost' IDENTIFIED BY 'spotweb';
                     GRANT ALL PRIVILEGES ON spotweb.* TO spotweb @'localhost' IDENTIFIED BY 'spotweb';"
                     echo "Database created named spotweb, user spotweb and password spotweb"
