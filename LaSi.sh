@@ -442,26 +442,41 @@ inst_App () {
 
     # install apps
     case $SET_APP in
+        # Alphabetical ordered applist with installcommands.
         CouchPotato)
             wget -O /tmp/couchpotato.deb $DROPBOX/LaSi_Repo/couchpotato.deb || echo "Connection to dropbox failed, try again later"
-            if sudo dpkg -i /tmp/couchpotato.deb | grep "daemon not enabled"; then
+            if sudo dpkg -i /tmp/couchpotato.deb | grep "/etc/default/couchpotato"; then
                 sudo editor /etc/default/couchpotato &&
                 sudo /etc/init.d/couchpotato start
+            fi
+            ;;
+        Headphones)
+            wget -O /tmp/headphones.deb $DROPBOX/LaSi_Repo/headphones.deb || echo "Connection to dropbox failed, try again later"
+            if sudo dpkg -i /tmp/headphones.deb | grep '/etc/default/headphones'; then
+                sudo editor /etc/default/headphones &&
+                sudo /etc/init.d/headphones start
+            fi
+            ;;
+        Sabnzbdplus)
+            # Check if ppa is used as a source
+            if ! ls jcfp-ppa* > /dev/null
+                sudo add-apt-repository ppa:jcfp/ppa
+            fi
+
+            # Update list, install and configure
+            echo "Checking for newest version..."
+            sudo apt-get update > /dev/null
+            if sudo apt-get -y install sabnzbdplus | grep '/etc/default/sabnzbdplus'; then
+                sudo editor /etc/default/sabnzbdplus
+                sudo /etc/init.d/sabnzbdplus start
             fi
             ;;
         SickBeard)
             sudo apt-get -y install python-cheetah
             wget -O /tmp/sickbeard.deb $DROPBOX/LaSi_Repo/sickbeard.deb || echo "Connection to dropbox failed, try again later"
-            if sudo dpkg -i /tmp/sickbeard.deb | grep "daemon not enabled"; then
+            if sudo dpkg -i /tmp/sickbeard.deb | grep "/etc/default/sickbeard"; then
                 sudo editor /etc/default/sickbeard &&
                 sudo /etc/init.d/sickbeard start
-            fi
-            ;;
-        Headphones)
-            wget -O /tmp/headphones.deb $DROPBOX/LaSi_Repo/headphones.deb || echo "Connection to dropbox failed, try again later"
-            if sudo dpkg -i /tmp/headphones.deb | grep "daemon not enabled"; then
-                sudo editor /etc/default/headphones &&
-                sudo /etc/init.d/headphones start
             fi
             ;;
         Spotweb)
@@ -476,7 +491,7 @@ inst_App () {
                 cf_SQL () {
                     echo
                     echo "Do you want to create a new database?"
-                    echo "Warning: All existing info in database Spotweb will be lost"
+                    echo "Warning: All existing info in an existing spotwebdatabase will be lost!"
                     read -p "(yes/no): " DBREPLY
                     case $DBREPLY in
                     [YyJj]*)
@@ -541,7 +556,7 @@ inst_App () {
             ;;
     esac
 
-    # give time to read output from above installprocess
+    # give time to read output from above installprocess before returning to menu
     read -sn 1 -p "Press a key to continue"
 
 LaSi_Menu
