@@ -567,12 +567,16 @@ inst_App () {
             wget -O /tmp/spotweb.deb $DROPBOX/LaSi_Repo/spotweb.deb || echo "Connection to dropbox failed, try again later"
             sudo dpkg -i /tmp/spotweb.deb
             /usr/bin/php /var/www/spotweb/upgrade-db.php
-            
+
             # launch editor if first time
             if ! [ -e /tmp/ownsettings.php ]; then
-                editor /etc/default/$app/ownsettings.php
-                echo \"Settings are saved in /etc/default/$app/ownsettings.php.\"
+                sudo editor /etc/default/spotweb/ownsettings.php
+                echo "Settings are saved in /etc/default/spotweb/ownsettings.php."
             fi
+
+            echo
+            echo "Spotweb is now located @ http://$HOSTNAME/spotweb"
+            echo "Run php /var/www/spotweb/retrieve.php to fill the database with spots"
             ;;
         Subliminal)
             sudo apt-get -y install python-pip
