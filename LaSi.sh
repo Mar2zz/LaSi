@@ -434,19 +434,35 @@ inst_App () {
     get_Installer () {
     # remove any existing .deb files in tmp
     rm -f /tmp/*.deb
+    
+    # install git for benefits like updating from commandline
+    if ! which git > /dev/null; then
+        sudo apt-get -y install git
+    fi
+
+    # install apps
     case $SET_APP in
         CouchPotato)
-            wget -P /tmp $DROPBOX/LaSi_Repo/couchpotato.deb || echo "Connection to dropbox failed, try again later"
-            sudo dpkg -i /tmp/couchpotato.deb
+            wget -O /tmp/couchpotato.deb $DROPBOX/LaSi_Repo/couchpotato.deb || echo "Connection to dropbox failed, try again later"
+            if sudo dpkg -i /tmp/couchpotato.deb | grep "daemon not enabled"; then
+                sudo editor /etc/default/couchpotato &&
+                sudo /etc/init.d/couchpotato start
+            fi
             ;;
         SickBeard)
             sudo apt-get -y install python-cheetah
-            wget -P /tmp $DROPBOX/LaSi_Repo/sickbeard.deb || echo "Connection to dropbox failed, try again later"
-            sudo dpkg -i /tmp/sickbeard.deb
+            wget -O /tmp/sickbeard.deb $DROPBOX/LaSi_Repo/sickbeard.deb || echo "Connection to dropbox failed, try again later"
+            if sudo dpkg -i /tmp/sickbeard.deb | grep "daemon not enabled"; then
+                sudo editor /etc/default/sickbeard &&
+                sudo /etc/init.d/sickbeard start
+            fi
             ;;
         Headphones)
-            wget -P /tmp $DROPBOX/LaSi_Repo/headphones.deb || echo "Connection to dropbox failed, try again later"
-            sudo dpkg -i /tmp/headphones.deb
+            wget -O /tmp/headphones.deb $DROPBOX/LaSi_Repo/headphones.deb || echo "Connection to dropbox failed, try again later"
+            if sudo dpkg -i /tmp/headphones.deb | grep "daemon not enabled"; then
+                sudo editor /etc/default/headphones &&
+                sudo /etc/init.d/headphones start
+            fi
             ;;
         Spotweb)
             sudo apt-get -y install apache2 php5 php5-curl php5-mysql mysql-server php-pear
@@ -506,8 +522,16 @@ inst_App () {
             }
 
             config_SQL
-            wget -P /tmp $DROPBOX/LaSi_Repo/spotweb.deb || echo "Connection to dropbox failed, try again later"
+
+            wget -O /tmp/spotweb.deb $DROPBOX/LaSi_Repo/spotweb.deb || echo "Connection to dropbox failed, try again later"
             sudo dpkg -i /tmp/spotweb.deb
+            /usr/bin/php /var/www/spotweb/upgrade-db.php
+            
+            # launch editor if first time
+            if ! [ -e /tmp/ownsettings.php ]; then
+                editor /etc/default/$app/ownsettings.php
+                echo \"Settings are saved in /etc/default/$app/ownsettings.php.\"
+            fi
             ;;
         *)
             wget -O $SET_INST $DROPBOX/$SET_APP/$SET_INST || echo "Connection to dropbox failed, try again later"
@@ -516,6 +540,10 @@ inst_App () {
             rm -f $SET_INST
             ;;
     esac
+
+    # give time to read output from above installprocess
+    read -sn 1 -p "Press a key to continue"
+
 LaSi_Menu
 }
 
