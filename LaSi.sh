@@ -58,7 +58,6 @@ APP5=Spotweb;
 APP6=Headphones;
 
 APP7=Mediafrontpage;
-APP7_INST=mediafrontpageinstall.sh;
 
 APP8=Sabnzbdplus;
 
@@ -353,7 +352,6 @@ echo "
 # Visit https://github.com/Mediafrontpage/mediafrontpage    
 *#############################################################"
 SET_APP=$APP7
-SET_INST=$APP7_INST
 cf_Choice
 }
 
@@ -477,6 +475,13 @@ inst_App () {
             echo
             echo "Type headphones --help for options"
             ;;
+        Mediafrontpage)
+            wget -O /tmp/mediafrontpage.deb $DROPBOX/LaSi_Repo/mediafrontpage.deb || echo "Connection to dropbox failed, try again later"
+            sudo dpkg -i /tmp/mediafrontpage.deb
+
+            echo
+            echo "Mediafrontpage is now located @ http://$HOSTNAME/mediafrontpage"
+            ;;
         Sabnzbdplus)
             # Check if ppa is used as a source
             if ! ls /etc/apt/sources.list.d/jcfp-ppa* > /dev/null; then
@@ -520,14 +525,15 @@ inst_App () {
                     echo "Warning: All existing info in an existing spotwebdatabase will be lost!"
                     read -p "(yes/no): " DBREPLY
                     case $DBREPLY in
-                    [YyJj]*)
-                        input_PW
-                        ;;
-                    [Nn]*)
-                        ;;
-                    *)
-                        echo "Answer yes or no"
-                        ;;
+                        [YyJj]*)
+                            input_PW
+                            ;;
+                        [Nn]*)
+                            ;;
+                        *)
+                            echo "Answer yes or no"
+                            cf_SQL
+                            ;;
                     esac
                 }
 
@@ -548,8 +554,13 @@ inst_App () {
                     fi
 
                     # drop DB if it exists
-                    if $($MYSQL mysql -u root --password="$SQLPASSWORD" -e "USE spotweb;" > /dev/null); then
-                        $($MYSQL mysql -u root --password="$SQLPASSWORD" -e "DROP DATABASE spotweb;")
+                    if $($MYSQL mysql -u root --password="$SQLPASSWORD" -e "SHOW DATABASES;" | grep 'spotweb' > /dev/null); then
+                        $MYSQL mysql -u root --password="$SQLPASSWORD" -e "DROP DATABASE spotweb;" > /dev/null
+                    fi
+
+                    # drop USER if it exists
+                    if $($MYSQL mysql -u root --password="$SQLPASSWORD" -e "select user.user from mysql.user;" | grep 'spotweb' > /dev/null); then
+                        $MYSQL mysql -u root --password="$SQLPASSWORD" -e "DROP USER 'spotweb'@'localhost';" > /dev/null
                     fi
 
                     # create DB
@@ -557,7 +568,9 @@ inst_App () {
                     CREATE DATABASE spotweb;
                     CREATE USER 'spotweb'@'localhost' IDENTIFIED BY 'spotweb';
                     GRANT ALL PRIVILEGES ON spotweb.* TO spotweb @'localhost' IDENTIFIED BY 'spotweb';"
-                    echo "Database created named spotweb, user spotweb and password spotweb"
+                    echo
+                    echo "Created a database named spotweb for user spotweb with password spotweb"
+                    echo
                 }
             cf_SQL
             }
@@ -577,6 +590,27 @@ inst_App () {
             echo
             echo "Spotweb is now located @ http://$HOSTNAME/spotweb"
             echo "Run php /var/www/spotweb/retrieve.php to fill the database with spots"
+
+            cf_Retrieve () {
+                echo
+                echo "Do you want to retrieve spots now?"
+                read -p "(yes/no): " RETRIEVE
+                case $RETRIEVE in
+                    [YyJj]*)
+                        echo "This will take a while!"
+                        cd /var/www/spotweb && /usr/bin/php /var/www/spotweb/retrieve.php
+                        cd - > /dev/null
+                        ;;
+                    [Nn]*)
+                        ;;
+                    *)
+                        echo "Answer yes or no"
+                        cf_Retrieve
+                        ;;
+                esac
+            }
+            cf_Retrieve
+
             ;;
         Subliminal)
             sudo apt-get -y install python-pip
