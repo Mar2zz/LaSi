@@ -98,7 +98,7 @@ LaSi_Menu (){
         echo "2. CouchPotato            7. Spotweb"
         echo "3. Headphones             8. Subliminal"
         echo "4. Mediafrontpage         9. Tranmission"
-        echo "5. Sabnzbdplus            10. XBMC (desktop)"
+        echo "5. Sabnzbdplus           10. XBMC (desktop)"
         echo
         echo "Q. Quit"
 
@@ -155,26 +155,27 @@ LaSi_Menu (){
 info_AlbumIdentify () {
     clear
     echo "
-    *################### ALBUMIDENTIFY ##########################
-    #
-    # Albumidentify description on github:
-    # Tools to identify and manage music albums.
-    #
-    *############################################################
-    #
-    # LaSi will enable one part of this powerfull toolset, the 
-    # 'renamealbum' part of it. Though the whole collection of
-    # tools will be downloaded, I am using just 1 or 2 of 'm.
-    # 
-    # I am adding a batchscript (for cronjobs or manual) and a
-    # sabnzbd postprocessingscript to it.
-    #
-    *############################################################
-    #
-    # AlbumIdentify is written by the albumidentify-team..
-    #
-    # Visit https://github.com/scottr/albumidentify    
-    *#############################################################"
+*###############################################################*
+*################### ALBUMIDENTIFY #############################*
+#                                                               #
+# Albumidentify description on github:                          #
+# Tools to identify and manage music albums.                    #
+#                                                               #
+*###############################################################*
+#                                                               #
+# LaSi will enable one part of this powerfull toolset, the      #
+# 'renamealbum' part of it. Though the whole collection of      #
+# tools will be downloaded, I am using just 1 or 2 of 'm.       #
+#                                                               #
+# I am adding a batchscript (for cronjobs or manual) and a      #
+# sabnzbd postprocessingscript to it.                           #
+#                                                               #
+*###############################################################*
+#                                                               #
+# AlbumIdentify is written by the albumidentify-team..          #
+#                                                               #
+# Visit https://github.com/scottr/albumidentify                 #
+*###############################################################*"
     SET_APP=AlbumIdentify
     SET_INST=albumidentify.sh
     cf_Choice
@@ -186,22 +187,23 @@ info_AlbumIdentify () {
 info_CouchPotato () {
     clear
     echo "
-    *###################### COUCHPOTATO ######################### 
-    #
-    # CouchPotato is an automatic NZB and torrent downloader. 
-    # You can keep a 'movies I want'-list and it will search 
-    # for NZBs/torrents of these movies every X hours.    
-    #
-    # Once a movie is found, it will send it to SABnzbd
-    # or download the .nzb or .torrent to a    # specified directory.
-    #
-    *############################################################
-    #
-    # CouchPotato is written by Ruud Burger in his spare time...
-    # ..so buy him a coke to support him.
-    #
-    # Visit http://www.couchpotatoapp.com
-    *#############################################################"
+*###############################################################*
+*###################### COUCHPOTATO ############################*
+#                                                               #
+# CouchPotato is an automatic NZB and torrent downloader.       #
+# You can keep a 'movies I want'-list and it will search        #
+# for NZBs/torrents of these movies every X hours.              #
+#                                                               #
+# Once a movie is found, it will send it to SABnzbd             #
+# or download the .nzb or .torrent to a specified directory.    #
+#                                                               #
+*###############################################################*
+#                                                               #
+# CouchPotato is written by Ruud Burger in his spare time...    #
+# ..so buy him a coke to support him.                           #
+#                                                               #
+# Visit http://www.couchpotatoapp.com                           #
+*###############################################################*"
     SET_APP=CouchPotato
     cf_Choice
 }
@@ -212,22 +214,23 @@ info_CouchPotato () {
 info_Headphones () {
     clear
     echo "
-    *###################### HEADPHONES ########################## 
-    #
-    # Headphones is an automatic NZB downloader. 
-    # You can keep a 'musicalbums I want'-list and it will search 
-    # for NZBs of these albums every X hours.
-    #
-    # It is also possible to 'follow' artists for upcoming albums.    
-    #
-    # Once an album is found, it will send it to SABnzbd.
-    #
-    *############################################################
-    #
-    # Headphones is written by Rembo10 in his spare time...
-    #
-    # Visit https://github.com/rembo10/headphones    
-    *#############################################################"
+*###############################################################*
+*###################### HEADPHONES #############################* 
+#                                                               #
+# Headphones is an automatic NZB downloader.                    #
+# You can keep a 'musicalbums I want'-list and it will search   #
+# for NZBs of these albums every X hours.                       #
+#                                                               #
+# It is also possible to 'follow' artists for upcoming albums.  #
+#                                                               #
+# Once an album is found, it will send it to SABnzbd.           #
+#                                                               #
+*###############################################################*
+#                                                               #
+# Headphones is written by Rembo10 in his spare time...         #
+#                                                               #
+# Visit https://github.com/rembo10/headphones                   #
+*###############################################################*"
     SET_APP=Headphones
     cf_Choice
 }
@@ -238,19 +241,20 @@ info_Headphones () {
 info_Mediafrontpage () {
     clear
     echo "
-    *###################### MEDIAFRONTPAGE ####################### 
-    #
-    # MediaFrontPage is a HTPC Web Program Organiser. Your HTPC 
-    # utilises a number of different programs to do certain tasks. 
-    # What MediaFrontPage does is creates a user specific web page 
-    # that will be your nerve centre for everything you will need.
-    #
-    *############################################################
-    #
-    # Mediafrontpage is written by Nick8888 and others
-    #
-    # Visit https://github.com/Mediafrontpage/mediafrontpage    
-    *#############################################################"
+*###############################################################*
+*###################### MEDIAFRONTPAGE #########################*
+#                                                               #
+# MediaFrontPage is a HTPC Web Program Organiser. Your HTPC     #
+# utilises a number of different programs to do certain tasks.  #
+# What MediaFrontPage does is creates a user specific web page  #
+# that will be your nerve centre for everything you will need.  #
+#                                                               #
+*###############################################################*
+#                                                               #
+# Mediafrontpage is written by Nick8888 and others              #
+#                                                               #
+# Visit https://github.com/Mediafrontpage/mediafrontpage        #
+*###############################################################*"
     SET_APP=Mediafrontpage
     cf_Choice
 }
@@ -261,24 +265,26 @@ info_Mediafrontpage () {
 info_Sabnzbdplus () {
     clear
     echo "
-    *###################### SABNZBDPLUS ######################### 
-    #
-    # SABnzbd is an Open Source Binary Newsreader written in Python.
-    #
-    # It's totally free, incredibly easy to use, and works practically everywhere.
-    #
-    # SABnzbd makes Usenet as simple and streamlined as possible by 
-    # automating everything we can. All you have to do is add an .nzb.
-    # SABnzbd takes over from there, where it will be automatically downloaded,
-    # verified, repaired, extracted and filed away with zero human interaction.
-    #
-    *############################################################
-    #
-    # Sabnzbdplus is written by the Sabnzbd-team...
-    # Donate if you like it.
-    #
-    # Visit http://sabnzbd.org
-    *#############################################################"
+*###############################################################*
+*###################### SABNZBDPLUS ############################*
+#                                                               #
+# SABnzbd is an Open Source Binary Newsreader written in Python.#
+#                                                               #
+# It's totally free, incredibly easy to use, and works          #
+# practically everywhere.                                       #
+#                                                               #
+# SABnzbd makes Usenet as simple and streamlined as possible by #
+# automating everything we can. All you have to do is add an    #
+# nzb.file and SABnzbd takes over from there, where it will be  #
+# automatically downloaded, verified, repaired, extracted and   #
+# filed away with zero human interaction.                       #
+#                                                               #
+*###############################################################*
+#                                                               #
+# Sabnzbdplus is written by the Sabnzbd-team                    #
+#                                                               #
+# Visit http://sabnzbd.org                                      #
+*###############################################################*"
     SET_APP=Sabnzbdplus
     cf_Choice
 }
@@ -289,42 +295,27 @@ info_Sabnzbdplus () {
 info_SickBeard () {
     clear
     echo "
-    *####################### SICKBEARD ######################### 
-    #
-    # Sick Beard is currently an alpha release. 
-    # There may be severe bugs in it and at any given time it may not work at all.
-    #
-    # Sick Beard is a PVR for newsgroup users (with limited torrent support). 
-    # It watches for new episodes of your favorite shows and when they are posted
-    # and it downloads them, sorts and renames them, and optionally generates 
-    # metadata for them. It currently supports NZBs.org, NZBMatrix, Bin-Req, 
-    # NZBs'R'Us,  EZTV.it, and any Newznab installation and retrieves 
-    # show information from theTVDB.com and TVRage.com.
-
-    #Features include:
-    * automatically retrieves new episode torrent or nzb files
-    * can scan your existing library and then download any old seasons 
-      or episodes you're missing"
-    echo
-    read -sn 1 -p "--- [more]---"
-    echo
-    echo "
-    * can watch for better versions and upgrade your existing episodes 
-      (to from TV DVD/BluRay for example)
-    * XBMC library updates, poster/fanart downloads, and NFO/TBN generation
-    * configurable episode renaming
-    * sends NZBs directly to SABnzbd, prioritizes and categorizes them properly
-    * available for any platform, uses simple HTTP interface
-    * can notify XBMC, Growl, or Twitter when new episodes are downloaded
-    * specials and double episode support
-    #
-    *############################################################
-    #
-    # SickBeard is written by midgetspy
-    #
-    # Visit http://www.sickbeard.com
-    *#############################################################"    
-    SET_APP=SickBeard
+*###############################################################*
+*####################### SICKBEARD #############################*
+#                                                               #
+# Sick Beard is a PVR for newsgroup and torrent users. It       #
+# watches for new episodes of your favorite shows and when they #
+# are posted it downloads them, sorts and renames them, and     #
+# optionally generates metadata for them.                       #
+#                                                               #
+# Features include:                                             #
+#   - automatically retrieves new episode torrent or nzb files  #
+#   - can scan your existing library and then download any      #
+#     old seasons or episodes you're missing                    #
+#   - can watch for better versions and upgrade your existing   #
+#     episodes (from TV to DVD/BluRay for example)              #
+#                                                               #
+*###############################################################*
+#                                                               #
+# SickBeard is written by midgetspy                             #
+#                                                               #
+# Visit http://www.sickbeard.com                                #
+*###############################################################*"
     cf_Choice
 }
 
@@ -334,31 +325,23 @@ info_SickBeard () {
 info_Spotweb () {
     clear
     echo "
-    *################### SPOTWEB ##########################
-    #
-    # SpotWeb is een versie van SpotNed (http://twitter.com/spotned) 
-    # voor het web. 
-    # Het gebruikt PHP5 om de meeste functies te implementeren
-    # en is getest op Linux en FreeBSD
-    #
-    *############################################################
-    #
-    # Deze installer installeert alle benodigdheden voor Spotweb.
-    # en installeert en configureert een apache/mysql-server indien
-    # dat nodig is. 
-    # Als de installatie klaar is zal spotweb draaien op 
-    # http://$HOSTNAME/spotweb.
-    # 
-    # Indien je niet kiest voor het importeren van je eigen
-    # ownsettings.php dan wordt er een minimale ownsettings aan-
-    # gemaakt, zodat je gelijk aan de slag kunt.
-    #
-    *############################################################
-    #
-    # Spotweb is geschreven door Spotweb e.a.
-    #
-    # Visit https://github.com/spotweb/spotweb
-    *#############################################################"
+*###############################################################*
+*####################### SPOTWEB ###############################*
+#                                                               #
+# SpotWeb is een versie van SpotNed voor een webserver          #
+# Het gebruikt PHP5 om de meeste functies te implementeren      #
+# en is getest op Linux en FreeBSD.                             #
+#                                                               #
+# Deze installer installeert alle benodigdheden voor Spotweb.   #
+# en installeert en configureert een apache/mysql-server indien #
+# dat nodig is.                                                 #
+#                                                               #
+*###############################################################*
+#                                                               #
+# Spotweb is geschreven door Spotweb e.a.                       #
+#                                                               #
+# Visit https://github.com/spotweb/spotweb                      #
+*###############################################################*"
     SET_APP=Spotweb
     cf_Choice
 }
@@ -369,25 +352,26 @@ info_Spotweb () {
 info_Subliminal () {
     clear
     echo "
-    *###################### SUBLIMINAL ######################### 
-    #
-    # Subliminal is a subtitles searching module written in python 
-    # that tries to find a correct match for a given video file. 
-    # The goal behind subliminal is that it will only return only 
-    # correct subtitles so that you can simply relax and 
-    # enjoy your video without having to double-check that 
-    # the subtitles match your video before watching it.
-    #
-    # Type subliminal --help in console after install to see options
-    # and learn how to search for subs.
-    #
-    # It works great in a sabnzbd-postprocessingscript or when set
-    # as a cronjob. Also checkout Sickbeards Subliminal branch!
-    #
-    # Subliminal is written by Diaoul and based on Patrick's Periscope.
-    #
-    # https://github.com/Diaoul/subliminal
-    *#############################################################"
+*###############################################################*
+*###################### SUBLIMINAL #############################*
+#                                                               #
+# Subliminal is a subtitles searching module written in python  #
+# that tries to find a correct match for a given video file.    #
+# The goal behind subliminal is that it will only return only   #
+# correct subtitles so that you can simply relax and            #
+# enjoy your video without having to double-check that          #
+# the subtitles match your video before watching it.            #
+#                                                               #
+# It works great in a sabnzbd-postprocessingscript or when set  #
+# as a cronjob. Also checkout Sickbeards Subliminal branch!     #
+#                                                               #
+*###############################################################*
+#                                                               #
+# Subliminal is written by Diaoul and based on Patrick's        #
+# Periscope. (http://code.google.com/p/periscope/)              #
+#                                                               #
+# https://github.com/Diaoul/subliminal                          #
+*###############################################################*"
     SET_APP=Subliminal
     cf_Choice
 }
@@ -398,23 +382,25 @@ info_Subliminal () {
 info_Transmission () {
     clear
     echo "
-    *##################### TRANSMISSION ######################### 
-    #
-    # Transmission is a powerfull torrentclient which can run as 
-    # a daemon with a webinterface. It has a very small footprint,
-    # so it can run on devices with low cpu power and low memory.
-    #
-    # Transmission has the features you want from a BitTorrent client: 
-    # encryption, a web interface, peer exchange, magnet links, DHT, µTP,
-    # UPnP and NAT-PMP port forwarding, webseed support, watch directories,
-    # tracker editing, global and per-torrent speed limits, and more.
-    #
-    *############################################################
-    #
-    # Transmission is written by volunteers, the Transmission Project.
-    #
-    # Visit http://www.transmissionbt.com/
-    *#############################################################"
+*###############################################################*
+*##################### TRANSMISSION ############################*
+#                                                               #
+# Transmission is a powerfull torrentclient which can run as    #
+# a daemon with a webinterface. It has a very small footprint,  #
+# so it can run on devices with low cpu power and low memory.   #
+#                                                               #
+# Transmission has the features you want from a Torrent client: #
+# encryption, a webinterface, peer exchange, magnet links, DHT, #
+# µTP, UPnP and NAT-PMP port forwarding, webseed support, watch #
+# directories, tracker editing, global and per-torrent          #
+# speedlimits, and more.                                        #
+#                                                               #
+*###############################################################*
+#                                                               #
+# Transmission is written by volunteers.                        #
+#                                                               #
+# Visit http://www.transmissionbt.com/                          #
+*###############################################################*"
     SET_APP=Transmission
     cf_Choice
 }
@@ -425,25 +411,26 @@ info_Transmission () {
 info_XBMC () {
 clear
 echo "
-*############################# XBMC ######################### 
-#
-# XBMC is an award-winning free and open source (GPL) software 
-# media player and entertainment hub for digital media.
-# 
-# Created in 2003 by a group of like minded programmers, 
-# XBMC is a non-profit project run and developed by volunteers 
-# located around the world.
-#
-# More than 50 software developers have contributed to XBMC,
-# and 100-plus translators have worked to expand its reach,
-# making it available in more than 30 languages.
-#
-*############################################################
-#
-# XBMC is written by the XBMC-Team
-#
-# Visit http://www.xbmc.org
-*#############################################################"
+*###############################################################*
+*############################# XBMC ############################*
+#                                                               #
+# XBMC is an award-winning free and open source (GPL) software  #
+# media player and entertainment hub for digital media.         #
+#                                                               #
+# Created in 2003 by a group of like minded programmers,        #
+# XBMC is a non-profit project run and developed by volunteers  #
+# located around the world.                                     #
+#                                                               #
+# More than 50 software developers have contributed to XBMC,    #
+# and 100-plus translators have worked to expand its reach,     #
+# making it available in more than 30 languages.                #
+#                                                               #
+*###############################################################*
+#                                                               #
+# XBMC is written by the XBMC-Team                              #
+#                                                               #
+# Visit http://www.xbmc.org                                     #
+*###############################################################*"
 SET_APP=XBMC
 cf_Choice
 }
@@ -493,7 +480,12 @@ inst_App () {
         CouchPotato)
             wget -O /tmp/couchpotato.deb $DROPBOX/LaSi_Repo/couchpotato.deb || echo "Connection to dropbox failed, try again later"
             if sudo dpkg -i /tmp/couchpotato.deb | grep "/etc/default/couchpotato"; then
-                sudo editor /etc/default/couchpotato &&
+                sudo sed -i "
+                    s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
+                    s/RUN_AS.*/RUN_AS=$USER/
+                    s/WEB_UPDATE=0/WEB_UPDATE=1/g
+                " /etc/default/couchpotato
+                echo "Changed daemon settings..."
                 sudo /etc/init.d/couchpotato start
             fi
 
@@ -506,7 +498,12 @@ inst_App () {
         Headphones)
             wget -O /tmp/headphones.deb $DROPBOX/LaSi_Repo/headphones.deb || echo "Connection to dropbox failed, try again later"
             if sudo dpkg -i /tmp/headphones.deb | grep '/etc/default/headphones'; then
-                sudo editor /etc/default/headphones &&
+                sudo sed -i "
+                    s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
+                    s/RUN_AS.*/RUN_AS=$USER/
+                    s/WEB_UPDATE=0/WEB_UPDATE=1/g
+                " /etc/default/headphones
+                echo "Changed daemon settings..."
                 sudo /etc/init.d/headphones start
             fi
 
@@ -548,7 +545,12 @@ inst_App () {
             sudo apt-get -y install python-cheetah
             wget -O /tmp/sickbeard.deb $DROPBOX/LaSi_Repo/sickbeard.deb || echo "Connection to dropbox failed, try again later"
             if sudo dpkg -i /tmp/sickbeard.deb | grep "/etc/default/sickbeard"; then
-                sudo editor /etc/default/sickbeard &&
+                sudo sed -i "
+                    s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
+                    s/RUN_AS.*/RUN_AS=$USER/
+                    s/WEB_UPDATE=0/WEB_UPDATE=1/g
+                " /etc/default/sickbeard
+                echo "Changed daemon settings..."
                 sudo /etc/init.d/sickbeard start
             fi
 
