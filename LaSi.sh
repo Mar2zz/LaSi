@@ -21,6 +21,8 @@
 # | # AlbumIdentify 
 # | # Spotweb
 # | # Headphones
+# | # Transmission
+# | # XBMC
 # |___________________________________________________________________________________
 #
 # Tested succesful on OS's:
@@ -30,7 +32,7 @@
 #######################################################################################
 #######################################################################################
 
-#### v1.5 ####
+#### v1.9 ####
 
 #######################################################################################
 #################### LIST OF VARIABLES USED ###########################################
@@ -43,31 +45,7 @@ CONN2=dropbox.com                                   # to test connections needed
 
 
 #######################################################################################
-#################### LIST APPS USED ###################################################
-
-APP1=CouchPotato;
-
-APP2=SickBeard;
-
-APP3=Subliminal;
-
-APP4=AlbumIdentify;
-APP4_INST=albumidentify.sh;
-
-APP5=Spotweb;
-
-APP6=Headphones;
-
-APP7=Mediafrontpage;
-
-APP8=Sabnzbdplus;
-
-APP9=XBMC;
-
-APP10=Transmission
-
-
-
+#######################################################################################
 #######################################################################################
 
 LaSi_Menu (){
@@ -478,7 +456,7 @@ inst_App () {
     case $SET_APP in
 
         CouchPotato)
-            wget -O /tmp/couchpotato.deb $DROPBOX/LaSi_Repo/couchpotato.deb || echo "Connection to dropbox failed, try again later"
+            wget -O /tmp/couchpotato.deb $DROPBOX/LaSi_Repo/couchpotato.deb || echo "Connection to dropbox failed, try again later" && exit 1
             if sudo dpkg -i /tmp/couchpotato.deb | grep "/etc/default/couchpotato"; then
                 sudo sed -i "
                     s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
@@ -496,7 +474,7 @@ inst_App () {
             ;;
 
         Headphones)
-            wget -O /tmp/headphones.deb $DROPBOX/LaSi_Repo/headphones.deb || echo "Connection to dropbox failed, try again later"
+            wget -O /tmp/headphones.deb $DROPBOX/LaSi_Repo/headphones.deb || echo "Connection to dropbox failed, try again later" && exit 1
             if sudo dpkg -i /tmp/headphones.deb | grep '/etc/default/headphones'; then
                 sudo sed -i "
                     s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
@@ -514,7 +492,7 @@ inst_App () {
             ;;
 
         Mediafrontpage)
-            wget -O /tmp/mediafrontpage.deb $DROPBOX/LaSi_Repo/mediafrontpage.deb || echo "Connection to dropbox failed, try again later"
+            wget -O /tmp/mediafrontpage.deb $DROPBOX/LaSi_Repo/mediafrontpage.deb || echo "Connection to dropbox failed, try again later" && exit 1
             sudo dpkg -i /tmp/mediafrontpage.deb
 
             echo
@@ -547,7 +525,7 @@ inst_App () {
 
         SickBeard)
             sudo apt-get -y install python-cheetah
-            wget -O /tmp/sickbeard.deb $DROPBOX/LaSi_Repo/sickbeard.deb || echo "Connection to dropbox failed, try again later"
+            wget -O /tmp/sickbeard.deb $DROPBOX/LaSi_Repo/sickbeard.deb || echo "Connection to dropbox failed, try again later" && exit 1
             if sudo dpkg -i /tmp/sickbeard.deb | grep "/etc/default/sickbeard"; then
                 sudo sed -i "
                     s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
@@ -577,7 +555,7 @@ inst_App () {
                     echo
                     echo "Do you want to create a new database?"
                     echo "Warning: All existing info in an existing spotwebdatabase will be lost!"
-                    read -p "(yes/no): " DBREPLY
+                    read -p "[yes/no]: " DBREPLY
                     case $DBREPLY in
                         [YyJj]*)
                             input_PW
@@ -592,9 +570,16 @@ inst_App () {
                 }
 
                 input_PW () {
+                    stty_orig=`stty -g`
                     echo
-                    echo "What is your MySQL Password?"
-                    read -p "Type password:" SQLPASSWORD
+                    echo "What is your mySQL password?"
+
+                    # hide password when typed
+                    stty -echo
+                        echo "[mysql] password:"
+                        read SQLPASSWORD
+                    stty $stty_orig
+
                     create_DB
                 }
 
@@ -631,7 +616,7 @@ inst_App () {
 
             config_SQL
 
-            wget -O /tmp/spotweb.deb $DROPBOX/LaSi_Repo/spotweb.deb || echo "Connection to dropbox failed, try again later"
+            wget -O /tmp/spotweb.deb $DROPBOX/LaSi_Repo/spotweb.deb || echo "Connection to dropbox failed, try again later" && exit 1
             sudo dpkg -i /tmp/spotweb.deb
 
             # change servername to hostname in ownsettings if it's still default.
@@ -669,7 +654,7 @@ inst_App () {
 
         Subliminal)
             sudo apt-get -y install python-pip
-            wget -O /tmp/subliminal.deb $DROPBOX/LaSi_Repo/subliminal.deb || echo "Connection to dropbox failed, try again later"
+            wget -O /tmp/subliminal.deb $DROPBOX/LaSi_Repo/subliminal.deb || echo "Connection to dropbox failed, try again later" && exit 1
             sudo dpkg -i /tmp/subliminal.deb
 
             echo
@@ -776,7 +761,7 @@ inst_App () {
             ;;
 
         *)
-            wget -O $SET_INST $DROPBOX/$SET_APP/$SET_INST || echo "Connection to dropbox failed, try again later"
+            wget -O $SET_INST $DROPBOX/$SET_APP/$SET_INST || echo "Connection to dropbox failed, try again later" && exit 1
             sudo chmod +x $SET_INST &&
             ./$SET_INST
             rm -f $SET_INST
