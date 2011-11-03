@@ -452,7 +452,7 @@ cf_Choice () {
         2*)
             LaSi_Menu
             ;;
-        Qq*)
+        [Qq]*)
             exit
             ;;
         *)
@@ -531,7 +531,11 @@ inst_App () {
             echo "Checking for newest version..."
             sudo apt-get update > /dev/null
             if sudo apt-get -y install sabnzbdplus | grep '/etc/default/sabnzbdplus'; then
-                sudo editor /etc/default/sabnzbdplus
+                sudo sed -i "
+                    /=/s/USER.*/USER=$USER/
+                    /=/s/HOST.*/HOST=0.0.0.0/
+                " /etc/default/sabnzbdplus
+                echo "Changed daemon settings..."
                 sudo /etc/init.d/sabnzbdplus start
             fi
 
@@ -790,6 +794,7 @@ LaSi_Menu
     echo
     echo "Are you sure you want to continue and install $SET_APP?"
     read -p "[yes/no]: " REPLY
+    echo
     case $REPLY in
     [Yy]*)
         get_Installer
