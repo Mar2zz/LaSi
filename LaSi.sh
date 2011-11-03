@@ -103,6 +103,7 @@ LaSi_Menu (){
         echo "Q. Quit"
 
         read SELECT
+
         case "$SELECT" in
             1)
                 info_AlbumIdentify
@@ -677,6 +678,10 @@ inst_App () {
             # replace running user to user and configdir with home-dir (default dir sucks for configs)
             sudo sed -i "s/USER=debian-transmission/USER=$USER/g" /etc/init.d/transmission-daemon
             sudo sed -i "s/CONFIG_DIR=\"\/var\/lib\/transmission-daemon\/info\"/CONFIG_DIR=\"$HOME/.transmission\"/g" /etc/default/transmission-daemon
+
+            # start-stop to create config at new location
+            sudo /etc/init.d/transmission-daemon start
+            sudo /etc/init.d/transmission-daemon stop
 
             # download a blocklist to hide from nosy capitalists
             wget -O $HOME/.transmission/blocklists/level1.gz http://rps8755.ovh.net/blocklists/level1.gz || echo "Downloading blocklist failed"
