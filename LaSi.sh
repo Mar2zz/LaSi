@@ -411,7 +411,7 @@ info_Transmission () {
     #
     *############################################################
     #
-    # Tranmssion is written by volunteers, the Transmission Project
+    # Transmission is written by volunteers, the Transmission Project.
     #
     # Visit http://www.transmissionbt.com/
     *#############################################################"
@@ -672,16 +672,16 @@ inst_App () {
             ;;
 
         Transmission)
-            sudo apt-get -y transmission-daemon
-            sudo /etc/init.d/transmission-daemon stop
+            sudo apt-get -y install transmission-daemon
+            sudo /etc/init.d/transmission-daemon stop > /dev/null
 
             # replace running user to user and configdir with home-dir (default dir sucks for configs)
             sudo sed -i "s/USER=debian-transmission/USER=$USER/g" /etc/init.d/transmission-daemon
-            sudo sed -i "s/CONFIG_DIR=\"\/var\/lib\/transmission-daemon\/info\"/CONFIG_DIR=\"$HOME/.transmission\"/g" /etc/default/transmission-daemon
+            sudo sed -i "s#CONFIG_DIR=\"/var/lib/transmission-daemon/info\"#CONFIG_DIR=\"$HOME/.transmission\"#g" /etc/default/transmission-daemon
 
             # start-stop to create config at new location
-            sudo /etc/init.d/transmission-daemon start
-            sudo /etc/init.d/transmission-daemon stop
+            sudo /etc/init.d/transmission-daemon start > /dev/null
+            sudo /etc/init.d/transmission-daemon stop > /dev/null
 
             # download a blocklist to hide from nosy capitalists
             wget -O $HOME/.transmission/blocklists/level1.gz http://rps8755.ovh.net/blocklists/level1.gz || echo "Downloading blocklist failed"
@@ -690,7 +690,8 @@ inst_App () {
             fi
 
             # edit settings.json
-            echo "You need to change these options in the settingsfile to gain access to the webinterface."
+            echo "You need to change these options in the settingsfile"
+            echo "to gain access to the webinterface."
             echo "Credentials:"
             echo "\"rpc-password\": \"password_webinterface\","
             echo "\"rpc-username\": \"username_webinterface\","
