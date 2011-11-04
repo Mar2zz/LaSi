@@ -455,13 +455,13 @@ inst_App () {
 
         Beets)
 
-            sudo apt-get -y install python-pip || { echo "Fail!"; exit 1; }
-            sudo pip install beets || { echo "Fail!"; exit 1; }
-            sudo pip install rgain || { echo "Fail!"; return 1; }
+            sudo apt-get -y install python-pip || exit 1
+            sudo pip install beets || exit 1
+            sudo pip install rgain || echo "Fail!"
 
             # Enable replaygain which is healthy for ears and speakers (TEMP DISABLED)
             if ! [ -d $HOME/.beets/plugins ]; then
-                mkdir -p $HOME/.beets/plugins || { echo "Fail!"; return 1; }
+                mkdir -p $HOME/.beets/plugins || echo "Fail, could not create $HOME/.beets/plugins!"
                 # git clone https://github.com/Lugoues/beets-replaygain.git $HOME/.beets/plugins/replaygain || echo "git clone for replaygain failed, install manual" commented because it doesn't work
             fi
 
@@ -596,7 +596,7 @@ inst_App () {
 
         Spotweb)
             sudo apt-get -y install apache2 php5 php5-curl php5-mysql mysql-server php-pear || exit 1
-            sudo pear install Net_NNTP || exit 1
+            sudo pear install Net_NNTP
             sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/apache2/php.ini
             sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/cli/php.ini
 
@@ -741,9 +741,9 @@ inst_App () {
             sudo /etc/init.d/transmission-daemon stop > /dev/null || exit 1
 
             # download a blocklist to hide from nosy capitalists
-            wget -O $HOME/.transmission/blocklists/level1.gz http://rps8755.ovh.net/blocklists/level1.gz || { echo "Downloading blocklist failed, try again later"; return 1; }
+            wget -O $HOME/.transmission/blocklists/level1.gz http://rps8755.ovh.net/blocklists/level1.gz || echo "Downloading blocklist failed, try again later"
             if [ -e $HOME/.transmission/blocklists/level1.gz ]; then
-                gunzip -f $HOME/.transmission/blocklists/level1.gz || return 1
+                gunzip -f $HOME/.transmission/blocklists/level1.gz
             fi
 
             # edit settings.json
