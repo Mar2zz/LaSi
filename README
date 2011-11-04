@@ -28,12 +28,10 @@ sh LaSi_syn.sh
 USAGE:
 When choosing a program LaSi will show some info about it
 and the option to install it. If choice is 
-install program X LaSi will download the latest version 
-of an installer from Dropbox and starts the install. 
+install program X LaSi will install the latest versions of
+those programs.
 
-The installation is questiondriven. Like answer yes/no,
-type location where to install etc. It's an easy way to
-install programs in a terminal via ssh. 
+The installation is questiondriven.
 
 The goal is to create a simple way to install 
 programs that are not inside repo's,
@@ -43,26 +41,18 @@ The programs I chose are mainly written for media
 entertainment and centered around Sabnzbd and postprocessing.
 They work best on headless linuxservers or dedicated linux HTPC's.
 
+For all program's daemons will be enabled so they will run @ boot.
+Programs can be uninstalled with sudo apt-get remove (or purge) programname.
+
 Programs supported Ubuntu:
-* SickBeard
--- TV Showdownloader (git)
-URL: http://sickbeard.com/
+
+* Beets
+-- Musicmanager (pip install)
+URL: http://beets.radbox.org
 
 * CouchPotato
 -- Moviedownloader (git)
 URL: http://couchpotatoapp.com/
-
-* Periscope
--- Subtitledownloader (svn)
-URL: http://code.google.com/p/periscope/
-
-* AlbumIdentify
--- Musictagger (git)
-URL: https://github.com/scottr/albumidentify
-
-* Spotweb
--- Dutch usenetcommunity (git)
-https://github.com/spotweb/spotweb
 
 * Headphones
 -- Musicdownloader (git)
@@ -71,6 +61,26 @@ URL: https://github.com/rembo10/headphones.git
 * Mediafrontpage
 -- HTPC Organizer (git)
 URL: http://mediafrontpage.net
+
+* SickBeard
+-- TV Showdownloader (git)
+URL: http://sickbeard.com/
+
+* Spotweb
+-- Dutch usenetcommunity (git)
+https://github.com/spotweb/spotweb
+
+* Subliminal
+-- Subtitle searcher (pip install)
+URL: https://github.com/Diaoul/subliminal
+
+* Transmission
+-- Torrent client (apt)
+URL: http://www.transmissionbt.com/
+
+* XBMC
+-- HTPC software (apt)
+URL: http://www.xbmc.org
 
 
 ############################
