@@ -72,7 +72,7 @@ LaSi_Menu (){
     show_Menu () {
         echo "Make a choice to see info or install these apps..."
 
-        echo "1. AlbumIdentify          6. SickBeard"
+        echo "1. Beets                  6. SickBeard"
         echo "2. CouchPotato            7. Spotweb"
         echo "3. Headphones             8. Subliminal"
         echo "4. Mediafrontpage         9. Tranmission"
@@ -84,7 +84,7 @@ LaSi_Menu (){
 
         case "$SELECT" in
             1)
-                info_AlbumIdentify
+                info_Beets
                 ;;
             2*)
                 info_CouchPotato
@@ -128,34 +128,30 @@ LaSi_Menu (){
 
 
 
-#### ALBUMIDENTIFY ####
+#### BEETS ####
 
-info_AlbumIdentify () {
+info_Beets () {
     clear
     echo "
 *###############################################################*
-*################### ALBUMIDENTIFY #############################*
+*################### BEETS #####################################*
 #                                                               #
-# Albumidentify description on github:                          #
-# Tools to identify and manage music albums.                    #
+# Beets is the media library management system for              #
+# obsessive-compulsive music geeks.                             #
 #                                                               #
-*###############################################################*
-#                                                               #
-# LaSi will enable one part of this powerfull toolset, the      #
-# 'renamealbum' part of it. Though the whole collection of      #
-# tools will be downloaded, I am using just 1 or 2 of 'm.       #
-#                                                               #
-# I am adding a batchscript (for cronjobs or manual) and a      #
-# sabnzbd postprocessingscript to it.                           #
+# The purpose of beets is to get your music collection right    #
+# once and for all. It catalogs your collection, automatically  #
+# improving its metadata as it goes using the MusicBrainz       #
+# database. It then provides a bouquet of tools for             #
+# manipulating and accessing your music.                        #
 #                                                               #
 *###############################################################*
 #                                                               #
-# AlbumIdentify is written by the albumidentify-team..          #
+# Beets is written by Adrian Sampson..                          #
 #                                                               #
-# Visit https://github.com/scottr/albumidentify                 #
+# Visit http://beets.radbox.org/                                #
 *###############################################################*"
-    SET_APP=AlbumIdentify
-    SET_INST=albumidentify.sh
+    SET_APP=Beets
     cf_Choice
 }
 
@@ -294,6 +290,7 @@ info_SickBeard () {
 #                                                               #
 # Visit http://www.sickbeard.com                                #
 *###############################################################*"
+    SET_APP=SickBeard
     cf_Choice
 }
 
@@ -455,8 +452,60 @@ inst_App () {
     # install apps: Alphabetical ordered applist with installcommands.
     case $SET_APP in
 
+        Beets)
+            sudo apt-get -y install python-pip
+            sudo pip install beets
+            sudo pip install rgain
+
+            # Enable replaygain which is healthy for ears and speakers (TEMP DISABLED)
+            if ! [ -d $HOME/.beets/plugins ]; then
+                mkdir -p $HOME/.beets/plugins
+                # git clone https://github.com/Lugoues/beets-replaygain.git $HOME/.beets/plugins/replaygain || echo "git clone for replaygain failed, install manual" commented because it doesn't work
+            fi
+
+            # create a configfile and databasefile
+            if ! [ -e $HOME/.beetsconfig ]; then
+                echo "[beets]
+                library: $HOME/.beets/musiclibrary.blb
+                directory: $HOME/Music
+                import_copy: yes
+                import_delete: yes
+                import_write: yes
+                import_resume: no
+                import_art: yes
+                import_quiet_fallback: skip
+                import_timid: no
+                import_log: $HOME/.beets/beetslog.txt
+                art_filename: folder
+                pluginpath: $HOME/.beets/plugins/
+                plugins:
+                threaded: yes
+                color: yes
+
+                [paths]
+                default: \$albumartist/\$album (\$year)/\$track. \$artist - \$title
+                soundtrack: Soundtracks/\$album/\$track. \$artist - \$title
+                comp: Various \$genre/\$album (\$year)/\$track. \$artist - \$title
+
+                [replaygain]
+                reference_loundess: 89
+                mp3_format: mp3gain " > $HOME/.beetsconfig
+                sed -i 's/^[ \t]*//' $HOME/.beetsconfig
+
+                echo
+                echo "Now set your defaults in Beets config"
+                read -sn 1 -p "Press a key to continue"
+                editor $HOME/.beetsconfig
+            fi
+
+            echo 
+            echo "Done!"
+            echo "Type beet --help for options"
+            echo "or start importing with beet import -q /path/to/new_music"
+            ;;
+
         CouchPotato)
-            wget -O /tmp/couchpotato.deb $DROPBOX/LaSi_Repo/couchpotato.deb || echo "Connection to dropbox failed, try again later" && exit 1
+            wget -O /tmp/couchpotato.deb $DROPBOX/LaSi_Repo/couchpotato.deb || echo "Connection to dropbox failed, try again later"
             if sudo dpkg -i /tmp/couchpotato.deb | grep "/etc/default/couchpotato"; then
                 sudo sed -i "
                     s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
@@ -467,14 +516,14 @@ inst_App () {
                 sudo /etc/init.d/couchpotato start
             fi
 
-            echo
+            echo 
             echo "Done!"
             echo "Type couchpotato --help for options."
             echo "CouchPotato is by default located @ http://$HOSTNAME:5000"
             ;;
 
         Headphones)
-            wget -O /tmp/headphones.deb $DROPBOX/LaSi_Repo/headphones.deb || echo "Connection to dropbox failed, try again later" && exit 1
+            wget -O /tmp/headphones.deb $DROPBOX/LaSi_Repo/headphones.deb || echo "Connection to dropbox failed, try again later"
             if sudo dpkg -i /tmp/headphones.deb | grep '/etc/default/headphones'; then
                 sudo sed -i "
                     s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
@@ -485,17 +534,17 @@ inst_App () {
                 sudo /etc/init.d/headphones start
             fi
 
-            echo
+            echo 
             echo "Done!"
             echo "Type headphones --help for options"
             echo "Headphones is by default located @ http://$HOSTNAME:8181"
             ;;
 
         Mediafrontpage)
-            wget -O /tmp/mediafrontpage.deb $DROPBOX/LaSi_Repo/mediafrontpage.deb || echo "Connection to dropbox failed, try again later" && exit 1
+            wget -O /tmp/mediafrontpage.deb $DROPBOX/LaSi_Repo/mediafrontpage.deb || echo "Connection to dropbox failed, try again later"
             sudo dpkg -i /tmp/mediafrontpage.deb
 
-            echo
+            echo 
             echo "Mediafrontpage is now located @ http://$HOSTNAME/mediafrontpage"
             ;;
 
@@ -517,7 +566,7 @@ inst_App () {
                 sudo /etc/init.d/sabnzbdplus start
             fi
 
-            echo
+            echo 
             echo "Done!"
             echo "Type sabnzbdplus --help for options"
             echo "Sabnzbdplus is by default located @ http://$HOSTNAME:8080"
@@ -525,7 +574,7 @@ inst_App () {
 
         SickBeard)
             sudo apt-get -y install python-cheetah
-            wget -O /tmp/sickbeard.deb $DROPBOX/LaSi_Repo/sickbeard.deb || echo "Connection to dropbox failed, try again later" && exit 1
+            wget -O /tmp/sickbeard.deb $DROPBOX/LaSi_Repo/sickbeard.deb || echo "Connection to dropbox failed, try again later"
             if sudo dpkg -i /tmp/sickbeard.deb | grep "/etc/default/sickbeard"; then
                 sudo sed -i "
                     s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
@@ -536,7 +585,7 @@ inst_App () {
                 sudo /etc/init.d/sickbeard start
             fi
 
-            echo
+            echo 
             echo "Done!"
             echo "Type sickbeard --help for options"
             echo "SickBeard is by default located @ http://$HOSTNAME:8081"
@@ -616,7 +665,7 @@ inst_App () {
 
             config_SQL
 
-            wget -O /tmp/spotweb.deb $DROPBOX/LaSi_Repo/spotweb.deb || echo "Connection to dropbox failed, try again later" && exit 1
+            wget -O /tmp/spotweb.deb $DROPBOX/LaSi_Repo/spotweb.deb || echo "Connection to dropbox failed, try again later"
             sudo dpkg -i /tmp/spotweb.deb
 
             # change servername to hostname in ownsettings if it's still default.
@@ -626,7 +675,7 @@ inst_App () {
             cd /var/www/spotweb && /usr/bin/php /var/www/spotweb/upgrade-db.php
             cd - > /dev/null
 
-            echo
+            echo 
             echo "Done!"
             echo "Spotweb is now located @ http://$HOSTNAME/spotweb"
             echo "Run /var/www/spotweb/retrieve.php to fill the database with spots"
@@ -654,10 +703,10 @@ inst_App () {
 
         Subliminal)
             sudo apt-get -y install python-pip
-            wget -O /tmp/subliminal.deb $DROPBOX/LaSi_Repo/subliminal.deb || echo "Connection to dropbox failed, try again later" && exit 1
+            wget -O /tmp/subliminal.deb $DROPBOX/LaSi_Repo/subliminal.deb || echo "Connection to dropbox failed, try again later"
             sudo dpkg -i /tmp/subliminal.deb
 
-            echo
+            echo 
             echo "Done!"
             echo "Type subliminal --help for options"
             ;;
@@ -697,7 +746,7 @@ inst_App () {
             # start with all new settings
             sudo /etc/init.d/transmission-daemon start
 
-            echo
+            echo 
             echo "Done!"
             echo "Type tranmission-daemon --help for options"
             echo "Transmission is by default located @ http://$HOSTNAME:9091"
@@ -769,14 +818,14 @@ inst_App () {
     esac
 
     # give time to read output from above installprocess before returning to menu
-    echo
+    echo 
     read -sn 1 -p "Press a key to continue"
 
 LaSi_Menu
 }
 
     Question() {
-    echo
+    echo 
     echo "Are you sure you want to continue and install $SET_APP?"
     read -p "[yes/no]: " REPLY
     echo
