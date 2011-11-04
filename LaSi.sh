@@ -437,6 +437,7 @@ cf_Choice () {
     esac
 }
 
+
 #### INSTALL APPLICATION
 inst_App () {
 
@@ -453,13 +454,14 @@ inst_App () {
     case $SET_APP in
 
         Beets)
-            sudo apt-get -y install python-pip
-            sudo pip install beets
-            sudo pip install rgain
+
+            sudo apt-get -y install python-pip || { echo "Fail!"; exit 1; }
+            sudo pip install beets || { echo "Fail!"; exit 1; }
+            sudo pip install rgain || { echo "Fail!"; return 1; }
 
             # Enable replaygain which is healthy for ears and speakers (TEMP DISABLED)
             if ! [ -d $HOME/.beets/plugins ]; then
-                mkdir -p $HOME/.beets/plugins
+                mkdir -p $HOME/.beets/plugins || { echo "Fail!"; return 1; }
                 # git clone https://github.com/Lugoues/beets-replaygain.git $HOME/.beets/plugins/replaygain || echo "git clone for replaygain failed, install manual" commented because it doesn't work
             fi
 
@@ -505,15 +507,16 @@ inst_App () {
             ;;
 
         CouchPotato)
-            wget -O /tmp/couchpotato.deb $DROPBOX/LaSi_Repo/couchpotato.deb || echo "Connection to dropbox failed, try again later"
-            if sudo dpkg -i /tmp/couchpotato.deb | grep "/etc/default/couchpotato"; then
+
+            wget -O /tmp/couchpotato.deb $DROPBOX/LaSi_Repo/couchpotato.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
+            if sudo dpkg -i /tmp/couchpotato.deb || exit 1 | grep "/etc/default/couchpotato"; then
                 sudo sed -i "
                     s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
                     s/RUN_AS.*/RUN_AS=$USER/
                     s/WEB_UPDATE=0/WEB_UPDATE=1/g
                 " /etc/default/couchpotato
                 echo "Changed daemon settings..."
-                sudo /etc/init.d/couchpotato start
+                sudo /etc/init.d/couchpotato start || exit 1
             fi
 
             echo 
@@ -523,15 +526,15 @@ inst_App () {
             ;;
 
         Headphones)
-            wget -O /tmp/headphones.deb $DROPBOX/LaSi_Repo/headphones.deb || echo "Connection to dropbox failed, try again later"
-            if sudo dpkg -i /tmp/headphones.deb | grep '/etc/default/headphones'; then
+            wget -O /tmp/headphones.deb $DROPBOX/LaSi_Repo/headphones.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
+            if sudo dpkg -i /tmp/headphones.deb || exit 1 | grep '/etc/default/headphones'; then
                 sudo sed -i "
                     s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
                     s/RUN_AS.*/RUN_AS=$USER/
                     s/WEB_UPDATE=0/WEB_UPDATE=1/g
                 " /etc/default/headphones
                 echo "Changed daemon settings..."
-                sudo /etc/init.d/headphones start
+                sudo /etc/init.d/headphones start || exit 1
             fi
 
             echo 
@@ -541,8 +544,8 @@ inst_App () {
             ;;
 
         Mediafrontpage)
-            wget -O /tmp/mediafrontpage.deb $DROPBOX/LaSi_Repo/mediafrontpage.deb || echo "Connection to dropbox failed, try again later"
-            sudo dpkg -i /tmp/mediafrontpage.deb
+            wget -O /tmp/mediafrontpage.deb $DROPBOX/LaSi_Repo/mediafrontpage.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
+            sudo dpkg -i /tmp/mediafrontpage.deb || exit 1
 
             echo 
             echo "Mediafrontpage is now located @ http://$HOSTNAME/mediafrontpage"
@@ -557,13 +560,13 @@ inst_App () {
             # Update list, install and configure
             echo "Checking for newest version..."
             sudo apt-get update > /dev/null
-            if sudo apt-get -y install sabnzbdplus | grep '/etc/default/sabnzbdplus'; then
+            if sudo apt-get -y install sabnzbdplus || exit 1 | grep '/etc/default/sabnzbdplus'; then
                 sudo sed -i "
                     /=/s/USER.*/USER=$USER/
                     /=/s/HOST.*/HOST=0.0.0.0/
                 " /etc/default/sabnzbdplus
                 echo "Changed daemon settings..."
-                sudo /etc/init.d/sabnzbdplus start
+                sudo /etc/init.d/sabnzbdplus start || exit 1
             fi
 
             echo 
@@ -573,16 +576,16 @@ inst_App () {
             ;;
 
         SickBeard)
-            sudo apt-get -y install python-cheetah
-            wget -O /tmp/sickbeard.deb $DROPBOX/LaSi_Repo/sickbeard.deb || echo "Connection to dropbox failed, try again later"
-            if sudo dpkg -i /tmp/sickbeard.deb | grep "/etc/default/sickbeard"; then
+            sudo apt-get -y install python-cheetah || exit 1
+            wget -O /tmp/sickbeard.deb $DROPBOX/LaSi_Repo/sickbeard.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
+            if sudo dpkg -i /tmp/sickbeard.deb || exit 1 | grep "/etc/default/sickbeard"; then
                 sudo sed -i "
                     s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
                     s/RUN_AS.*/RUN_AS=$USER/
                     s/WEB_UPDATE=0/WEB_UPDATE=1/g
                 " /etc/default/sickbeard
                 echo "Changed daemon settings..."
-                sudo /etc/init.d/sickbeard start
+                sudo /etc/init.d/sickbeard start || exit 1
             fi
 
             echo 
@@ -592,8 +595,8 @@ inst_App () {
             ;;
 
         Spotweb)
-            sudo apt-get -y install apache2 php5 php5-curl php5-mysql mysql-server php-pear
-            sudo pear install Net_NNTP
+            sudo apt-get -y install apache2 php5 php5-curl php5-mysql mysql-server php-pear || exit 1
+            sudo pear install Net_NNTP || exit 1
             sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/apache2/php.ini
             sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/cli/php.ini
 
@@ -656,21 +659,35 @@ inst_App () {
                     CREATE DATABASE spotweb;
                     CREATE USER 'spotweb'@'localhost' IDENTIFIED BY 'spotweb';
                     GRANT ALL PRIVILEGES ON spotweb.* TO spotweb @'localhost' IDENTIFIED BY 'spotweb';"
-                    echo
+
+                    # check if database and user is created
+                    if ! $($MYSQL mysql -u root --password="$SQLPASSWORD" -e "SHOW DATABASES;" | grep 'spotweb' > /dev/null); then
+                        echo 
+                        echo "Creation of database failed, try again"
+                        exit 1
+                    fi
+
+                    if ! $($MYSQL mysql -u root --password="$SQLPASSWORD" -e "select user.user from mysql.user;" | grep 'spotweb' > /dev/null); then
+                        echo 
+                        echo "Creation of user failed, try again"
+                        exit 1
+                    fi
+
+                    echo 
                     echo "Created a database named spotweb for user spotweb with password spotweb"
-                    echo
+                    echo 
                 }
             cf_SQL
             }
 
             config_SQL
 
-            wget -O /tmp/spotweb.deb $DROPBOX/LaSi_Repo/spotweb.deb || echo "Connection to dropbox failed, try again later"
-            sudo dpkg -i /tmp/spotweb.deb
+            wget -O /tmp/spotweb.deb $DROPBOX/LaSi_Repo/spotweb.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
+            sudo dpkg -i /tmp/spotweb.deb || exit 1
 
             # change servername to hostname in ownsettings if it's still default.
             sudo sed -i "s/mijnserver/$HOSTNAME/g" /etc/default/spotweb/ownsettings.php
-            
+
             # update database
             cd /var/www/spotweb && /usr/bin/php /var/www/spotweb/upgrade-db.php
             cd - > /dev/null
@@ -702,9 +719,9 @@ inst_App () {
             ;;
 
         Subliminal)
-            sudo apt-get -y install python-pip
-            sudo pip install subliminal
-            sudo pip install argparse
+            sudo apt-get -y install python-pip || exit 1
+            sudo pip install subliminal || exit 1
+            sudo pip install argparse || exit 1
 
             echo 
             echo "Done!"
@@ -712,21 +729,21 @@ inst_App () {
             ;;
 
         Transmission)
-            sudo apt-get -y install transmission-daemon
-            sudo /etc/init.d/transmission-daemon stop > /dev/null
+            sudo apt-get -y install transmission-daemon || exit 1
+            sudo /etc/init.d/transmission-daemon stop > /dev/null || exit 1
 
             # replace running user to user and configdir with home-dir (default dir sucks for configs)
             sudo sed -i "s/USER=debian-transmission/USER=$USER/g" /etc/init.d/transmission-daemon
             sudo sed -i "s#CONFIG_DIR=\"/var/lib/transmission-daemon/info\"#CONFIG_DIR=\"$HOME/.transmission\"#g" /etc/default/transmission-daemon
 
             # start-stop to create config at new location
-            sudo /etc/init.d/transmission-daemon start > /dev/null
-            sudo /etc/init.d/transmission-daemon stop > /dev/null
+            sudo /etc/init.d/transmission-daemon start > /dev/null || exit 1
+            sudo /etc/init.d/transmission-daemon stop > /dev/null || exit 1
 
             # download a blocklist to hide from nosy capitalists
-            wget -O $HOME/.transmission/blocklists/level1.gz http://rps8755.ovh.net/blocklists/level1.gz || echo "Downloading blocklist failed"
+            wget -O $HOME/.transmission/blocklists/level1.gz http://rps8755.ovh.net/blocklists/level1.gz || { echo "Downloading blocklist failed, try again later"; return 1; }
             if [ -e $HOME/.transmission/blocklists/level1.gz ]; then
-                gunzip -f $HOME/.transmission/blocklists/level1.gz
+                gunzip -f $HOME/.transmission/blocklists/level1.gz || return 1
             fi
 
             # edit settings.json
@@ -744,7 +761,7 @@ inst_App () {
             editor $HOME/.transmission/settings.json
 
             # start with all new settings
-            sudo /etc/init.d/transmission-daemon start
+            sudo /etc/init.d/transmission-daemon start || exit 1
 
             echo 
             echo "Done!"
@@ -766,11 +783,11 @@ inst_App () {
                 read -p ": " VERSION
                 case $VERSION in
                     1*)
-                        sudo add-apt-repository ppa:team-xbmc
+                        sudo add-apt-repository ppa:team-xbmc || exit 1
                         distro=$(ls /etc/apt/sources.list.d/team-xbmc* | sed "s/.*ppa-\|\.list//g")
                         ;;
                     2*)
-                        sudo add-apt-repository ppa:team-xbmc/unstable
+                        sudo add-apt-repository ppa:team-xbmc/unstable || exit 1
                         distro=$(ls /etc/apt/sources.list.d/team-xbmc* | sed "s/.*unstable-\|\.list//g")
                         ;;
                     *)
@@ -794,14 +811,14 @@ inst_App () {
             sudo apt-get update > /dev/null
             case $VERSION in
                 1*)
-                    sudo apt-get -y install xbmc xbmc-standalone
+                    sudo apt-get -y install xbmc xbmc-standalone || exit 1
                     echo
                     echo "Done!"
                     echo "XBMC can now be started from the menu"
                     echo "or can be set in the loginscreen as a desktopmanager."
                     ;;
                 2*)
-                    sudo apt-get -y install xbmc
+                    sudo apt-get -y install xbmc || exit 1
                     echo
                     echo "Done!"
                     echo "XBMC can now be started from the menu"
@@ -810,10 +827,8 @@ inst_App () {
             ;;
 
         *)
-            wget -O $SET_INST $DROPBOX/$SET_APP/$SET_INST || echo "Connection to dropbox failed, try again later" && exit 1
-            sudo chmod +x $SET_INST &&
-            ./$SET_INST
-            rm -f $SET_INST
+            echo "Oops, something wen't wrong. Please report @ https://github.com/Mar2zz/LaSi/issues?sort=created&direction=desc&state=open"
+            return 1
             ;;
     esac
 
