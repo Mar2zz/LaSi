@@ -703,8 +703,8 @@ inst_App () {
 
         Subliminal)
             sudo apt-get -y install python-pip
-            wget -O /tmp/subliminal.deb $DROPBOX/LaSi_Repo/subliminal.deb || echo "Connection to dropbox failed, try again later"
-            sudo dpkg -i /tmp/subliminal.deb
+            sudo pip install subliminal
+            sudo pip install argparse
 
             echo 
             echo "Done!"
