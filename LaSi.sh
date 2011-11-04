@@ -438,6 +438,18 @@ cf_Choice () {
 }
 
 
+### ERROR HANDLING ####
+error_Msg () {
+    echo 
+    echo "########################################################################"
+    echo "#  Fail! Installation didn't finish, try again or:                     #"
+    echo "#  Copy the text above and report an issue at the following address:   #"
+    echo "#  https://github.com/Mar2zz/LaSi/issues                               #"
+    echo "########################################################################"
+    exit 1
+}
+
+
 #### INSTALL APPLICATION
 inst_App () {
 
@@ -455,8 +467,8 @@ inst_App () {
 
         Beets)
 
-            sudo apt-get -y install python-pip || exit 1
-            sudo pip install beets || exit 1
+            sudo apt-get -y install python-pip || error_Msg
+            sudo pip install beets || error_Msg
             sudo pip install rgain || echo "Fail!"
 
             # Enable replaygain which is healthy for ears and speakers (TEMP DISABLED)
@@ -509,14 +521,14 @@ inst_App () {
         CouchPotato)
 
             wget -O /tmp/couchpotato.deb $DROPBOX/LaSi_Repo/couchpotato.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
-            if sudo dpkg -i /tmp/couchpotato.deb || exit 1 | grep "/etc/default/couchpotato"; then
+            if sudo dpkg -i /tmp/couchpotato.deb || error_Msg | grep "/etc/default/couchpotato"; then
                 sudo sed -i "
                     s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
                     s/RUN_AS.*/RUN_AS=$USER/
                     s/WEB_UPDATE=0/WEB_UPDATE=1/g
                 " /etc/default/couchpotato
                 echo "Changed daemon settings..."
-                sudo /etc/init.d/couchpotato start || exit 1
+                sudo /etc/init.d/couchpotato start || error_Msg
             fi
 
             echo 
@@ -527,14 +539,14 @@ inst_App () {
 
         Headphones)
             wget -O /tmp/headphones.deb $DROPBOX/LaSi_Repo/headphones.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
-            if sudo dpkg -i /tmp/headphones.deb || exit 1 | grep '/etc/default/headphones'; then
+            if sudo dpkg -i /tmp/headphones.deb || error_Msg | grep '/etc/default/headphones'; then
                 sudo sed -i "
                     s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
                     s/RUN_AS.*/RUN_AS=$USER/
                     s/WEB_UPDATE=0/WEB_UPDATE=1/g
                 " /etc/default/headphones
                 echo "Changed daemon settings..."
-                sudo /etc/init.d/headphones start || exit 1
+                sudo /etc/init.d/headphones start || error_Msg
             fi
 
             echo 
@@ -545,7 +557,7 @@ inst_App () {
 
         Mediafrontpage)
             wget -O /tmp/mediafrontpage.deb $DROPBOX/LaSi_Repo/mediafrontpage.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
-            sudo dpkg -i /tmp/mediafrontpage.deb || exit 1
+            sudo dpkg -i /tmp/mediafrontpage.deb || error_Msg
 
             echo 
             echo "Mediafrontpage is now located @ http://$HOSTNAME/mediafrontpage"
@@ -560,13 +572,13 @@ inst_App () {
             # Update list, install and configure
             echo "Checking for newest version..."
             sudo apt-get update > /dev/null
-            if sudo apt-get -y install sabnzbdplus || exit 1 | grep '/etc/default/sabnzbdplus'; then
+            if sudo apt-get -y install sabnzbdplus || error_Msg| grep '/etc/default/sabnzbdplus'; then
                 sudo sed -i "
                     /=/s/USER.*/USER=$USER/
                     /=/s/HOST.*/HOST=0.0.0.0/
                 " /etc/default/sabnzbdplus
                 echo "Changed daemon settings..."
-                sudo /etc/init.d/sabnzbdplus start || exit 1
+                sudo /etc/init.d/sabnzbdplus start || error_Msg
             fi
 
             echo 
@@ -576,16 +588,16 @@ inst_App () {
             ;;
 
         SickBeard)
-            sudo apt-get -y install python-cheetah || exit 1
+            sudo apt-get -y install python-cheetah || error_Msg
             wget -O /tmp/sickbeard.deb $DROPBOX/LaSi_Repo/sickbeard.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
-            if sudo dpkg -i /tmp/sickbeard.deb || exit 1 | grep "/etc/default/sickbeard"; then
+            if sudo dpkg -i /tmp/sickbeard.deb || error_Msg | grep "/etc/default/sickbeard"; then
                 sudo sed -i "
                     s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
                     s/RUN_AS.*/RUN_AS=$USER/
                     s/WEB_UPDATE=0/WEB_UPDATE=1/g
                 " /etc/default/sickbeard
                 echo "Changed daemon settings..."
-                sudo /etc/init.d/sickbeard start || exit 1
+                sudo /etc/init.d/sickbeard start || error_Msg
             fi
 
             echo 
@@ -595,7 +607,7 @@ inst_App () {
             ;;
 
         Spotweb)
-            sudo apt-get -y install apache2 php5 php5-curl php5-mysql mysql-server php-pear || exit 1
+            sudo apt-get -y install apache2 php5 php5-curl php5-mysql mysql-server php-pear || error_Msg
             sudo pear install Net_NNTP
             sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/apache2/php.ini
             sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/cli/php.ini
@@ -664,13 +676,13 @@ inst_App () {
                     if ! $($MYSQL mysql -u root --password="$SQLPASSWORD" -e "SHOW DATABASES;" | grep 'spotweb' > /dev/null); then
                         echo 
                         echo "Creation of database failed, try again"
-                        exit 1
+                        error_Msg
                     fi
 
                     if ! $($MYSQL mysql -u root --password="$SQLPASSWORD" -e "select user.user from mysql.user;" | grep 'spotweb' > /dev/null); then
                         echo 
                         echo "Creation of user failed, try again"
-                        exit 1
+                        error_Msg
                     fi
 
                     echo 
@@ -683,7 +695,7 @@ inst_App () {
             config_SQL
 
             wget -O /tmp/spotweb.deb $DROPBOX/LaSi_Repo/spotweb.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
-            sudo dpkg -i /tmp/spotweb.deb || exit 1
+            sudo dpkg -i /tmp/spotweb.deb || error_Msg
 
             # change servername to hostname in ownsettings if it's still default.
             sudo sed -i "s/mijnserver/$HOSTNAME/g" /etc/default/spotweb/ownsettings.php
@@ -719,9 +731,9 @@ inst_App () {
             ;;
 
         Subliminal)
-            sudo apt-get -y install python-pip || exit 1
-            sudo pip install subliminal || exit 1
-            sudo pip install argparse || exit 1
+            sudo apt-get -y install python-pip || error_Msg
+            sudo pip install subliminal || error_Msg
+            sudo pip install argparse || error_Msg
 
             echo 
             echo "Done!"
@@ -729,16 +741,16 @@ inst_App () {
             ;;
 
         Transmission)
-            sudo apt-get -y install transmission-daemon || exit 1
-            sudo /etc/init.d/transmission-daemon stop > /dev/null || exit 1
+            sudo apt-get -y install transmission-daemon || error_Msg
+            sudo /etc/init.d/transmission-daemon stop > /dev/null || error_Msg
 
             # replace running user to user and configdir with home-dir (default dir sucks for configs)
             sudo sed -i "s/USER=debian-transmission/USER=$USER/g" /etc/init.d/transmission-daemon
             sudo sed -i "s#CONFIG_DIR=\"/var/lib/transmission-daemon/info\"#CONFIG_DIR=\"$HOME/.transmission\"#g" /etc/default/transmission-daemon
 
             # start-stop to create config at new location
-            sudo /etc/init.d/transmission-daemon start > /dev/null || exit 1
-            sudo /etc/init.d/transmission-daemon stop > /dev/null || exit 1
+            sudo /etc/init.d/transmission-daemon start > /dev/null || error_Msg
+            sudo /etc/init.d/transmission-daemon stop > /dev/null || error_Msg
 
             # download a blocklist to hide from nosy capitalists
             wget -O $HOME/.transmission/blocklists/level1.gz http://rps8755.ovh.net/blocklists/level1.gz || echo "Downloading blocklist failed, try again later"
@@ -761,7 +773,7 @@ inst_App () {
             editor $HOME/.transmission/settings.json
 
             # start with all new settings
-            sudo /etc/init.d/transmission-daemon start || exit 1
+            sudo /etc/init.d/transmission-daemon start || error_Msg
 
             echo 
             echo "Done!"
@@ -783,11 +795,11 @@ inst_App () {
                 read -p ": " VERSION
                 case $VERSION in
                     1*)
-                        sudo add-apt-repository ppa:team-xbmc || exit 1
+                        sudo add-apt-repository ppa:team-xbmc || error_Msg
                         distro=$(ls /etc/apt/sources.list.d/team-xbmc* | sed "s/.*ppa-\|\.list//g")
                         ;;
                     2*)
-                        sudo add-apt-repository ppa:team-xbmc/unstable || exit 1
+                        sudo add-apt-repository ppa:team-xbmc/unstable || error_Msg
                         distro=$(ls /etc/apt/sources.list.d/team-xbmc* | sed "s/.*unstable-\|\.list//g")
                         ;;
                     *)
@@ -811,14 +823,14 @@ inst_App () {
             sudo apt-get update > /dev/null
             case $VERSION in
                 1*)
-                    sudo apt-get -y install xbmc xbmc-standalone || exit 1
+                    sudo apt-get -y install xbmc xbmc-standalone || error_Msg
                     echo
                     echo "Done!"
                     echo "XBMC can now be started from the menu"
                     echo "or can be set in the loginscreen as a desktopmanager."
                     ;;
                 2*)
-                    sudo apt-get -y install xbmc || exit 1
+                    sudo apt-get -y install xbmc || error_Msg
                     echo
                     echo "Done!"
                     echo "XBMC can now be started from the menu"
