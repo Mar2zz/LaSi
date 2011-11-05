@@ -439,7 +439,16 @@ cf_Choice () {
 
 
 ### ERROR HANDLING ####
+error_Depends () {
+    # solve dependency problems
+    echo 
+    echo "Solving dependencys..."
+    sudo apt-get -fy install || error_Msg
+    echo 
+}
+
 error_Msg () {
+    # show error message and exit 1
     echo 
     echo "########################################################################"
     echo "#  Fail! Installation didn't finish, try again or:                     #"
@@ -521,7 +530,10 @@ inst_App () {
         CouchPotato)
 
             wget -O /tmp/couchpotato.deb $DROPBOX/LaSi_Repo/couchpotato.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
-            if sudo dpkg -i /tmp/couchpotato.deb || error_Msg | grep "/etc/default/couchpotato"; then
+
+            sudo dpkg -i /tmp/couchpotato.deb || error_Depends
+
+            if ! pgrep -f CouchPotato.py > /dev/null; then
                 sudo sed -i "
                     s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
                     s/RUN_AS.*/RUN_AS=$USER/
@@ -539,7 +551,10 @@ inst_App () {
 
         Headphones)
             wget -O /tmp/headphones.deb $DROPBOX/LaSi_Repo/headphones.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
-            if sudo dpkg -i /tmp/headphones.deb || error_Msg | grep '/etc/default/headphones'; then
+
+            sudo dpkg -i /tmp/headphones.deb || error_Depends
+
+            if ! pgrep -f Headphones.py > /dev/null; then
                 sudo sed -i "
                     s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
                     s/RUN_AS.*/RUN_AS=$USER/
@@ -557,7 +572,7 @@ inst_App () {
 
         Mediafrontpage)
             wget -O /tmp/mediafrontpage.deb $DROPBOX/LaSi_Repo/mediafrontpage.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
-            sudo dpkg -i /tmp/mediafrontpage.deb || error_Msg
+            sudo dpkg -i /tmp/mediafrontpage.deb || error_Depends
 
             echo 
             echo "Mediafrontpage is now located @ http://$HOSTNAME/mediafrontpage"
@@ -572,7 +587,7 @@ inst_App () {
             # Update list, install and configure
             echo "Checking for newest version..."
             sudo apt-get update > /dev/null
-            if sudo apt-get -y install sabnzbdplus || error_Msg| grep '/etc/default/sabnzbdplus'; then
+            if sudo apt-get -y install sabnzbdplus || error_Msg | grep '/etc/default/sabnzbdplus'; then
                 sudo sed -i "
                     /=/s/USER.*/USER=$USER/
                     /=/s/HOST.*/HOST=0.0.0.0/
@@ -588,9 +603,11 @@ inst_App () {
             ;;
 
         SickBeard)
-            sudo apt-get -y install python-cheetah || error_Msg
+            # sudo apt-get -y install python-cheetah || error_Msg
             wget -O /tmp/sickbeard.deb $DROPBOX/LaSi_Repo/sickbeard.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
-            if sudo dpkg -i /tmp/sickbeard.deb || error_Msg | grep "/etc/default/sickbeard"; then
+            sudo dpkg -i /tmp/sickbeard.deb || error_Depends
+
+            if ! pgrep -f SickBeard.py > /dev/null; then
                 sudo sed -i "
                     s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
                     s/RUN_AS.*/RUN_AS=$USER/
@@ -607,8 +624,11 @@ inst_App () {
             ;;
 
         Spotweb)
-            sudo apt-get -y install apache2 php5 php5-curl php5-mysql mysql-server php-pear || error_Msg
+            wget -O /tmp/spotweb.deb $DROPBOX/LaSi_Repo/spotweb.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
+            sudo dpkg -i /tmp/spotweb.deb || error_Depends
+
             sudo pear install Net_NNTP
+            
             sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/apache2/php.ini
             sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/cli/php.ini
 
@@ -693,9 +713,6 @@ inst_App () {
             }
 
             config_SQL
-
-            wget -O /tmp/spotweb.deb $DROPBOX/LaSi_Repo/spotweb.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
-            sudo dpkg -i /tmp/spotweb.deb || error_Msg
 
             # change servername to hostname in ownsettings if it's still default.
             sudo sed -i "s/mijnserver/$HOSTNAME/g" /etc/default/spotweb/ownsettings.php
