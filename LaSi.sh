@@ -37,14 +37,7 @@
 #######################################################################################
 #################### LIST OF VARIABLES USED ###########################################
 
-
-#SET SOME VARIABLES (SOME VARIABLES WILL BE SET THROUGH LIVE USERINPUT IN TERMINAL)
-
-DROPBOX=http://dl.dropbox.com/u/18712538/           # dropbox-adres
-CONN2=dropbox.com                                   # to test connections needed
-
-unattended=$1                                       # start lasi with ./LaSi.sh --fast for unattendes installs
-
+DROPBOX=http://dl.dropbox.com/u/18712538/                               # dropbox-adres
 
 #######################################################################################
 #######################################################################################
