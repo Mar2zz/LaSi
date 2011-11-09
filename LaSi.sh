@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-# Author:  Mar2zz
-# blogs: mar2zz.tweakblogs.net
+# Author: Mar2zz
+# Email: lasi.mar2zz@gmail.com
+# Blogs: mar2zz.tweakblogs.net
 # License: GNU GPL v3
 #
 # This is the main script of "Lazy Admins Scripted Installers (LaSi)"
@@ -12,9 +13,11 @@
 # |
 # | execute this script with the command: sudo chmod +x LaSi.sh 
 # | then run with ./LaSi.sh
+# | # Or ./LaSi.sh hourly|daily|weekly|monthly to set cronjobs for updating on the fly
 # |
 # | LaSi will install the programs you choose
 # | from the menu:
+# | # Beets
 # | # Sickbeard
 # | # CouchPotato
 # | # Subliminal
@@ -79,6 +82,25 @@ check_Deb () {
 }
 
 
+### SET CRONJOBS ON THE FLY ###
+periodic=$1
+check_Crontime () {
+    case $periodic in
+        hourly) 
+            schedule=hourly ;;
+        daily)
+            schedule=daily ;;
+        weekly)
+            schedule=weekly ;;
+        monthly)
+            schedule=monthly ;;
+        *)
+            echo "Incorrect value, usage:"
+            echo "./LaSi.sh hourly|daily|weekly|monthly"
+            return 1
+    esac
+}
+
 
 ### PRESENT MENU ###
 LaSi_Menu (){
@@ -98,9 +120,6 @@ LaSi_Menu (){
     echo "     \/__/         \/__/         \/__/         \/__/   "
     echo 
     echo "------------------------------------------------ Mar2zz"
-    echo
-    echo
-
 
     show_Menu () {
         echo "Make a choice to see info or install these apps..."
@@ -110,8 +129,13 @@ LaSi_Menu (){
         echo "3. Headphones             8. Subliminal"
         echo "4. Mediafrontpage         9. Tranmission"
         echo "5. Sabnzbdplus           10. XBMC (desktop)"
-        echo
+        echo 
         echo "Use f[n] for fast install (e.g. f1 f2 5 f6)"
+        if [ -z $periodic ]; then
+        echo "Autoset cronjobs for fast installs with:"
+        echo "./LaSi.sh hourly|daily|weekly|monthly"
+        fi
+        echo 
         echo "Q. Quit"
 
         read SELECT
@@ -122,44 +146,68 @@ LaSi_Menu (){
             case "$item" in
 
                 # beets
-                1) info_Beets ;;
-            [Ff]1) install_Beets ;;
+                1) Info_Beets ;;
+                [Ff]1)
+                    set_app=Beets
+                    install_Beets && { [ -n $periodic ] && check_Crontime && set_Cronjob; }
+                    ;;
 
                 # couchpotato
-                2) info_CouchPotato ;;
-            [Ff]2) Install_CouchPotato ;;
+                2) Info_CouchPotato ;;
+                [Ff]2)
+                    set_app=CouchPotato
+                    Install_CouchPotato && { [ -n $periodic ] && check_Crontime && set_Cronjob; }
+                    ;;
 
                 # headphones
-                3) info_Headphones ;;
-            [Ff]3) Install_Headphones ;;
+                3) Info_Headphones ;;
+                [Ff]3)
+                    set_app=Headphones
+                    Install_Headphones && { [ -n $periodic ] && check_Crontime && set_Cronjob; }
+                    ;;
 
                 # mediafrontpage
-                4) info_Mediafrontpage ;;
-            [Ff]4) Install_Mediafrontpage ;;
+                4) Info_Mediafrontpage ;;
+                [Ff]4)
+                    set_app=Mediafrontpage
+                    Install_Mediafrontpage && { [ -n $periodic ] && check_Crontime && set_Cronjob; }
+                    ;;
 
                 # sabnzbdplus
-                5) info_Sabnzbdplus ;;
-            [Ff]5) Install_Sabnzbdplus ;;
+                5) Info_Sabnzbdplus ;;
+                [Ff]5) 
+                    Install_Sabnzbdplus && Summ_Sabnzbdplus
+                    ;;
 
                 # sickbeard
-                6) info_SickBeard ;;
-            [Ff]6) Install_SickBeard ;;
+                6) Info_SickBeard ;;
+                [Ff]6)
+                    set_app=SickBeard
+                    Install_SickBeard && { [ -n $periodic ] && check_Crontime && set_Cronjob; }
+                    ;;
 
                 # spotweb
-                7) info_Spotweb ;;
-            [Ff]7) Install_Spotweb ;;
+                7) Info_Spotweb ;;
+                [Ff]7)
+                    set_app=Spotweb
+                    Install_Spotweb && { [ -n $periodic ] && check_Crontime && set_Cronjob; }
+                    ;;
 
                 # subliminal
-                8) info_Subliminal ;;
-            [Ff]8) Install_Subliminal ;;
+                8) Info_Subliminal ;;
+                [Ff]8)
+                    Install_Subliminal && { [ -n $periodic ] && check_Crontime && set_Cronjob; }
+                    ;;
 
                 # transmission
-                9) info_Transmission ;;
-            [Ff]9) Install_Transmission ;;
+                9) Info_Transmission ;;
+                [Ff]9) Install_Transmission && Summ_Transmission
+                    ;;
 
                 # xbmc
-                10) info_XBMC ;;
-            [Ff]10) Install_XBMC ;;
+                10) Info_XBMC ;;
+                [Ff]10) Install_XBMC && Summ_XBMC
+                    ;;
 
                 [Qq]) exit ;;
 
@@ -171,6 +219,7 @@ LaSi_Menu (){
                     ;;
             esac
         done
+
     }
     show_Menu
 }
@@ -181,7 +230,7 @@ LaSi_Menu (){
 #### BEETS ####
 ###############
 
-info_Beets () {
+Info_Beets () {
     clear
     echo "
 *###############################################################*
@@ -202,7 +251,7 @@ info_Beets () {
 #                                                               #
 # Visit http://beets.radbox.org/                                #
 *###############################################################*"
-    SET_APP=Install_Beets
+    set_app=Beets
     cf_Choice
 }
 
@@ -254,21 +303,23 @@ Install_Beets () {
         editor $HOME/.beetsconfig
     fi
 
+Summ_Beets
+
+}
+
+Summ_Beets () {
     echo 
     echo "Done!"
     echo "Type beet --help for options"
     echo "or start importing with beet import -q /path/to/new_music"
     echo 
-
 }
-
-
 
 #####################
 #### COUCHPOTATO ####
 #####################
 
-info_CouchPotato () {
+Info_CouchPotato () {
     clear
     echo "
 *###############################################################*
@@ -288,7 +339,7 @@ info_CouchPotato () {
 #                                                               #
 # Visit http://www.couchpotatoapp.com                           #
 *###############################################################*"
-    SET_APP=Install_CouchPotato
+    set_app=CouchPotato
     cf_Choice
 }
 
@@ -313,20 +364,23 @@ Install_CouchPotato () {
         sudo /etc/init.d/couchpotato start || error_Msg
     fi
 
+Summ_CouchPotato
+
+}
+
+Summ_CouchPotato () {
     echo 
     echo "Done!"
     echo "Type couchpotato --help for options."
     echo "CouchPotato is by default located @ http://$HOSTNAME:5000"
     echo 
-
 }
-
 
 ####################
 #### HEADPHONES ####
 ####################
 
-info_Headphones () {
+Info_Headphones () {
     clear
     echo "
 *###############################################################*
@@ -346,7 +400,7 @@ info_Headphones () {
 #                                                               #
 # Visit https://github.com/rembo10/headphones                   #
 *###############################################################*"
-    SET_APP=Install_Headphones
+    set_app=Headphones
     cf_Choice
 }
 
@@ -371,21 +425,24 @@ Install_Headphones () {
         sudo /etc/init.d/headphones start || error_Msg
     fi
 
+Summ_Headphones
+
+}
+
+Summ_Headphones () {
     echo 
     echo "Done!"
     echo "Type headphones --help for options"
 
     echo "Headphones is by default located @ http://$HOSTNAME:8181"
     echo 
-
 }
-
 
 ########################
 #### MEDIAFRONTPAGE ####
 ########################
 
-info_Mediafrontpage () {
+Info_Mediafrontpage () {
     clear
     echo "
 *###############################################################*
@@ -402,7 +459,7 @@ info_Mediafrontpage () {
 #                                                               #
 # Visit https://github.com/Mediafrontpage/mediafrontpage        #
 *###############################################################*"
-    SET_APP=Install_Mediafrontpage
+    set_app=Mediafrontpage
     cf_Choice
 }
 
@@ -415,19 +472,21 @@ Install_Mediafrontpage () {
     wget -O /tmp/mediafrontpage.deb $DROPBOX/LaSi_Repo/mediafrontpage.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
     sudo dpkg -i /tmp/mediafrontpage.deb || error_Depends
 
-    echo 
-    echo "Mediafrontpage is now located @ http://$HOSTNAME/mediafrontpage"
-    echo 
+Summ_Mediafrontpage
 
 }
 
-
+Summ_Mediafrontpage () {
+    echo 
+    echo "Mediafrontpage is now located @ http://$HOSTNAME/mediafrontpage"
+    echo 
+}
 
 #####################
 #### SABNZBDPLUS ####
 #####################
 
-info_Sabnzbdplus () {
+Info_Sabnzbdplus () {
     clear
     echo "
 *###############################################################*
@@ -450,7 +509,7 @@ info_Sabnzbdplus () {
 #                                                               #
 # Visit http://sabnzbd.org                                      #
 *###############################################################*"
-    SET_APP=Install_Sabnzbdplus
+    set_app=Sabnzbdplus
     cf_Choice
 }
 
@@ -474,21 +533,24 @@ Install_Sabnzbdplus () {
         sudo /etc/init.d/sabnzbdplus start || error_Msg
     fi
 
+Summ_Sabnzbdplus
+
+}
+
+Summ_Sabnzbdplus () {
     echo 
     echo "Done!"
     echo "Type sabnzbdplus --help for options"
     echo "Sabnzbdplus is by default located @ http://$HOSTNAME:8080"
     echo 
-
 }
-
 
 
 ###################
 #### SICKBEARD ####
 ###################
 
-info_SickBeard () {
+Info_SickBeard () {
     clear
     echo "
 *###############################################################*
@@ -512,7 +574,7 @@ info_SickBeard () {
 #                                                               #
 # Visit http://www.sickbeard.com                                #
 *###############################################################*"
-    SET_APP=Install_SickBeard
+    set_app=SickBeard
     cf_Choice
 }
 
@@ -536,21 +598,23 @@ Install_SickBeard () {
         sudo /etc/init.d/sickbeard start || error_Msg
     fi
 
+Summ_SickBeard
+
+}
+
+Summ_SickBeard () {
     echo 
     echo "Done!"
     echo "Type sickbeard --help for options"
     echo "SickBeard is by default located @ http://$HOSTNAME:8081"
     echo 
-
 }
-
-
 
 #################
 #### SPOTWEB ####
 #################
 
-info_Spotweb () {
+Info_Spotweb () {
     clear
     echo "
 *###############################################################*
@@ -570,7 +634,7 @@ info_Spotweb () {
 #                                                               #
 # Visit https://github.com/spotweb/spotweb                      #
 *###############################################################*"
-    SET_APP=Install_Spotweb
+    set_app=Spotweb
     cf_Choice
 }
 
@@ -678,14 +742,65 @@ Install_Spotweb () {
     cd /var/www/spotweb && /usr/bin/php /var/www/spotweb/upgrade-db.php
     cd - > /dev/null
 
-    echo 
-    echo "Done!"
-    echo "Spotweb is now located @ http://$HOSTNAME/spotweb"
-    echo "Run /var/www/spotweb/retrieve.php to fill the database with spots"
-    echo 
+    Summ_Spotweb
+
+
+    cf_CronRetrieve () {
+        echo 
+        echo "Do you want to set a hourly cronjob for retrieving spots?"
+        read -p "[yes/no]: " CRONRETRIEVE
+
+        case $CRONRETRIEVE in
+
+            [YyJj]*)
+                # check if another cronjob for this exists and remove it
+                [ -e /etc/cron.hourly/spotweb_spots ] && sudo rm -f /etc/cron.hourly/spotweb_spots
+
+                # create lasi file in correct location
+                # would like to use sed for this, but can't figure out how...
+echo "#!/bin/sh
+
+# Author: Mar2zz
+# Email: lasi.mar2zz@gmail.com
+# Blogs: mar2zz.tweakblogs.net
+# License: GNU GPL v3
+
+# This job is set by the LaZy Admin Installer Script
+
+set -e
+
+[ -x /usr/bin/php ] || exit 0
+[ -e /var/www/spotweb/retrieve.php ] || exit 0
+
+/usr/bin/php /var/www/spotweb/retrieve.php || exit 1
+" > /tmp/spotweb_spots
+
+                sudo mv -f /tmp/spotweb_spots /etc/cron.hourly/spotweb_spots
+                sudo chmod +x /etc/cron.hourly/spotweb_spots
+
+                echo 
+                echo "Cronjob set."
+                echo "See /etc/cron.hourly/spotweb_spots."
+                echo 
+                ;;
+
+            [Nn]*)
+                echo "You can set cronjobs yourself if you want to."
+                echo "Type crontab -e for personal jobs or sudo crontab -e for root jobs."
+                echo "See: https://help.ubuntu.com/community/CronHowto for help and info"
+                echo 
+                ;;
+            *)
+                echo "Answer yes or no."
+                cf_CronRetrieve
+                ;;
+        esac
+    }
+    cf_CronRetrieve
+
 
     cf_Retrieve () {
-        echo
+        echo 
         echo "Do you want to retrieve spots now?"
         read -p "[yes/no]: " RETRIEVE
         case $RETRIEVE in
@@ -706,13 +821,20 @@ Install_Spotweb () {
 
 }
 
+Summ_Spotweb () {
+    echo 
+    echo "Done!"
+    echo "Spotweb is now located @ http://$HOSTNAME/spotweb"
+    echo "Run /var/www/spotweb/retrieve.php to fill the database with spots"
+    echo 
+}
 
 
 ####################
 #### SUBLIMINAL ####
 ####################
 
-info_Subliminal () {
+Info_Subliminal () {
     clear
     echo "
 *###############################################################*
@@ -735,7 +857,7 @@ info_Subliminal () {
 #                                                               #
 # https://github.com/Diaoul/subliminal                          #
 *###############################################################*"
-    SET_APP=Install_Subliminal
+    set_app=Subliminal
     cf_Choice
 }
 
@@ -746,20 +868,23 @@ Install_Subliminal () {
     sudo pip install subliminal || error_Msg
     sudo pip install argparse || error_Msg
 
+Summ_Subliminal
+
+}
+
+Summ_Subliminal () {
     echo 
     echo "Done!"
     echo "Type subliminal --help for options"
     echo 
-
 }
-
 
 
 ######################
 #### TRANSMISSION ####
 ######################
 
-info_Transmission () {
+Info_Transmission () {
     clear
     echo "
 *###############################################################*
@@ -781,7 +906,7 @@ info_Transmission () {
 #                                                               #
 # Visit http://www.transmissionbt.com/                          #
 *###############################################################*"
-    SET_APP=Install_Transmission
+    set_app=Transmission
     cf_Choice
 }
 
@@ -822,23 +947,26 @@ Install_Transmission () {
     # start with all new settings
     sudo /etc/init.d/transmission-daemon start || error_Msg
 
+Summ_Transmission
+
+}
+
+Summ_Transmission () {
     echo 
     echo "Done!"
     echo "Type tranmission-daemon --help for options"
     echo "Transmission is by default located @ http://$HOSTNAME:9091"
     echo 
-
 }
-
 
 
 ##############
 #### XBMC ####
 ##############
 
-info_XBMC () {
-clear
-echo "
+Info_XBMC () {
+    clear
+    echo "
 *###############################################################*
 *############################# XBMC ############################*
 #                                                               #
@@ -859,8 +987,8 @@ echo "
 #                                                               #
 # Visit http://www.xbmc.org                                     #
 *###############################################################*"
-SET_APP=Install_XBMC
-cf_Choice
+    set_app=XBMC
+    cf_Choice
 }
 
 
@@ -925,6 +1053,13 @@ Install_XBMC () {
 
 }
 
+Summ_XBMC () {
+    echo
+    echo "Done!"
+    echo "XBMC can now be started from the menu"
+    echo 
+}
+
 
 ###############################
 #### BACKTOMENU OR INSTALL ####
@@ -932,18 +1067,39 @@ Install_XBMC () {
 
 cf_Choice () {
 
-    echo
-    echo "Options:"
-    echo "1. $SET_APP" | sed 's/_/ /g'
-    echo "2. Back to menu"
-    echo "Q. Quit"
+    case $set_app in
+        Sabnzbdplus|Transmission|XBMC)
+            echo 
+            echo "Options:"
+            echo "1. Install $set_app"
+            echo 
+            echo "B. Back to menu"
+            echo "Q. Quit"
+            ;;
+        *)
+            echo 
+            echo "Options:"
+            echo "1. Install $set_app"
+            echo "2. Set cronjob for $set_app"
+            echo 
+            echo "B. Back to menu"
+            echo "Q. Quit"
+            ;;
+    esac
 
     read SELECT
+
     case "$SELECT" in
-        1*)
+        1)
             cf_Install
             ;;
-        2*)
+        2)
+            case $set_app in
+                Sabnzbdplus|Transmission|XBMC) ;;
+                *) cf_Cronjob ;;
+            esac
+            ;;
+        [Bb]*)
             LaSi_Menu
             ;;
         [Qq]*)
@@ -958,17 +1114,17 @@ cf_Choice () {
 }
 
 
-############################
-#### INSTALL APPLICATION ###
-############################
 cf_Install () {
+
     echo 
-    echo "Are you sure you want to continue and install $SET_APP?"
+    echo "Are you sure you want to continue and install $set_app?"
     read -p "[yes/no]: " REPLY
     echo
     case $REPLY in
     [Yy]*)
-        $SET_APP
+        Install_$set_app &&
+        Summ_$set_app
+
         # give time to read output from above installprocess before returning to menu
         echo 
         read -sn 1 -p "Press a key to continue"
@@ -986,7 +1142,138 @@ cf_Install () {
         cf_Install
         ;;
     esac
+
     }
+
+
+
+##################
+#### CRONJOBS ####
+##################
+
+set_Cronjob () {
+
+    # set updaters
+    set_app_lower=$(echo $set_app | tr '[A-Z]' '[a-z]')
+
+    case $set_app in
+        CouchPotato|Headphones|SickBeard)
+
+            cron_exe=$(which git)
+            cron_dir="[ -d /opt/$set_app_lower/.git ] || exit 0"
+            cron_chk="if $cron_exe --git-dir=/opt/$set_app_lower/.git pull | grep 'files changed'; then"
+            cron_act="    etc/init.d/$set_app_lower restart || exit 1; fi"
+            ;;
+
+        Mediafrontpage)
+
+            cron_exe='[ -x /usr/bin/git ] || exit 0'
+            cron_dir="[ -d /var/www/$set_app_lower/.git ] || exit 0"
+            cron_chk="if $cron_exe --git-dir=/var/www/$set_app_lower pull | grep 'files changed'; then"
+            cron_act="    chown -R www-data /var/www/$set_app_lower || exit 1; fi"
+            ;;
+
+        Spotweb)
+
+            cron_exe=$(which git)
+            cron_dir="[ -d /var/www/$set_app_lower/.git ] || exit 0"
+            cron_chk="if $cron_exe --git-dir=/var/www/$set_app_lower/.git pull | grep 'files changed'; then"
+            cron_act="    cd /var/www/$set_app_lower && php upgrade-db.php; fi"
+            ;;
+
+        Beets|Subliminal)
+            cron_exe='[ -x /usr/bin/easy_install ] || exit 0'
+            cron_dir=
+            cron_chk="/usr/bin/easy_install --upgrade $set_app_lower || exit 1"
+            cron_act=
+            ;;
+
+    esac
+
+
+    # check if another cronjob for this exists and remove it
+    [ -e /etc/cron.hourly/$set_app_lower ] && sudo rm -f /etc/cron.hourly/$set_app_lower
+    [ -e /etc/cron.daily/$set_app_lower ] && sudo rm -f /etc/cron.daily/$set_app_lower
+    [ -e /etc/crond.weekly/$set_app_lower ] && sudo rm -f /etc/cron.weekly/$set_app_lower
+    [ -e /etc/crond.monthly/$set_app_lower ] && sudo rm -f /etc/cron.monthly/$set_app_lower
+
+
+    # create lasi file in correct location
+    # would like to use sed for this, but can't figure out how...
+echo "#!/bin/sh
+
+# Author: Mar2zz
+# Email: lasi.mar2zz@gmail.com
+# Blogs: mar2zz.tweakblogs.net
+# License: GNU GPL v3
+
+# This job is set by the LaZy Admin Installer Script
+
+set -e
+
+[ -x $cron_exe ] || exit 0
+$cron_dir
+
+$cron_chk
+$cron_act
+" > /tmp/$set_app_lower
+
+    sudo mv -f /tmp/$set_app_lower /etc/cron.$schedule/$set_app_lower
+    sudo chmod +x /etc/cron.$schedule/$set_app_lower
+
+    echo 
+    echo "Cronjob set."
+    echo "See /etc/cron.$schedule/$set_app_lower."
+    echo 
+
+}
+
+
+cf_Cronjob () {
+    clear
+    echo "Set a cronjob for updating $set_app"
+    echo 
+    echo "1. Check hourly"
+    echo "2. Check daily"
+    echo "3. Check weekly"
+    echo "4. Check monthly"
+    echo 
+    echo "Q. Quit"
+
+    read CRON_SELECT
+    echo 
+
+    case $CRON_SELECT in
+        1)
+            schedule=hourly
+            set_Cronjob
+            ;;
+        2)
+            schedule=daily 
+            set_Cronjob
+            ;;
+        3)
+            schedule=weekly 
+            set_Cronjob
+            ;;
+        4)
+            schedule=monthly 
+            set_Cronjob
+            ;;
+        [Qq]*)
+            Info_$set_app ;;
+        *)
+            echo "Please choose... (e.g. 2)"
+            cf_Cronjob
+            ;;
+    esac
+
+    # give time to read output from above installprocess before returning to menu
+    echo 
+    read -sn 1 -p "Press a key to continue"
+    Info_$set_app
+
+}
 
 LaSi_Menu
 
