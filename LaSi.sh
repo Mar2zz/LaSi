@@ -149,7 +149,7 @@ LaSi_Menu (){
                 1) Info_Beets ;;
                 [Ff]1)
                     set_app=Beets
-                    install_Beets && { [ -n $periodic ] && check_Crontime && set_Cronjob; }
+                    Install_Beets && { [ -n $periodic ] && check_Crontime && set_Cronjob; }
                     ;;
 
                 # couchpotato
@@ -765,7 +765,7 @@ echo "#!/bin/sh
 # Blogs: mar2zz.tweakblogs.net
 # License: GNU GPL v3
 
-# This job is set by the LaZy Admin Installer Script
+# This job is set by the Lazy admin Scripted installer
 
 set -e
 
@@ -806,8 +806,7 @@ set -e
         case $RETRIEVE in
             [YyJj]*)
                 echo "This will take a while!"
-                cd /var/www/spotweb && /usr/bin/php /var/www/spotweb/retrieve.php
-                cd - > /dev/null
+                /usr/bin/php /var/www/spotweb/retrieve.php
                 ;;
             [Nn]*)
                 ;;
@@ -1207,7 +1206,7 @@ echo "#!/bin/sh
 # Blogs: mar2zz.tweakblogs.net
 # License: GNU GPL v3
 
-# This job is set by the LaZy Admin Installer Script
+# This job is set by the Lazy admin Scripted installer
 
 set -e
 
