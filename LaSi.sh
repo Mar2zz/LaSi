@@ -57,22 +57,41 @@ error_Depends () {
 }
 
 error_Msg () {
-    # show error message and exit 1
-    echo 
-    echo "########################################################################"
-    echo "#  Fail! Installation didn't finish, try again or:                     #"
-    echo "#  Copy the text above and report an issue at the following address:   #"
-    echo "#  https://github.com/Mar2zz/LaSi/issues                               #"
-    echo "########################################################################"
-    exit 1
+# show error message
+echo "
+Failed! Installing $set_app didn't finish, try again or:
+Copy the text above and report an issue at the following address:
+https://github.com/Mar2zz/LaSi/issues
+"
+# log error message
+echo "
+Failed! Installing $set_app had errors, try again or:
+Copy the text with errors above and report an issue at the following address:
+https://github.com/Mar2zz/LaSi/issues
+" >> /tmp/lasi_install.log
 }
 
 
 ### BEST PRACTICE ###
+check_Apt () {
+    # check if distro with apt is used
+    if ! which apt-get > /dev/null; then
+        echo "This installer is written for Debian-based distro's using Apt"
+        exit
+    fi
+}
+
 check_Git () {
     # install git for benefits like updating from commandline
     if ! which git > /dev/null; then
-        sudo apt-get -y install git
+        sudo apt-get -y install git || error_Msg
+    fi
+}
+
+check_Pip () {
+    # install git for benefits like updating from commandline
+    if ! which pip > /dev/null; then
+        sudo apt-get -y install python-pip || error_Msg
     fi
 }
 
@@ -81,24 +100,82 @@ check_Deb () {
     rm -f /tmp/*.deb
 }
 
+check_Log () {
+    # remove any previous lasi_install logs
+    rm -f /tmp/lasi_install.log
+}
 
-### SET CRONJOBS ON THE FLY ###
-periodic=$1
-check_Crontime () {
-    case $periodic in
-        hourly) 
-            schedule=hourly ;;
-        daily)
-            schedule=daily ;;
-        weekly)
-            schedule=weekly ;;
-        monthly)
-            schedule=monthly ;;
-        *)
-            echo "Incorrect value, usage:"
-            echo "./LaSi.sh hourly|daily|weekly|monthly"
-            return 1
-    esac
+### HELP MESSAGE ###
+Print_Help () {
+    echo '
+usage: ./LaSi.sh --options
+
+OPTIONS:
+    --fast | -f         : install unattended (no info shown and no confirmations needed)
+                          (note: Beets, Spotweb and XBMC can ask questions)
+
+    --cronjob=value     : value can be ask|hourly|daily|weekly|monthly
+
+                          ask; for every installed app ask how often to check for updates
+
+                          hourly|daily|weekly|monthly; set cronjobs unattended during install
+                          to check for updates hourly|daily|weekly|monthly
+
+    --help | -h         : Print this helpmessage'
+    exit
+}
+
+
+### CHECK COMMANDLINE STUFF ###
+
+# set defaults
+unattended=0
+ask_schedule=0
+schedule=0
+
+options=($@)
+
+check_Variables () {
+    for option in ${options[@]}
+    do
+        case $option in
+
+            --help|-h)
+                    Print_Help
+                    ;;
+
+            --fast|-f)
+                    unattended=1
+                    ;;
+
+            --cronjob*)
+                crontime=$(echo $option | sed 's/--cronjob=//')
+
+                case $crontime in
+                    ask)
+                        ask_schedule=1 ;;
+                    hourly) 
+                        schedule=hourly ;;
+                    daily)
+                        schedule=daily ;;
+                    weekly)
+                        schedule=weekly ;;
+                    monthly)
+                        schedule=monthly ;;
+                    *)
+                        echo "Incorrect value: echo $schedule."
+                        Print_Help
+                        ;;
+                esac
+                ;;
+
+            *)
+                echo "Incorrect value: $option"
+                Print_Help
+                ;;
+
+        esac
+    done
 }
 
 
@@ -130,83 +207,94 @@ LaSi_Menu (){
         echo "4. Mediafrontpage         9. Tranmission"
         echo "5. Sabnzbdplus           10. XBMC (desktop)"
         echo 
-        echo "Use f[n] for fast install (e.g. f1 f2 5 f6)"
-        if [ -z $periodic ]; then
-        echo "Autoset cronjobs for fast installs with:"
-        echo "./LaSi.sh hourly|daily|weekly|monthly"
+        # tell about commandline options
+        if [ $unattended != 0 ]; then
+            echo "Unattended installation enabled"
+        else
+            echo "Tip: Type LaSi.sh --help for more install options!"
         fi
+        if [ $schedule != 0 ]; then
+            echo "Set $schedule checks for updates."
+        fi
+
         echo 
         echo "Q. Quit"
 
         read SELECT
+
+        # create array
         items=( $SELECT )
 
+        # go through array one by one
         for item in ${items[@]}
         do
             case "$item" in
 
                 # beets
-                1) Info_Beets ;;
-                [Ff]1)
+                1)
                     set_app=Beets
-                    Install_Beets && { [ -n $periodic ] && check_Crontime && set_Cronjob; }
+                    if [ $unattended = 1 ]; then Install_$set_app; else Info_$set_app; fi
+                    if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
                     ;;
 
                 # couchpotato
-                2) Info_CouchPotato ;;
-                [Ff]2)
+                2)
                     set_app=CouchPotato
-                    Install_CouchPotato && { [ -n $periodic ] && check_Crontime && set_Cronjob; }
+                    if [ $unattended = 1 ]; then Install_$set_app; else Info_$set_app; fi
+                    if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
                     ;;
 
                 # headphones
-                3) Info_Headphones ;;
-                [Ff]3)
+                3)
                     set_app=Headphones
-                    Install_Headphones && { [ -n $periodic ] && check_Crontime && set_Cronjob; }
+                    if [ $unattended = 1 ]; then Install_$set_app; else Info_$set_app; fi
+                    if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
                     ;;
 
                 # mediafrontpage
-                4) Info_Mediafrontpage ;;
-                [Ff]4)
+                4)
                     set_app=Mediafrontpage
-                    Install_Mediafrontpage && { [ -n $periodic ] && check_Crontime && set_Cronjob; }
+                    if [ $unattended = 1 ]; then Install_$set_app; else Info_$set_app; fi
+                    if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
                     ;;
 
                 # sabnzbdplus
-                5) Info_Sabnzbdplus ;;
-                [Ff]5) 
-                    Install_Sabnzbdplus && Summ_Sabnzbdplus
+                5)
+                    $set_app=Sabnzbdplus
+                    if [ $unattended = 1 ]; then Install_$set_app; else Info_$set_app; fi
                     ;;
 
                 # sickbeard
-                6) Info_SickBeard ;;
-                [Ff]6)
+                6)
                     set_app=SickBeard
-                    Install_SickBeard && { [ -n $periodic ] && check_Crontime && set_Cronjob; }
+                    if [ $unattended = 1 ]; then Install_$set_app; else Info_$set_app; fi
+                    if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
                     ;;
 
                 # spotweb
-                7) Info_Spotweb ;;
-                [Ff]7)
+                7)
                     set_app=Spotweb
-                    Install_Spotweb && { [ -n $periodic ] && check_Crontime && set_Cronjob; }
+                    if [ $unattended = 1 ]; then Install_$set_app; else Info_$set_app; fi
+                    if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
                     ;;
 
                 # subliminal
-                8) Info_Subliminal ;;
-                [Ff]8)
-                    Install_Subliminal && { [ -n $periodic ] && check_Crontime && set_Cronjob; }
+                8)
+                    set_app=Subliminal
+                    if [ $unattended = 1 ]; then Install_$set_app; else Info_$set_app; fi
+                    if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
                     ;;
 
                 # transmission
-                9) Info_Transmission ;;
-                [Ff]9) Install_Transmission && Summ_Transmission
+                9)
+                    set_app=Transmission
+                    if [ $unattended = 1 ]; then Install_$set_app; else Info_$set_app; fi
                     ;;
 
                 # xbmc
-                10) Info_XBMC ;;
-                [Ff]10) Install_XBMC && Summ_XBMC
+                10)
+                    set_app=XBMC
+                    if [ $unattended = 1 ]; then Install_$set_app; else Info_$set_app; fi
                     ;;
 
                 [Qq]) exit ;;
@@ -214,11 +302,18 @@ LaSi_Menu (){
                 *)
                     echo "Please make a selection (e.g. 1)"
                     echo "Or select multiple (e.g. 1 4 5 7 10)"
-                    echo "or with f[n] for fast installs, like f1 3 f10 f8"
                     show_Menu
                     ;;
             esac
         done
+
+    # see if install summary is needed, so count items in array
+    if [ ${#items[@]} -gt 1 ]; then
+        echo "*###############################################################*"
+        echo "*################### INSTALL SUMMARY ###########################*"
+        cat /tmp/lasi_install.log
+        echo "*###############################################################*"
+    fi
 
     }
     show_Menu
@@ -251,14 +346,13 @@ Info_Beets () {
 #                                                               #
 # Visit http://beets.radbox.org/                                #
 *###############################################################*"
-    set_app=Beets
     cf_Choice
 }
 
 
 Install_Beets () {
 
-    sudo apt-get -y install python-pip || error_Msg
+    check_Pip
     sudo pip install beets || error_Msg
     sudo pip install rgain || echo "Fail!"
 
@@ -303,16 +397,17 @@ Install_Beets () {
         editor $HOME/.beetsconfig
     fi
 
-Summ_Beets
+Summ_$set_app
+Summ_$set_app >> /tmp/lasi_install.log
 
 }
 
 Summ_Beets () {
-    echo 
-    echo "Done!"
-    echo "Type beet --help for options"
-    echo "or start importing with beet import -q /path/to/new_music"
-    echo 
+echo "
+Done! Installed $set_app.
+Type beet --help for options
+or start importing with beet import /path/to/new_music
+"
 }
 
 #####################
@@ -339,17 +434,13 @@ Info_CouchPotato () {
 #                                                               #
 # Visit http://www.couchpotatoapp.com                           #
 *###############################################################*"
-    set_app=CouchPotato
     cf_Choice
 }
 
 
 Install_CouchPotato () {
 
-    # best practice
-    check_Deb
     check_Git
-
     wget -O /tmp/couchpotato.deb $DROPBOX/LaSi_Repo/couchpotato.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
 
     sudo dpkg -i /tmp/couchpotato.deb || error_Depends
@@ -364,16 +455,17 @@ Install_CouchPotato () {
         sudo /etc/init.d/couchpotato start || error_Msg
     fi
 
-Summ_CouchPotato
+Summ_$set_app
+Summ_$set_app >> /tmp/lasi_install.log
 
 }
 
 Summ_CouchPotato () {
-    echo 
-    echo "Done!"
-    echo "Type couchpotato --help for options."
-    echo "CouchPotato is by default located @ http://$HOSTNAME:5000"
-    echo 
+echo "
+Done! Installed $set_app.
+Type couchpotato --help for options.
+CouchPotato is by default located @ http://$HOSTNAME:5000
+"
 }
 
 ####################
@@ -400,17 +492,13 @@ Info_Headphones () {
 #                                                               #
 # Visit https://github.com/rembo10/headphones                   #
 *###############################################################*"
-    set_app=Headphones
     cf_Choice
 }
 
 
 Install_Headphones () {
 
-    # best practice
-    check_Deb
     check_Git
-
     wget -O /tmp/headphones.deb $DROPBOX/LaSi_Repo/headphones.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
 
     sudo dpkg -i /tmp/headphones.deb || error_Depends
@@ -425,17 +513,17 @@ Install_Headphones () {
         sudo /etc/init.d/headphones start || error_Msg
     fi
 
-Summ_Headphones
+Summ_$set_app
+Summ_$set_app >> /tmp/lasi_install.log
 
 }
 
 Summ_Headphones () {
-    echo 
-    echo "Done!"
-    echo "Type headphones --help for options"
-
-    echo "Headphones is by default located @ http://$HOSTNAME:8181"
-    echo 
+echo "
+Done! Installed $set_app.
+Type headphones --help for options
+Headphones is by default located @ http://$HOSTNAME:8181
+"
 }
 
 ########################
@@ -459,27 +547,25 @@ Info_Mediafrontpage () {
 #                                                               #
 # Visit https://github.com/Mediafrontpage/mediafrontpage        #
 *###############################################################*"
-    set_app=Mediafrontpage
     cf_Choice
 }
 
 Install_Mediafrontpage () {
 
-    # best practice
-    check_Deb
     check_Git
-
     wget -O /tmp/mediafrontpage.deb $DROPBOX/LaSi_Repo/mediafrontpage.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
     sudo dpkg -i /tmp/mediafrontpage.deb || error_Depends
 
-Summ_Mediafrontpage
+Summ_$set_app
+Summ_$set_app >> /tmp/lasi_install.log
 
 }
 
 Summ_Mediafrontpage () {
-    echo 
-    echo "Mediafrontpage is now located @ http://$HOSTNAME/mediafrontpage"
-    echo 
+echo "
+Done! Installed $set_app.
+Mediafrontpage is now located @ http://$HOSTNAME/mediafrontpage
+"
 }
 
 #####################
@@ -509,7 +595,6 @@ Info_Sabnzbdplus () {
 #                                                               #
 # Visit http://sabnzbd.org                                      #
 *###############################################################*"
-    set_app=Sabnzbdplus
     cf_Choice
 }
 
@@ -533,16 +618,17 @@ Install_Sabnzbdplus () {
         sudo /etc/init.d/sabnzbdplus start || error_Msg
     fi
 
-Summ_Sabnzbdplus
+Summ_$set_app
+Summ_$set_app >> /tmp/lasi_install.log
 
 }
 
 Summ_Sabnzbdplus () {
-    echo 
-    echo "Done!"
-    echo "Type sabnzbdplus --help for options"
-    echo "Sabnzbdplus is by default located @ http://$HOSTNAME:8080"
-    echo 
+echo "
+Done! Installed $set_app.
+Type sabnzbdplus --help for options
+Sabnzbdplus is by default located @ http://$HOSTNAME:8080
+"
 }
 
 
@@ -574,17 +660,13 @@ Info_SickBeard () {
 #                                                               #
 # Visit http://www.sickbeard.com                                #
 *###############################################################*"
-    set_app=SickBeard
     cf_Choice
 }
 
 
 Install_SickBeard () {
 
-    # best practice
-    check_Deb
     check_Git
-
     wget -O /tmp/sickbeard.deb $DROPBOX/LaSi_Repo/sickbeard.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
     sudo dpkg -i /tmp/sickbeard.deb || error_Depends
 
@@ -598,17 +680,19 @@ Install_SickBeard () {
         sudo /etc/init.d/sickbeard start || error_Msg
     fi
 
-Summ_SickBeard
+Summ_$set_app
+Summ_$set_app >> /tmp/lasi_install.log
 
 }
 
 Summ_SickBeard () {
-    echo 
-    echo "Done!"
-    echo "Type sickbeard --help for options"
-    echo "SickBeard is by default located @ http://$HOSTNAME:8081"
-    echo 
+echo "
+Done! Installed $set_app
+Type sickbeard --help for options
+SickBeard is by default located @ http://$HOSTNAME:8081
+"
 }
+
 
 #################
 #### SPOTWEB ####
@@ -634,17 +718,13 @@ Info_Spotweb () {
 #                                                               #
 # Visit https://github.com/spotweb/spotweb                      #
 *###############################################################*"
-    set_app=Spotweb
     cf_Choice
 }
 
 
 Install_Spotweb () {
 
-    # best practice
-    check_Deb
     check_Git
-
     wget -O /tmp/spotweb.deb $DROPBOX/LaSi_Repo/spotweb.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
     sudo dpkg -i /tmp/spotweb.deb || error_Depends
 
@@ -742,7 +822,9 @@ Install_Spotweb () {
     cd /var/www/spotweb && /usr/bin/php /var/www/spotweb/upgrade-db.php
     cd - > /dev/null
 
-    Summ_Spotweb
+
+Summ_$set_app
+Summ_$set_app >> /tmp/lasi_install.log
 
 
     cf_CronRetrieve () {
@@ -821,11 +903,11 @@ set -e
 }
 
 Summ_Spotweb () {
-    echo 
-    echo "Done!"
-    echo "Spotweb is now located @ http://$HOSTNAME/spotweb"
-    echo "Run /var/www/spotweb/retrieve.php to fill the database with spots"
-    echo 
+echo "
+Done! Installed $set_app.
+Spotweb is now located @ http://$HOSTNAME/spotweb
+Run /var/www/spotweb/retrieve.php to fill the database with spots
+"
 }
 
 
@@ -856,26 +938,26 @@ Info_Subliminal () {
 #                                                               #
 # https://github.com/Diaoul/subliminal                          #
 *###############################################################*"
-    set_app=Subliminal
     cf_Choice
 }
 
 
 Install_Subliminal () {
 
-    sudo apt-get -y install python-pip || error_Msg
+    check_Pip
     sudo pip install subliminal || error_Msg
     sudo pip install argparse || error_Msg
 
-Summ_Subliminal
+Summ_$set_app
+Summ_$set_app >> /tmp/lasi_install.log
 
 }
 
 Summ_Subliminal () {
-    echo 
-    echo "Done!"
-    echo "Type subliminal --help for options"
-    echo 
+echo "
+Done! Installed $set_app.
+Type subliminal --help for options
+"
 }
 
 
@@ -905,7 +987,6 @@ Info_Transmission () {
 #                                                               #
 # Visit http://www.transmissionbt.com/                          #
 *###############################################################*"
-    set_app=Transmission
     cf_Choice
 }
 
@@ -946,16 +1027,17 @@ Install_Transmission () {
     # start with all new settings
     sudo /etc/init.d/transmission-daemon start || error_Msg
 
-Summ_Transmission
+Summ_$set_app
+Summ_$set_app >> /tmp/lasi_install.log
 
 }
 
 Summ_Transmission () {
-    echo 
-    echo "Done!"
-    echo "Type tranmission-daemon --help for options"
-    echo "Transmission is by default located @ http://$HOSTNAME:9091"
-    echo 
+echo "
+Done! Installed $set_app.
+Type tranmission-daemon --help for options
+Transmission is by default located @ http://$HOSTNAME:9091
+"
 }
 
 
@@ -986,7 +1068,6 @@ Info_XBMC () {
 #                                                               #
 # Visit http://www.xbmc.org                                     #
 *###############################################################*"
-    set_app=XBMC
     cf_Choice
 }
 
@@ -1035,28 +1116,31 @@ Install_XBMC () {
     case $VERSION in
         1*)
             sudo apt-get -y install xbmc xbmc-standalone || error_Msg
-            echo
-            echo "Done!"
-            echo "XBMC can now be started from the menu"
-            echo "or can be set in the loginscreen as a desktopmanager."
-            echo 
+            Summ_XBMC_stable
+            Summ_XBMC_stable >> /tmp/lasi_install.log
             ;;
         2*)
             sudo apt-get -y install xbmc || error_Msg
-            echo
-            echo "Done!"
-            echo "XBMC can now be started from the menu"
-            echo 
+            Summ_XBMC_unstable
+            Summ_XBMC_unstable >> /tmp/lasi_install.log
             ;;
     esac
 
 }
 
-Summ_XBMC () {
-    echo
-    echo "Done!"
-    echo "XBMC can now be started from the menu"
-    echo 
+Summ_XBMC_stable () {
+echo "
+Done! Installed XBMC stable.
+XBMC can now be started from the menu
+or can be set in the loginscreen as a desktopmanager.
+"
+}
+
+Summ_XBMC_unstable () {
+echo "
+Done! Installed XBMC stable.
+XBMC can now be started from the menu.
+"
 }
 
 
@@ -1094,8 +1178,10 @@ cf_Choice () {
             ;;
         2)
             case $set_app in
-                Sabnzbdplus|Transmission|XBMC) ;;
-                *) cf_Cronjob ;;
+                Sabnzbdplus|Transmission|XBMC)
+                    cf_Choice ;;
+                *)
+                    cf_Cronjob ;;
             esac
             ;;
         [Bb]*)
@@ -1122,7 +1208,7 @@ cf_Install () {
     case $REPLY in
     [Yy]*)
         Install_$set_app &&
-        Summ_$set_app
+        Summ_$set_app >> /tmp/lasi_install.log
 
         # give time to read output from above installprocess before returning to menu
         echo 
@@ -1217,14 +1303,19 @@ $cron_chk
 $cron_act
 " > /tmp/$set_app_lower
 
-    sudo mv -f /tmp/$set_app_lower /etc/cron.$schedule/$set_app_lower
-    sudo chmod +x /etc/cron.$schedule/$set_app_lower
+    sudo mv -f /tmp/$set_app_lower /etc/cron.$schedule/$set_app_lower || error_Msg
+    sudo chmod +x /etc/cron.$schedule/$set_app_lower  || error_Msg
 
-    echo 
-    echo "Cronjob set."
-    echo "See /etc/cron.$schedule/$set_app_lower."
-    echo 
+Summ_Cronjob
+Summ_Cronjob >> /tmp/lasi_install.log
 
+}
+
+Summ_Cronjob () {
+echo "Checking $schedule for $set_app updates.
+Script placed in /etc/cron.$schedule/$set_app_lower.
+Check /etc/crontab for the exact times these jobs will be run.
+"
 }
 
 
@@ -1237,6 +1328,7 @@ cf_Cronjob () {
     echo "3. Check weekly"
     echo "4. Check monthly"
     echo 
+    echo "S. Skip"
     echo "Q. Quit"
 
     read CRON_SELECT
@@ -1259,6 +1351,10 @@ cf_Cronjob () {
             schedule=monthly 
             set_Cronjob
             ;;
+        [Ss]*)
+            echo "No cronjob set"
+            break
+            ;;
         [Qq]*)
             Info_$set_app ;;
         *)
@@ -1267,12 +1363,19 @@ cf_Cronjob () {
             ;;
     esac
 
+if [ $ask_schedule = 0 ]; then
     # give time to read output from above installprocess before returning to menu
     echo 
     read -sn 1 -p "Press a key to continue"
     Info_$set_app
+fi
 
 }
 
+### RUN ALL FUNCTIONS ###
+check_Apt
+check_Variables
+check_Deb
+check_Log
 LaSi_Menu
 
