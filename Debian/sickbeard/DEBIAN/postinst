@@ -1,0 +1,33 @@
+#!/bin/sh
+
+set -e
+
+# if git exists clone repo, else wget sickbeard.tar.gz
+if which git > /dev/null; then
+    git clone https://github.com/midgetspy/Sick-Beard.git /opt/sickbeard
+elif wget -O /tmp/sickbeard.tar.gz https://nodeload.github.com/midgetspy/Sick-Beard/tarball/master; then
+    # create path again
+    mkdir -p /opt/sickbeard || exit 1
+    tar -xzf /tmp/sickbeard.tar.gz --strip 1 -C /opt/sickbeard
+    rm -f /tmp/sickbeard.tar.gz
+else
+    echo "Both git clone and wget file failed, to solve this execute: 
+    git clone https://github.com/midgetspy/Sick-Beard.git /opt/sickbeard
+        or:
+    wget -O /tmp/sickbeard.tar.gz https://nodeload.github.com/midgetspy/Sick-Beard/tarball/master && tar -xzf /tmp/sickbeard.tar.gz --strip 1 -C /opt/sickbeard
+    
+    or download, extract and copy the files from github to /opt/sickbeard"
+    exit 1
+fi
+
+# handle sickbeard's own configfile
+# backup
+[ -e /tmp/autoProcessTV.cfg ] &&
+    mv -f /tmp/autoProcessTV.cfg /opt/sickbeard/autoProcessTV/autoProcessTV.cfg
+# or fresh
+[ -e /opt/sickbeard/autoProcessTV/autoProcessTV.cfg ] ||
+    cp /opt/sickbeard/autoProcessTV/autoProcessTV.cfg.sample /opt/sickbeard/autoProcessTV/autoProcessTV.cfg
+
+# execute init.script
+update-rc.d sickbeard defaults  | grep /etc/init.d/sickbeard
+/etc/init.d/sickbeard start

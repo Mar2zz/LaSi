@@ -1,0 +1,24 @@
+Package: headphones
+Version: 2011.11.10
+Section: web 
+Priority: optional
+Architecture: all
+Essential: no
+Depends: python (>= 2.6)
+Recommends: git
+Installed-Size: 6000
+Maintainer: Mar2zz <lasi.mar2zz@gmail.com>
+Provides: headphones
+Description: Headphones is an automated NZB downloader, 
+ similar to SickBeard and CouchPotato, but for music!
+ Most of it is pretty automated - click a button and 
+ your whole music library gets imported.... 
+ or if you prefer, you can add your favorite artists in one by one.
+ .
+ It'll let you know when one of the artists on your list is coming out with 
+ a new album, and it will download it as soon as it's available.
+ .
+ Headphones can be found @ https://github.com/rembo10/headphones and is written and maintained by Rembo10
+ .
+ Headphones is installed in /opt/headphones, config and data in ~/.headphones (configurable).
+ Type headphones --help for options

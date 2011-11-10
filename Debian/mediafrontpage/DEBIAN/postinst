@@ -1,0 +1,30 @@
+#!/bin/sh
+
+set -e
+
+# if git exists clone repo, else wget mediafrontpage.tar.gz
+if which git > /dev/null; then
+    git clone https://github.com/MediaFrontPage/mediafrontpage.git /var/www/mediafrontpage
+elif wget -O /tmp/mediafrontpage.tar.gz https://nodeload.github.com/Mediafrontpage/mediafrontpage/tarball/master; then
+    # create path again
+    mkdir -p /var/www/mediafrontpage || exit 1
+    tar -xzf /tmp/mediafrontpage.tar.gz --strip 1 -C /var/www/mediafrontpage
+    rm -f /tmp/mediafrontpage.tar.gz
+else
+    echo "Both git clone and wget file failed, to solve this execute: 
+    git clone https://github.com/MediaFrontPage/mediafrontpage.git /var/www/mediafrontpage
+        or:
+    wget -O /tmp/mediafrontpage.tar.gz https://nodeload.github.com/Mediafrontpage/mediafrontpage/tarball/master && tar -xzf /tmp/mediafrontpage.tar.gz --strip 1 -C /var/www/mediafrontpage
+    
+    or download, extract and copy the files from github to /var/www/mediafrontpage"
+    exit 1
+fi
+
+# restore config if any
+if [ -e /tmp/mediafrontpage-config.ini ]; then
+    cp -f /tmp/mediafrontpage-config.ini /var/www/mediafrontpage/config.ini
+fi
+
+# chown for www-data to write to folder
+chown -R www-data /var/www/mediafrontpage
+

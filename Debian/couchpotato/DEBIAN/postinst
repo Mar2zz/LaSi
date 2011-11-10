@@ -1,0 +1,25 @@
+#!/bin/sh
+
+set -e
+
+# if git exists clone repo, else wget couchpotato.tar.gz
+if which git > /dev/null; then
+    git clone https://github.com/RuudBurger/CouchPotato.git /opt/couchpotato
+elif wget -O /tmp/couchpotato.tar.gz https://nodeload.github.com/RuudBurger/CouchPotato/tarball/master; then
+    # create path again
+    mkdir -p /opt/couchpotato || exit 1
+    tar -xzf /tmp/couchpotato.tar.gz --strip 1 -C /opt/couchpotato
+    rm -f /tmp/couchpotato.tar.gz
+else
+    echo "Both git clone and wget file failed, to solve this execute: 
+    git clone https://github.com/RuudBurger/CouchPotato.git /opt/couchpotato
+        or:
+    wget -O /tmp/couchpotato.tar.gz https://nodeload.github.com/RuudBurger/CouchPotato/tarball/master && tar -xzf /tmp/couchpotato.tar.gz --strip 1 -C /opt/couchpotato
+    
+    or download, extract and copy the files from github to /opt/couchpotato"
+    exit 1
+fi
+
+# execute init.script
+update-rc.d couchpotato defaults  | grep /etc/init.d/couchpotato
+/etc/init.d/couchpotato start

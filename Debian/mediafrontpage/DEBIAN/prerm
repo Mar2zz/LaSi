@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -e
+
+# check if configfile is set
+if ! [ $1 = 'purge' ]; then
+    if [ -e /var/www/mediafrontpage/config.ini ]; then
+        cp /var/www/mediafrontpage/config.ini /tmp/mediafrontpage-config.ini
+    fi
+fi
+
+# remove path if exists
+if [ -d /var/www/mediafrontpage ]; then
+    rm -Rf /var/www/mediafrontpage
+fi

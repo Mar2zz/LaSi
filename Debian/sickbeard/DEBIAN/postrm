@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -e
+
+# remove stuff if purge
+if [ $1 = 'purge' ]; then
+    /usr/sbin/update-rc.d -f sickbeard remove | grep /etc/init.d/sickbeard
+    if ls /etc/cron.*/sickbeard | xargs rm -f > /dev/null; then
+        echo " Removing any cronjobs for sickbeard ..."
+    fi
+fi
+

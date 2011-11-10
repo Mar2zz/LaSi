@@ -1,0 +1,159 @@
+#!/bin/bash
+
+# Copyright (C) 2011- by Mar2zz <LaSi.Mar2zz@gmail.com>
+# released under GPL, version 2 or later
+
+
+#helptext
+helptext () {
+    echo 'usage: headphones --option --environment=value
+    OPTIONS:
+        --daemon        : run in background
+        --quiet         : run silent
+        --nolaunch      : prevent browser from launching at startup
+
+    ENVIRONMENT:        : Example --config=/path/to/config.ini.
+        --config=       : Set full path to config.ini,
+                          defaults to ~/.headphones/config.ini.
+        --datadir=      : Set folder to store database and thumbs, 
+                          defaults to ~/.headphones.
+        --pidfile=      : Set full path to pidfile, 
+                          defaults to /var/run/headphones/headphones.pid.
+        --port=         : Set port to listen on, defaults to port 8181.
+
+        --startup       : Edit /etc/default/headphones to autostart 
+                          headphones when this machine starts.
+
+        --help          : print this help message.'
+
+# The following only works on buntu-based systems, so it's hidden for other distro's
+# This makes the /usr/bin/headphones service compatible with multiple distro's
+if cat /etc/*release | grep -i 'buntu\|mint' > /dev/null; then
+    echo '
+    DAEMON OPTIONS:     : Handle the daemon that runs as a service
+        --startup       : Edit /etc/default/headphones to autostart 
+                          headphones when this machine starts.
+        --start         : Start the daemon.
+        --stop          : Stop the daemon.
+        --restart       : Restart the daemon.
+        --force-reload  : Same as --restart.'
+fi
+if which git > /dev/null && [ -d /opt/headphones/.git ]; then
+    echo '        --force-update  : Update headphones from GitHub
+  '
+fi
+}
+
+. /lib/lsb/init-functions
+
+check_retval() {
+    if [ $? -eq 0 ]; then
+        log_end_msg 0
+        return 0
+    else
+        log_end_msg 1
+        exit 1
+    fi
+}
+
+check_git () {
+if ! which git > /dev/null; then
+    check_retval
+    echo "git is not installed"
+    echo "fix: sudo apt-get install git-core"
+    exit 1
+fi
+}
+
+
+#defaults
+Headphones=/opt/headphones/Headphones.py
+DAEMON=
+QUIET=
+NOLAUNCH=
+PORT=
+CONFIG="--config=/home/$USER/.headphones/config.ini"
+DATA="--datadir=/home/$USER/.headphones"
+PID=
+
+# check if defaults are overwritten @ commandline
+options=("$@")
+for option in "${options[@]}"
+do
+    case $option in
+        Headphones.py)
+            Headphones=$option
+            ;;
+        --config*)
+            CONFIG=$option
+            ;;
+        --datadir*)
+            DATA=$option
+            ;;
+        --pidfile*)
+            PID=$option
+            ;;
+        --port*)
+            PORT=$option
+            ;;
+        --quiet)
+            QUIET=$option
+            ;;
+        --daemon)
+            DAEMON=$option
+            ;;
+        --nolaunch)
+            NOLAUNCH=$option
+            ;;
+        --help)
+            helptext
+            exit 0
+            ;;
+        --startup)
+            sudo editor /etc/default/headphones || exit 1
+            exit 0
+            ;;
+
+        *)
+            # The following only works on buntu-based systems, so it's hidden for other distro's
+            if cat /etc/*release | grep -i 'ubuntu\|distrib' > /dev/null; then
+                case $option in
+                    --start)
+                        sudo /etc/init.d/headphones start || exit 1
+                        exit 0
+                        ;;
+                    --stop)
+                        sudo /etc/init.d/headphones stop || exit 1
+                        exit 0
+                        ;;
+                    --restart|--force-reload)
+                        sudo /etc/init.d/headphones restart || exit 1
+                        exit 0
+                        ;;
+                    --force-update)
+                        if check_git; then
+                            if ! sudo git --git-dir=/opt/headphones/.git pull | grep 'Already up-to-date'; then
+                            sudo /etc/init.d/headphones restart
+                            fi
+                        fi
+                        exit 0
+                        ;;
+                    *)
+                        helptext
+                        exit 1
+                        ;;
+                esac
+            fi
+            ;;
+    esac
+done
+
+
+OPTS="$QUIET $DAEMON $NOLAUNCH" 
+OPTS_ENV="$CONFIG $DATA $PID $PORT"
+
+OPTIONS=$(echo $OPTS $OPTS_ENV | sed 's/=/ /g')
+
+#$(which python) $Headphones $OPTS $OPTS_ENV
+$(which python) $Headphones $OPTIONS
+check_retval

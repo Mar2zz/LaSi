@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -e
+
+# Stop sickbeard service.
+if pgrep -f SickBeard.py > /dev/null; then
+    [ -e /etc/init.d/sickbeard ] && /etc/init.d/sickbeard stop
+fi
+
+# backup configfile if any
+if [ -e /opt/sickbeard/autoProcessTV/autoProcessTV.cfg ]; then
+    cp -f /opt/sickbeard/autoProcessTV/autoProcessTV.cfg /tmp/autoProcessTV.cfg
+fi
+
+# remove path if exists
+if [ -d /opt/sickbeard ]; then
+    rm -Rf /opt/sickbeard
+fi
+

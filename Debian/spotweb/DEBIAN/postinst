@@ -1,0 +1,31 @@
+#!/bin/sh
+
+set -e
+
+# if git exists clone repo, else wget spotweb.tar.gz
+if which git > /dev/null; then
+    git clone https://github.com/spotweb/spotweb.git /var/www/spotweb
+elif wget -O /tmp/spotweb.tar.gz https://nodeload.github.com/spotweb/spotweb/tarball/master; then
+    # create path again
+    mkdir -p /var/www/spotweb || exit 1
+    tar -xzf /tmp/spotweb.tar.gz --strip 1 -C /var/www/spotweb
+    rm -f /tmp/spotweb.tar.gz
+else
+    echo "Both git clone and wget file failed, to solve this execute: 
+    git clone https://github.com/spotweb/spotweb.git /var/www/spotweb
+        or:
+    wget -O /tmp/spotweb.tar.gz https://nodeload.github.com/spotweb/spotweb/tarball/master && tar -xzf /tmp/spotweb.tar.gz --strip 1 -C /var/www/spotweb
+    
+    or download, extract and copy the files from github to /var/www/spotweb"
+    exit 1
+fi
+
+# symlink settings to webroot
+ln -s /etc/default/spotweb/ownsettings.php /var/www/spotweb/ownsettings.php
+
+# launch editor if first time
+if grep 'xx\|yy' /etc/default/spotweb/ownsettings.php > /dev/null; then
+    editor /etc/default/spotweb/ownsettings.php
+    echo "Settings are saved in /etc/default/spotweb/ownsettings.php."
+fi
+

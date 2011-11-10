@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -e
+
+# remove stuff if purge
+if [ $1 = 'purge' ]; then
+    /usr/sbin/update-rc.d -f couchpotato remove | grep /etc/init.d/couchpotato
+    if ls /etc/cron.*/couchpotato | xargs rm -f > /dev/null; then
+        echo " Removing any cronjobs for couchpotato ..."
+    fi
+fi
+

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -e
+
+# remove stuff if purge
+# remove stuff if purge
+if [ $1 = 'purge' ]; then
+    if ls /etc/cron.*/mediafrontpage | xargs rm -f > /dev/null; then
+        echo " Removing any cronjobs for mediafrontpage ..."
+    fi
+fi
+

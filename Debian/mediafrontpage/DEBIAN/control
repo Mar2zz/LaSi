@@ -1,0 +1,19 @@
+Package: mediafrontpage
+Version: 2011.11.10
+Section: web 
+Priority: optional
+Architecture: all
+Essential: no
+Depends: apache2, php5, php5-curl
+Recommends: git
+Installed-Size: 4700
+Maintainer: Mar2zz <lasi.mar2zz@gmail.com>
+Provides: mediafrontpage
+Description: MediaFrontPage is a HTPC Web Program Organiser.
+ Your HTPC utilises a number of different programs to do certain tasks. 
+ What MediaFrontPage does is creates a user specific web page 
+ that will be your nerve centre for everything you will need.
+ .
+ MediaFrontPage can be found @ https://github.com/mediafrontpage/ and is written and maintained by Gugahoi, DejaVu and others
+ .
+ MediaFrontPage is installed in /var/www/mediafrontpage.

@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -e
+
+# stop sickbeard
+if pgrep -f SickBeard.py > /dev/null; then
+    /etc/init.d/sickbeard stop
+fi
+
+# make sure process is killed ok and pidfile is removed
+if pgrep -f SickBeard.py > /dev/null; then
+    rm -f $(ps up $(pgrep -f SickBeard.py) | grep pidfile | sed "s/.*--pidfile=//g") > /dev/null
+    kill -9 $(pgrep -f SickBeard.py) > /dev/null
+fi
+
+# remove path if exists
+if [ -d /opt/sickbeard ]; then
+    rm -Rf /opt/sickbeard
+fi
+

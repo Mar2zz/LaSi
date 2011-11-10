@@ -1,0 +1,9 @@
+#!/bin/sh
+
+set -e
+
+# remove path if exists
+if [ -d /var/www/spotweb ]; then
+    rm -Rf /var/www/spotweb
+fi
+

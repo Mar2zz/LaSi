@@ -1,0 +1,18 @@
+Package: spotweb
+Version: 2011.11.10
+Section: web 
+Priority: optional
+Architecture: all
+Essential: no
+Depends: apache2, php5, php5-curl, php5-mysql, mysql-server, php-pear
+Recommends: git
+Installed-Size: 8800
+Maintainer: Mar2zz <lasi.mar2zz@gmail.com>
+Provides: spotweb
+Description: Spotweb is a webbased version of Spotnet, a dutch nzb-community.
+ It utilises PHP5 to implement most functions. A webserver is needed to run Spotweb.
+ .
+ SpotWeb can be found @ https://github.com/spotweb/ and is written and maintained by Spotweb and others
+ .
+ SpotWeb is installed in /var/www/spotweb, configuration installed in /etc/default/spotweb/ownsettings.php.
+ Type spotweb --help for options

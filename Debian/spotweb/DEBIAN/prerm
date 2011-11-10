@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -e
+
+if [ $1 = purge ]; then
+    rm -f /etc/default/spotweb/ownsettings.php
+fi
+
+# remove path if exists
+if [ -d /var/www/spotweb ]; then
+    rm -Rf /var/www/spotweb
+fi

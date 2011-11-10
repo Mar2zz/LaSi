@@ -1,0 +1,25 @@
+#!/bin/sh
+
+set -e
+
+# if git exists clone repo, else wget headphones.tar.gz
+if which git > /dev/null; then
+    git clone https://github.com/rembo10/headphones.git /opt/headphones
+elif wget -O /tmp/headphones.tar.gz https://nodeload.github.com/rembo10/Headphones/tarball/master; then
+    # create path again
+    mkdir -p /opt/headphones || exit 1
+    tar -xzf /tmp/headphones.tar.gz --strip 1 -C /opt/headphones
+    rm -f /tmp/headphones.tar.gz
+else
+    echo "Both git clone and wget file failed, to solve this execute: 
+    git clone https://github.com/rembo10/headphones.git /opt/headphones
+        or:
+    wget -O /tmp/headphones.tar.gz https://nodeload.github.com/rembo10/Headphones/tarball/master && tar -xzf /tmp/headphones.tar.gz --strip 1 -C /opt/headphones
+    
+    or download, extract and copy the files from github to /opt/headphones"
+    exit 1
+fi
+
+# execute init.script
+update-rc.d headphones defaults  | grep /etc/init.d/headphones
+/etc/init.d/headphones start

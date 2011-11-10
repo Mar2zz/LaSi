@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -e
+
+# Stop headphones service.
+if pgrep -f Headphones.py > /dev/null; then
+    [ -e /etc/init.d/headphones ] && /etc/init.d/headphones stop
+fi
+
+# remove path if exists
+if [ -d /opt/headphones ]; then 
+    rm -Rf /opt/headphones
+fi

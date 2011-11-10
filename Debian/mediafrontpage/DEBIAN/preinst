@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -e
+
+# check if configfile is allready set
+if [ -e /var/www/mediafrontpage/config.ini ]; then
+    cp -f /var/www/mediafrontpage/config.ini /tmp/mediafrontpage-config.ini
+fi
+
+# remove path if exists
+if [ -d /var/www/mediafrontpage ]; then
+    rm -Rf /var/www/mediafrontpage
+fi
+

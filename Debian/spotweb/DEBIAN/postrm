@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -e
+
+# remove stuff if purge
+if [ $1 = 'purge' ]; then
+    if ls /etc/cron.*/spotweb* | xargs rm -f > /dev/null; then
+        echo " Removing any cronjobs for spotweb ..."
+    fi
+    if [ -e /etc/cron.hourly/spotweb_spots ]; then
+        rm -f /etc/cron.hourly/spotweb_spots
+    fi
+fi
+

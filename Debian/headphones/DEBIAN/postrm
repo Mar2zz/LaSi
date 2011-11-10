@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -e
+
+# remove stuff if purge
+if [ $1 = 'purge' ]; then
+    /usr/sbin/update-rc.d -f headphones remove | grep /etc/init.d/headphones
+    if ls /etc/cron.*/headphones | xargs rm -f > /dev/null; then
+        echo " Removing any cronjobs for headphones ..."
+    fi
+fi
+

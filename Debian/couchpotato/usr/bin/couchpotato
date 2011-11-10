@@ -1,0 +1,146 @@
+#!/bin/bash
+
+# Copyright (C) 2011- by Mar2zz <LaSi.Mar2zz@gmail.com>
+# released under GPL, version 2 or later
+
+
+#helptext
+helptext () {
+    echo 'usage: couchpotato --option --environment=value
+    OPTIONS:
+        --daemon        : run in background
+        --quiet         : run silent
+
+    ENVIRONMENT:        : Example --configdir=/path/to/config.ini.
+        --config=       : Set full path to config.ini,
+                          defaults to ~/.couchpotato/config.ini.
+        --datadir=      : Set folder to store database and thumbs, 
+                          defaults to ~/.couchpotato.
+        --pidfile=      : Set full path to pidfile, 
+                          defaults to /var/run/couchpotato/couchpotato.pid.
+
+        --startup       : Edit /etc/default/couchpotato to autostart 
+                          couchpotato when this machine starts.
+
+        --help          : print this help message.'
+
+# The following only works on buntu-based systems, so it's hidden for other distro's
+# This makes the /usr/bin/couchpotato service compatible with multiple distro's
+if cat /etc/*release | grep -i 'buntu\|mint' > /dev/null; then
+    echo '
+    DAEMON OPTIONS:     : Handle the daemon that runs as a service
+        --startup       : Edit /etc/default/couchpotato to autostart 
+                          couchpotato when this machine starts.
+        --start         : Start the daemon.
+        --stop          : Stop the daemon.
+        --restart       : Restart the daemon.
+        --force-reload  : Same as --restart.'
+fi
+if which git > /dev/null && [ -d /opt/couchpotato/.git ]; then
+    echo '        --force-update  : Update couchpotato from GitHub
+  '
+fi
+}
+
+. /lib/lsb/init-functions
+
+check_retval() {
+    if [ $? -eq 0 ]; then
+        log_end_msg 0
+        return 0
+    else
+        log_end_msg 1
+        exit 1
+    fi
+}
+
+check_git () {
+if ! which git > /dev/null; then
+    check_retval
+    echo "git is not installed"
+    echo "fix: sudo apt-get install git-core"
+    exit 1
+fi
+}
+
+
+#defaults
+CouchPotato=/opt/couchpotato/CouchPotato.py
+DAEMON=
+QUIET=
+CONFIG="--config=/home/$USER/.couchpotato/config.ini"
+DATA="--datadir=/home/$USER/.couchpotato"
+PID=
+
+# check if defaults are overwritten @ commandline
+options=("$@")
+for option in "${options[@]}"
+do
+    case $option in
+        CouchPotato.py)
+            CouchPotato=$option
+            ;;
+        --config*)
+            CONFIG=$option
+            ;;
+        --datadir*)
+            DATA=$option
+            ;;
+        --pidfile*)
+            PID=$option
+            ;;
+        --quiet)
+            QUIET=$option
+            ;;
+        --daemon|-d)
+            DAEMON='-d'
+            ;;
+        --help)
+            helptext
+            exit 0
+            ;;
+        --startup)
+            sudo editor /etc/default/couchpotato || exit 1
+            exit 0
+            ;;
+
+        *)
+            # The following only works on buntu-based systems, so it's hidden for other distro's
+            if cat /etc/*release | grep -i 'ubuntu\|distrib' > /dev/null; then
+                case $option in
+                    --start)
+                        sudo /etc/init.d/couchpotato start || exit 1
+                        exit 0
+                        ;;
+                    --stop)
+                        sudo /etc/init.d/couchpotato stop || exit 1
+                        exit 0
+                        ;;
+                    --restart|--force-reload)
+                        sudo /etc/init.d/couchpotato restart || exit 1
+                        exit 0
+                        ;;
+                    --force-update)
+                        if check_git; then
+                            if ! sudo git --git-dir=/opt/couchpotato/.git pull | grep 'Already up-to-date'; then
+                            sudo /etc/init.d/couchpotato restart
+                            fi
+                        fi
+                        exit 0
+                        ;;
+                    *)
+                        helptext
+                        exit 1
+                        ;;
+                esac
+            fi
+            ;;
+    esac
+done
+
+
+OPTS="$DAEMON" 
+OPTS_ENV="$CONFIG $DATA $PID"
+
+$(which python) $CouchPotato $OPTS $OPTS_ENV 
+check_retval
