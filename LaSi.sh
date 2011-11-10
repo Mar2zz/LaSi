@@ -133,9 +133,11 @@ unattended=0
 ask_schedule=0
 schedule=0
 
-options=($@)
+# create array
+options=( $@ )
 
 check_Variables () {
+    # check if input is correct and set them
     for option in ${options[@]}
     do
         case $option in
@@ -213,8 +215,10 @@ LaSi_Menu (){
         else
             echo "Tip: Type LaSi.sh --help for more install options!"
         fi
-        if [ $schedule != 0 ]; then
-            echo "Set $schedule checks for updates."
+        if [ $ask_schedule = 1 ]; then
+            echo "Cronjobs set to 'ask'."
+        elif [ $schedule != 0 ]; then
+            echo "Cronjobs set to $schedule."
         fi
 
         echo 
@@ -1279,8 +1283,8 @@ set_Cronjob () {
     # check if another cronjob for this exists and remove it
     [ -e /etc/cron.hourly/$set_app_lower ] && sudo rm -f /etc/cron.hourly/$set_app_lower
     [ -e /etc/cron.daily/$set_app_lower ] && sudo rm -f /etc/cron.daily/$set_app_lower
-    [ -e /etc/crond.weekly/$set_app_lower ] && sudo rm -f /etc/cron.weekly/$set_app_lower
-    [ -e /etc/crond.monthly/$set_app_lower ] && sudo rm -f /etc/cron.monthly/$set_app_lower
+    [ -e /etc/cron.weekly/$set_app_lower ] && sudo rm -f /etc/cron.weekly/$set_app_lower
+    [ -e /etc/cron.monthly/$set_app_lower ] && sudo rm -f /etc/cron.monthly/$set_app_lower
 
 
     # create lasi file in correct location
