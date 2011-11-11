@@ -11,7 +11,7 @@
 #  ___________________________________________________________________________________
 # |
 # | execute this script with the command: chmod +x LaSi_syn.sh 
-# | then run with sh LaSi.sh
+# | then run with ./LaSi.sh
 # |
 # | LaSi will install the programs you choose
 # | from the menu:
@@ -114,14 +114,10 @@ read -sn 1 -p '--- [continue]---'
 # check if fast install is enabled
 option=$1
 check_Variables () {
-unattended=0
+    unattended=0
     case $option in
         --fast)
             unattended=1 ;;
-        *)
-            echo "Invalid variable $option"
-            echo "Usage: ./LaSi_syn.sh --fast"
-            exit 1 ;;
     esac
 }
 
@@ -910,7 +906,7 @@ cf_Install () {
 
 
 ### RUN ALL FUNCTIONS ###
-check_Ipkg
+#check_Ipkg
 check_Variables
 LaSi_Menu
 
