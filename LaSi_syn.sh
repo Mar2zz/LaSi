@@ -15,8 +15,12 @@
 # |
 # | LaSi will install the programs you choose
 # | from the menu:
-# | # Periscope
+# | # Beets
+# | # CouchPotato
+# | # Headphones
+# | # Sickbeard
 # | # Spotweb
+# | # Subliminal
 # |___________________________________________________________________________________
 #
 #
@@ -55,14 +59,24 @@ Bootstrap is not installed, please install it before using this script
 Information on how to install bootstrap can be found at:
 http://forum.synology.com/wiki/index.php/Overview_on_modifying_the_Synology_Server,_bootstrap,_ipkg_etc#How_to_install_ipkg
 "
-    exit
+exit
 fi
 }
 
 check_Git () {
-if ! which git > /dev/null; then
-    ipkg install git || error_Msg
-fi
+    if ! which git > /dev/null; then
+        ipkg install git || error_Msg
+    fi
+}
+
+check_Editor () {
+    if which nano > /dev/null; then
+        writer=nano
+    elif which vi > /dev/null; then
+        writer=vi
+    else
+        echo "No editor found"
+    fi
 }
 
 check_DSM () {
@@ -89,6 +103,14 @@ echo "
 read -sn 1 -p '--- [continue]---'
 }
 
+check_DSM_users () {
+echo "
+# Go to your DSM:
+# Control Panel -> User -> User Home and enable it for the users that will run $set_app
+# Press the Ok button"
+read -sn 1 -p '--- [continue]---'
+}
+
 # check if fast install is enabled
 option=$1
 check_Variables () {
@@ -98,6 +120,7 @@ unattended=0
             unattended=1 ;;
         *)
             echo "Invalid variable $option"
+            echo "Usage: ./LaSi_syn.sh --fast"
             exit 1 ;;
     esac
 }
@@ -210,6 +233,8 @@ Info_Beets () {
 }
 
 Install_Beets () {
+    cfg_path=/volume1/@appstore/.$app_low
+
     # dependencys
     ipkg install textutils || error_Msg
 
@@ -231,6 +256,18 @@ Install_Beets () {
     /opt/local/bin/pip install beets || error_Msg
 
     # Set configfile!
+    if ! [ -e $HOME ]; then
+        echo "Beets needs a .beetsconfig in the home directory of the user running beets"
+        echo "Please enable home-directory for the user that will use Beets in DSM"
+        check_DSM_users
+    fi
+
+    [ -d $cfg_path ] || mkdir -p $cfg_path
+    if ! [ -e $cfg_path/.beetsconfig-sample ]; then
+        echo "Saving a basic .beetsconfig-sample in $cfg_path, edit it and copy it to the home-folders ..."
+        echo "Command: cp -f $cfg_path/.beetsconfig-sample /home/''user-running-beets''/.beetsconfig"
+        wget -O $cfg_path/.beetsconfig-sample $dropbox/$app_low/.beetsconfig-sample || error_Msg
+    fi
 
     Summ_Beets
     }
@@ -560,16 +597,16 @@ Install_Spotweb () {
     app_path=/volume1/web/$app_low
     cfg_path=/volume1/@appstore/.$app_low
 
-# enable webserver in DSM
-check_DSM_web
+    # enable webserver in DSM
+    check_DSM_web
 
-check_Git
+    check_Git
 
-# dependencys
-ipkg install textutils || error_Msg
-ipkg install php-pear || error_Msg
-pear config-set php_bin /usr/bin/php || error_Msg
-sed -i 's#;include_path = ".:/php/includes"#include_path = ".:/php/includes:/opt/share/pear"#g' /usr/syno/etc/php.ini || error_Msg
+    # dependencys
+    ipkg install textutils || error_Msg
+    ipkg install php-pear || error_Msg
+    pear config-set php_bin /usr/bin/php || error_Msg
+    sed -i 's#;include_path = ".:/php/includes"#include_path = ".:/php/includes:/opt/share/pear"#g' /usr/syno/etc/php.ini || error_Msg
 
     # before downloading source from git, save personal stuff if not in cfg_path allready
     # ownsettings.php
@@ -713,6 +750,13 @@ sed -i 's#;include_path = ".:/php/includes"#include_path = ".:/php/includes:/opt
     # update database
     cd $app_path && /usr/bin/php upgrade-db.php 
     cd - > /dev/null
+
+    # launch editor if first time
+    if grep 'xx\|yy' $cfg_path/ownsettings.php > /dev/null; then
+        check_Editor
+        $writer /etc/default/spotweb/ownsettings.php
+        echo "Settings saved to $cfg_path/ownsettings.php"
+    fi
 
         cf_Retrieve () {
             echo 

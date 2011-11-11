@@ -1,0 +1,25 @@
+[beets]
+library: /volume1/@appstore/.beets/musiclibrary.blb
+directory: /volume1/Music
+import_copy: yes
+import_delete: yes
+import_write: yes
+import_resume: no
+import_art: yes
+import_quiet_fallback: skip
+import_timid: no
+import_log: /volume1/@appstore/.beets/beetslog.txt
+art_filename: folder
+pluginpath: /volume1/@appstore/.beets/plugins/
+plugins:web
+threaded: yes
+color: yes
+
+[paths]
+default: $albumartist/$album ($year)/$track. $artist - $title
+soundtrack: Soundtracks/$album/$track. $artist - $title
+comp: Various $genre/$album ($year)/$track. $artist - $title
+
+[replaygain]
+reference_loundess: 89
+mp3_format: mp3gain 
