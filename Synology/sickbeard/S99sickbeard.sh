@@ -58,10 +58,10 @@ RUN_AS=sickbeard
 GIT=$(which git)
 
 host_check () {
-    PORT=$(grep web_port $APP_PATH/config.ini | sed 's/web_port = //g');
-    USERNAME=$(grep -m1 web_username $APP_PATH/config.ini | sed 's/web_username = //g');
-    PASSWORD=$(grep -m1 web_password $APP_PATH/config.ini | sed 's/web_password = //g');
-    WEBROOT=$(grep -m1 web_root $APP_PATH/config.ini | sed 's/web_root = //g');
+    PORT=$(grep web_port $CFG_PATH/config.ini | sed 's/web_port = //g');
+    USERNAME=$(grep -m1 web_username $CFG_PATH/config.ini | sed 's/web_username = //g');
+    PASSWORD=$(grep -m1 web_password $CFG_PATH/config.ini | sed 's/web_password = //g');
+    WEBROOT=$(grep -m1 web_root $CFG_PATH/config.ini | sed 's/web_root = //g');
 
     if [ -n $WEBROOT ]; then WEBROOT="/"$WEBROOT; fi
     if [ "$USERNAME" == "\"\"" ]; then USERNAME=; fi
@@ -94,7 +94,6 @@ start_daemon () {
     echo "* Starting $DESC ..."
 
     conf_dir_check
-    log_dir_check
     python_check
 
     su $RUN_AS -s /bin/sh -c "$DAEMON $DAEMON_OPTS &" || echo "Fail!"
@@ -123,9 +122,13 @@ stop_daemon () {
 }
 
 daemon_status () {
-    # Check if it is still listening @ port
-    host_check
-    wget -q --spider $AUTH $URL > /dev/null
+    # Check if it is still listening @ port (and bypass this check first start)
+    if [ -e $CFG_PATH/config.ini]; then
+        host_check
+        wget -q --spider $AUTH $URL > /dev/null
+    else
+        echo "First run, creating config.ini"
+    fi
 }
 
 run_update () {

@@ -121,9 +121,13 @@ stop_daemon () {
 }
 
 daemon_status () {
-    # Check if it is still listening @ port
-    host_check
-    wget -q --spider $AUTH $URL > /dev/null
+    # Check if it is still listening @ port (and bypass this check first start)
+    if [ -e $CFG_PATH/config.ini]; then
+        host_check
+        wget -q --spider $AUTH $URL > /dev/null
+    else
+        echo "First run, creating config.ini"
+    fi
 }
 
 run_update () {
