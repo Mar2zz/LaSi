@@ -604,19 +604,23 @@ Install_Spotweb () {
     pear config-set php_bin /usr/bin/php || error_Msg
     sed -i 's#;include_path = ".:/php/includes"#include_path = ".:/php/includes:/opt/share/pear"#g' /usr/syno/etc/php.ini || error_Msg
 
+    # create configpath if it doesn't exist
+    [ -d $cfg_path ] || mkdir -p $cfg_path
+
     # before downloading source from git, save personal stuff if not in cfg_path allready
     # ownsettings.php
     if ! [ -e $cfg_path/ownsettings.php ]; then
-        [ -e $app_path/ownsettings.php ] || mv -f $cfg_path/ownsettings.php
+        [ -e $app_path/ownsettings.php ] && mv -f $app_path/ownsettings.php $cfg_path/ownsettings.php
     fi
 
-    # download source from git
+    # starting fresh
     if [ -d $app_path ]; then
         echo "Start fresh, removing $app_path ..."
         rm -Rf $app_path
-    else
-        git clone git://github.com/spotweb/spotweb.git $app_path || error_Msg
     fi
+
+    # download source from git
+    git clone git://github.com/spotweb/spotweb.git $app_path || error_Msg
 
     # symlink settingsfile if any, or create a new one
     if [ -e $cfg_path/ownsettings.php ]; then
@@ -750,7 +754,7 @@ Install_Spotweb () {
     # launch editor if first time
     if grep 'xx\|yy' $cfg_path/ownsettings.php > /dev/null; then
         check_Editor
-        $writer /etc/default/spotweb/ownsettings.php
+        $writer $cfg_path/ownsettings.php
         echo "Settings saved to $cfg_path/ownsettings.php"
     fi
 
