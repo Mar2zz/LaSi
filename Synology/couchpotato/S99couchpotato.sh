@@ -57,7 +57,7 @@ RUN_AS=couchpotato
 
 GIT=$(which git)
 
-host_check ()
+host_check () {
     PORT=$(grep -m1 port $CFG_PATH/config.ini | sed 's/port = //g');
     USERNAME=$(grep -m1 username $CFG_PATH/config.ini | sed 's/username = //g');
     PASSWORD=$(grep -m2 -n password $CFG_PATH/config.ini | grep [0-9][0-9]: | sed 's/[0-9][0-9]:password = //g');
@@ -94,7 +94,6 @@ start_daemon () {
     echo "* Starting $DESC ..."
 
     conf_dir_check
-    log_dir_check
     python_check
 
     su $RUN_AS -s /bin/sh -c "$DAEMON $DAEMON_OPTS &" || echo "Fail!"

@@ -37,7 +37,7 @@
 APP_PATH=/volume1/@appstore/headphones
 
 # path where config.ini and database is stored
-CFG_PATH=/volume1/@appstore/.couchpotato
+CFG_PATH=/volume1/@appstore/.headphones
 
 # path to python bin
 DAEMON=/opt/bin/python2.6
@@ -57,10 +57,10 @@ RUN_AS=headphones
 GIT=$(which git)
 
 host_check () {
-PORT=$(grep -m1 http_port $APP_PATH/config.ini | sed 's/http_port = //g');
-USERNAME=$(grep -m1 http_username $APP_PATH/config.ini | sed 's/http_username = //g');
-PASSWORD=$(grep -m1 http_password $APP_PATH/config.ini | sed 's/http_password = //g');
-WEBROOT=$(grep -m1 http_root $APP_PATH/config.ini | sed 's/http_root = //g');
+PORT=$(grep -m1 http_port $CFG_PATH/config.ini | sed 's/http_port = //g');
+USERNAME=$(grep -m1 http_username $CFG_PATH/config.ini | sed 's/http_username = //g');
+PASSWORD=$(grep -m1 http_password $CFG_PATH/config.ini | sed 's/http_password = //g');
+WEBROOT=$(grep -m1 http_root $CFG_PATH/config.ini | sed 's/http_root = //g');
 
     if [ -n $WEBROOT ]; then WEBROOT="/"$WEBROOT; fi
     if [ "$USERNAME" == "\"\"" ]; then USERNAME=; fi
@@ -93,7 +93,6 @@ start_daemon () {
     echo "* Starting $DESC ..."
 
     conf_dir_check
-    log_dir_check
     python_check
 
     su $RUN_AS -s /bin/sh -c "$DAEMON $DAEMON_OPTS &" || echo "Fail!"

@@ -39,7 +39,7 @@
 APP_PATH=/volume1/@appstore/sickbeard
 
 # path where config.ini and database is stored
-CFG_PATH=/volume1/@appstore/.couchpotato
+CFG_PATH=/volume1/@appstore/.sickbeard
 
 # path to python bin
 DAEMON=/opt/bin/python2.6

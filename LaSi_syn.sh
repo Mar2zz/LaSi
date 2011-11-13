@@ -863,7 +863,7 @@ cf_Choice () {
     read -p "Choose an option: " SELECT
         case "$SELECT" in
             1)
-                Install_$set_app
+                cf_Install
                 ;;
             2)
                 LaSi_Menu
@@ -906,7 +906,7 @@ cf_Install () {
 
 
 ### RUN ALL FUNCTIONS ###
-#check_Ipkg
+check_Ipkg
 check_Variables
 LaSi_Menu
 
