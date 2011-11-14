@@ -127,6 +127,7 @@ daemon_status () {
         wget -q --spider $AUTH $URL > /dev/null
     else
         echo "First run, creating config.ini"
+        return 1
     fi
 }
 
