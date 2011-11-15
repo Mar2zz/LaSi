@@ -89,10 +89,17 @@ check_Git () {
 }
 
 check_Pip () {
-    # install git for benefits like updating from commandline
     if ! which pip > /dev/null; then
-        sudo apt-get -y install python-pip || error_Msg
+        sudo apt-get -y install python-pip || check_Easy
     fi
+    pip=`which pip`
+}
+
+check_Easy () {
+    if ! which easy_install > /dev/null; then
+        sudo apt-get python-setuptools || error_Msg
+    fi
+    easy_install=`which easy_install`
 }
 
 check_Deb () {
@@ -319,6 +326,10 @@ LaSi_Menu (){
         echo "*###############################################################*"
     fi
 
+    # give time to read output from above installprocess before returning to menu
+    echo 
+    read -sn 1 -p "Press a key to continue"
+    LaSi_Menu
     }
     show_Menu
 }
@@ -357,8 +368,8 @@ Info_Beets () {
 Install_Beets () {
 
     check_Pip
-    sudo pip install beets || error_Msg
-    sudo pip install rgain || echo "Fail!"
+    sudo $pip install beets || { sudo $easy_install beets || error_Msg; }
+    sudo $pip install rgain || { sudo $easy_install rgain || echo "Fail!"; }
 
     # Enable replaygain which is healthy for ears and speakers (TEMP DISABLED)
     if ! [ -d $HOME/.beets/plugins ]; then
@@ -949,8 +960,8 @@ Info_Subliminal () {
 Install_Subliminal () {
 
     check_Pip
-    sudo pip install subliminal || error_Msg
-    sudo pip install argparse || error_Msg
+    sudo $pip install subliminal || { sudo $easy_install subliminal || error_Msg; }
+    sudo $pip install argparse || { sudo $easy_install argparse || error_Msg; }
 
 Summ_$set_app
 Summ_$set_app >> /tmp/lasi_install.log
@@ -1213,10 +1224,10 @@ cf_Install () {
     [Yy]*)
         Install_$set_app &&
         Summ_$set_app >> /tmp/lasi_install.log
-
         # give time to read output from above installprocess before returning to menu
         echo 
         read -sn 1 -p "Press a key to continue"
+        Info_$set_app
         ;;
     [Nn]*)
         LaSi_Menu
