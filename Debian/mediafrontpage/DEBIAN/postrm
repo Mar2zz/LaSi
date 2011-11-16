@@ -5,8 +5,9 @@ set -e
 # remove stuff if purge
 # remove stuff if purge
 if [ $1 = 'purge' ]; then
-    if ls /etc/cron.*/mediafrontpage | xargs rm -f > /dev/null; then
-        echo " Removing any cronjobs for mediafrontpage ..."
-    fi
+    [ -e /etc/cron.hourly/mediafrontpage && rm -f /etc/cron.hourly/mediafrontpage
+    [ -e /etc/cron.daily/mediafrontpage && rm -f /etc/cron.daily/mediafrontpage
+    [ -e /etc/cron.weekly/mediafrontpage && rm -f /etc/cron.weekly/mediafrontpage
+    [ -e /etc/cron.monthly/mediafrontpage && rm -f /etc/cron.monthly/mediafrontpage
 fi
 

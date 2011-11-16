@@ -5,8 +5,9 @@ set -e
 # remove stuff if purge
 if [ $1 = 'purge' ]; then
     /usr/sbin/update-rc.d -f couchpotato remove | grep /etc/init.d/couchpotato
-    if ls /etc/cron.*/couchpotato | xargs rm -f > /dev/null; then
-        echo " Removing any cronjobs for couchpotato ..."
-    fi
+    [ -e /etc/cron.hourly/couchpotato && rm -f /etc/cron.hourly/couchpotato
+    [ -e /etc/cron.daily/couchpotato && rm -f /etc/cron.daily/couchpotato
+    [ -e /etc/cron.weekly/couchpotato && rm -f /etc/cron.weekly/couchpotato
+    [ -e /etc/cron.monthly/couchpotato && rm -f /etc/cron.monthly/couchpotato
 fi
 
