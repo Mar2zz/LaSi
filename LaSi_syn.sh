@@ -262,7 +262,7 @@ Install_Beets () {
     if ! [ -e $cfg_path/.beetsconfig-sample ]; then
         echo "Saving a basic .beetsconfig-sample in $cfg_path, edit it and copy it to the home-folders ..."
         echo "Command: cp -f $cfg_path/.beetsconfig-sample /home/''user-running-beets''/.beetsconfig"
-        wget -O $cfg_path/.beetsconfig-sample $dropbox/$app_low/.beetsconfig-sample || error_Msg
+        wget -O $cfg_path/.beetsconfig-sample $dropbox/$app_low/beetsconfig-sample || error_Msg
     fi
 
     Summ_Beets
