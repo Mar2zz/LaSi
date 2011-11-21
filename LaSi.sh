@@ -271,7 +271,7 @@ LaSi_Menu (){
 
                 # sabnzbdplus
                 5)
-                    $set_app=Sabnzbdplus
+                    set_app=Sabnzbdplus
                     if [ $unattended = 1 ]; then Install_$set_app; else Info_$set_app; fi
                     ;;
 
