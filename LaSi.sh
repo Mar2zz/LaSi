@@ -1235,8 +1235,7 @@ cf_Install () {
     echo
     case $REPLY in
     [Yy]*)
-        Install_$set_app &&
-        Summ_$set_app >> /tmp/lasi_install.log
+        Install_$set_app
         # give time to read output from above installprocess before returning to menu
         echo 
         read -sn 1 -p "Press a key to continue"
