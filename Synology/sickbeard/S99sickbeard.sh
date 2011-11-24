@@ -63,7 +63,7 @@ host_check () {
     PASSWORD=$(grep -m1 web_password $CFG_PATH/config.ini | sed 's/web_password = //g');
     WEBROOT=$(grep -m1 web_root $CFG_PATH/config.ini | sed 's/web_root = //g');
 
-    if [ -n $WEBROOT ]; then WEBROOT="/"$WEBROOT; fi
+    if [ "$WEBROOT" == "\"\"" ]; then WEBROOT=; fi
     if [ "$USERNAME" == "\"\"" ]; then USERNAME=; fi
     if [ "$PASSWORD" == "\"\"" ]; then PASSWORD=; fi
     if [ "$USERNAME" != "" ]; then AUTH="--user=$USERNAME --password=$PASSWORD"; fi
