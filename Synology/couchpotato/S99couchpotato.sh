@@ -63,7 +63,7 @@ host_check () {
     PASSWORD=$(grep -m2 -n password $CFG_PATH/config.ini | grep [0-9][0-9]: | sed 's/[0-9][0-9]:password = //g');
     WEBROOT=$(grep -m1 urlbase $CFG_PATH/config.ini | sed 's/urlbase = //g');
 
-    if [ -n $WEBROOT ]; then WEBROOT="/"$WEBROOT; fi
+    if [ "$WEBROOT" == "\"\"" ]; then WEBROOT=; fi
     if [ "$USERNAME" == "\"\"" ]; then USERNAME=; fi
     if [ "$PASSWORD" == "\"\"" ]; then PASSWORD=; fi
     if [ "$USERNAME" != "" ]; then AUTH="--user=$USERNAME --password=$PASSWORD"; fi
@@ -77,7 +77,7 @@ host_check () {
 
 # check if daemon exists and link it
 python_check () {
-    if [ -f /usr/bin/python ]; then
+    if ! [ -f /usr/bin/python ]; then
         ln -s $DAEMON /usr/bin/python
     fi
 }
@@ -123,7 +123,7 @@ stop_daemon () {
 
 daemon_status () {
     # Check if it is still listening @ port (and bypass this check first start)
-    if [ -e $CFG_PATH/config.ini]; then
+    if [ -e $CFG_PATH/config.ini ]; then
         host_check
         wget -q --spider $AUTH $URL > /dev/null
     else

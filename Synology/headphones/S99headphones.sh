@@ -62,7 +62,7 @@ USERNAME=$(grep -m1 http_username $CFG_PATH/config.ini | sed 's/http_username = 
 PASSWORD=$(grep -m1 http_password $CFG_PATH/config.ini | sed 's/http_password = //g');
 WEBROOT=$(grep -m1 http_root $CFG_PATH/config.ini | sed 's/http_root = //g');
 
-    if [ -n $WEBROOT ]; then WEBROOT="/"$WEBROOT; fi
+    if [ "$WEBROOT" == "\"\"" ]; then WEBROOT=; fi
     if [ "$USERNAME" == "\"\"" ]; then USERNAME=; fi
     if [ "$PASSWORD" == "\"\"" ]; then PASSWORD=; fi
     if [ "$USERNAME" != "" ]; then AUTH="--user=$USERNAME --password=$PASSWORD"; fi
@@ -122,7 +122,7 @@ stop_daemon () {
 
 daemon_status () {
     # Check if it is still listening @ port (and bypass this check first start)
-    if [ -e $CFG_PATH/config.ini]; then
+    if [ -e $CFG_PATH/config.ini ]; then
         host_check
         wget -q --spider $AUTH $URL > /dev/null
     else
