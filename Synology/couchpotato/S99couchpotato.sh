@@ -69,7 +69,7 @@ host_check () {
     if [ "$USERNAME" != "" ]; then AUTH="--user=$USERNAME --password=$PASSWORD"; fi
 
     # Check is webroot is specified, if not use port
-    if [ "$WEBROOT" != "" ]; then URL="http://localhost$WEBROOT"; else URL="http://localhost:${PORT}"; fi
+    if [ "$WEBROOT" != "" ]; then URL="http://localhost/$WEBROOT"; else URL="http://localhost:${PORT}"; fi
 
     # Define exit URL
     EXIT=$URL/config/exit/
