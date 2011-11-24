@@ -86,6 +86,7 @@ check_PPA () {
         echo "Installing python-software-properties to install ppa's"
         sudo apt-get install -y python-software-properties || { echo "Need this to install $set_app, exiting ..." && exit; }
     fi
+}
 
 check_Git () {
     # install git for benefits like updating from commandline
