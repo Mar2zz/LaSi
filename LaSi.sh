@@ -81,6 +81,12 @@ check_Apt () {
     fi
 }
 
+check_PPA () {
+    if ! which apt-add-repository > /dev/null; then
+        echo "Installing python-software-properties to install ppa's"
+        sudo apt-get install -y python-software-properties || { echo "Need this to install $set_app, exiting ..." && exit; }
+    fi
+
 check_Git () {
     # install git for benefits like updating from commandline
     if ! which git > /dev/null; then
@@ -616,6 +622,9 @@ Info_Sabnzbdplus () {
 
 Install_Sabnzbdplus () {
 
+    # check if python-software-properties is installed (not by default on minimal servers)
+    check_PPA
+
     # Check if ppa is used as a source
     if ! ls /etc/apt/sources.list.d/jcfp-ppa* > /dev/null; then
         sudo add-apt-repository ppa:jcfp/ppa
@@ -1088,6 +1097,9 @@ Info_XBMC () {
 
 
 Install_XBMC () {
+
+    # check if python-software-properties is installed (not by default on minimal servers)
+    check_PPA
 
     # remove source to prevent installing wrong version
     if ls /etc/apt/sources.list.d | grep "team-xbmc*" > /dev/null; then
