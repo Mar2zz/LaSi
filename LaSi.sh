@@ -1099,9 +1099,6 @@ Info_XBMC () {
 
 Install_XBMC () {
 
-    # check if python-software-properties is installed (not by default on minimal servers)
-    check_PPA
-
     # remove source to prevent installing wrong version
     if ls /etc/apt/sources.list.d | grep "team-xbmc*" > /dev/null; then
         sudo rm -f /etc/apt/sources.list.d/team-xbmc*
@@ -1111,14 +1108,19 @@ Install_XBMC () {
     Question () {
         echo "Choose a version to install"
         echo "1. Stable"
-        echo "2. Unstable, but has newer features"
+        echo "2. Live (stable only)"
+        echo "3. Unstable, but has newer features"
         read -p ": " VERSION
         case $VERSION in
-            1*)
+            1*|2*)
+                # check if python-software-properties is installed (not by default on minimal servers)
+                check_PPA
                 sudo add-apt-repository ppa:team-xbmc || error_Msg
                 distro=$(ls /etc/apt/sources.list.d/team-xbmc* | sed "s/.*ppa-\|\.list//g")
                 ;;
-            2*)
+            3*)
+                # check if python-software-properties is installed (not by default on minimal servers)
+                check_PPA
                 sudo add-apt-repository ppa:team-xbmc/unstable || error_Msg
                 distro=$(ls /etc/apt/sources.list.d/team-xbmc* | sed "s/.*unstable-\|\.list//g")
                 ;;
@@ -1148,6 +1150,11 @@ Install_XBMC () {
             Summ_XBMC_stable >> /tmp/lasi_install.log
             ;;
         2*)
+            sudo apt-get -y install xorg alsa-base xbmc xbmc-live  || error_Msg
+            Summ_XBMC_Live
+            Summ_XBMC_Live >> /tmp/lasi_install.log
+            ;;
+        3*)
             sudo apt-get -y install xbmc || error_Msg
             Summ_XBMC_unstable
             Summ_XBMC_unstable >> /tmp/lasi_install.log
@@ -1161,6 +1168,13 @@ echo "
 Done! Installed XBMC stable.
 XBMC can now be started from the menu
 or can be set in the loginscreen as a desktopmanager.
+"
+}
+
+Summ_XBMC_Live () {
+echo "
+Done! Installed XBMC Live.
+Reboot your machine and XBMC will be started
 "
 }
 
