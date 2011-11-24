@@ -77,7 +77,7 @@ host_check () {
 
 # check if daemon exists and link it
 python_check () {
-    if [ -f /usr/bin/python ]; then
+    if ! [ -f /usr/bin/python ]; then
         ln -s $DAEMON /usr/bin/python
     fi
 }
