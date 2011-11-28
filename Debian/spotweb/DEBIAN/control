@@ -1,10 +1,10 @@
 Package: spotweb
-Version: 2011.11.18
+Version: 2011.11.28
 Section: web 
 Priority: optional
 Architecture: all
 Essential: no
-Depends: apache2, php5, php5-curl, php5-mysql, mysql-server, php-pear, php5-gd
+Depends: apache2, php5, php5-curl, php5-mysql, mysql-server, php5-gd
 Recommends: git
 Installed-Size: 8800
 Maintainer: Mar2zz <lasi.mar2zz@gmail.com>

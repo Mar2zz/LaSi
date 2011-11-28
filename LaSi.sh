@@ -753,8 +753,6 @@ Install_Spotweb () {
     wget -O /tmp/spotweb.deb $DROPBOX/LaSi_Repo/spotweb.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
     sudo dpkg -i /tmp/spotweb.deb || error_Depends
 
-    sudo pear install Net_NNTP
-    
     sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/apache2/php.ini
     sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/cli/php.ini
 
@@ -839,9 +837,6 @@ Install_Spotweb () {
     }
 
     config_SQL
-
-    # change servername to hostname in ownsettings if it's still default.
-    sudo sed -i "s/mijnserver/$HOSTNAME/g" /etc/default/spotweb/ownsettings.php
 
     # update database
     cd /var/www/spotweb && /usr/bin/php /var/www/spotweb/upgrade-db.php

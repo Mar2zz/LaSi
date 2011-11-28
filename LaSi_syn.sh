@@ -95,10 +95,9 @@ read -sn 1 -p '--- [continue]---'
 check_DSM_web () {
 echo "
 # Go to your DSM:
-# Control Panel -> Web Services -> Web Applications -> Check 'Enable Web Statio' and 'Enable MySQL'
+# Control Panel -> Web Services -> Web Applications -> Check 'Enable Web Station' and 'Enable MySQL'
 # Control Panel -> Web Services -> PHP Settings:
-#       Check 'Customize PHP open_basedir' and add ':/opt/share/pear' at the end
-#       Under 'Select PHP extension': Make sure that the following items are checked: openssl, mysql, zlib, gd, mcrypt
+#       Under 'Select PHP extension': Make sure that the following items are checked: gd, mysql, openssl, zip, zlib
 # Press the Ok button"
 read -sn 1 -p '--- [continue]---'
 }
@@ -600,9 +599,6 @@ Install_Spotweb () {
 
     # dependencys
     ipkg install textutils || error_Msg
-    ipkg install php-pear || error_Msg
-    pear config-set php_bin /usr/bin/php || error_Msg
-    sed -i 's#;include_path = ".:/php/includes"#include_path = ".:/php/includes:/opt/share/pear"#g' /usr/syno/etc/php.ini || error_Msg
 
     # create configpath if it doesn't exist
     [ -d $cfg_path ] || mkdir -p $cfg_path
@@ -750,13 +746,6 @@ Install_Spotweb () {
     # update database
     cd $app_path && /usr/bin/php upgrade-db.php 
     cd - > /dev/null
-
-    # launch editor if first time
-    if grep 'xx\|yy' $cfg_path/ownsettings.php > /dev/null; then
-        check_Editor
-        $writer $cfg_path/ownsettings.php
-        echo "Settings saved to $cfg_path/ownsettings.php"
-    fi
 
         cf_Retrieve () {
             echo 
