@@ -912,7 +912,7 @@ set -e
                 if [ $new_database = 1 ]; then
                     echo 
                     echo "You need to set your newsserver and other options first in spotweb."
-                    echo "Go to http://ip_diskstation/spotweb/?page=editsettings"
+                    echo "Go to http://$HOSTNAME/spotweb/?page=editsettings"
                     echo "Login with admin / admin"
                     echo "and set it at the Nieuwsserver-tab, after that, continue ..."
                     read -sn 1 -p "Press a key to continue"
