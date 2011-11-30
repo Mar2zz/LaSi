@@ -620,10 +620,10 @@ Install_Spotweb () {
 
     # symlink settingsfile if any, or create a new one
     if [ -e $cfg_path/ownsettings.php ]; then
-        ln -s $cfg_path/ownsettings.php $app_path/ownsettings.php || error_Msg
+        cp -f $cfg_path/ownsettings.php $app_path/ownsettings.php || error_Msg
     else
         wget -O $cfg_path/ownsettings.php $dropbox/$app_low/ownsettings.php || error_Msg
-        ln -s $cfg_path/ownsettings.php $app_path/ownsettings.php || error_Msg
+        cp -f $cfg_path/ownsettings.php $app_path/ownsettings.php || error_Msg
     fi
 
     config_SQL () {
@@ -636,8 +636,10 @@ Install_Spotweb () {
             case $DBREPLY in
                 [YyJj]*)
                     cf_PW
+                    new_database=1
                     ;;
                 [Nn]*)
+                    new_database=0
                     ;;
                 *)
                     echo "Answer yes or no"
@@ -753,6 +755,14 @@ Install_Spotweb () {
             read -p "[yes/no]: " RETRIEVE
             case $RETRIEVE in
                 [YyJj]*)
+                    if [ $new_database = 1 ]; then
+                        echo 
+                        echo "You need to set your newsserver and other options first in spotweb."
+                        echo "Go to http://ip_diskstation/spotweb/?page=editsettings"
+                        echo "Login with admin / admin"
+                        echo "and set it at the Nieuwsserver-tab, after that, continue ..."
+                        read -sn 1 -p "Press a key to continue"
+                    fi
                     echo "This will take a while!"
                     cd $app_path && /usr/bin/php retrieve.php
                     cd - > /dev/null

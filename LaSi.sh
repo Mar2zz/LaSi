@@ -767,8 +767,10 @@ Install_Spotweb () {
             case $DBREPLY in
                 [YyJj]*)
                     input_PW
+                    new_database=1
                     ;;
                 [Nn]*)
+                    new_database=0
                     ;;
                 *)
                     echo "Answer yes or no"
@@ -907,6 +909,14 @@ set -e
         read -p "[yes/no]: " RETRIEVE
         case $RETRIEVE in
             [YyJj]*)
+                if [ $new_database = 1 ]; then
+                    echo 
+                    echo "You need to set your newsserver and other options first in spotweb."
+                    echo "Go to http://ip_diskstation/spotweb/?page=editsettings"
+                    echo "Login with admin / admin"
+                    echo "and set it at the Nieuwsserver-tab, after that, continue ..."
+                    read -sn 1 -p "Press a key to continue"
+                fi
                 echo "This will take a while!"
                 /usr/bin/php /var/www/spotweb/retrieve.php
                 ;;
