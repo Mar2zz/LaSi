@@ -36,6 +36,7 @@
 #SET SOME VARIABLES (SOME VARIABLES WILL BE SET THROUGH LIVE USERINPUT IN TERMINAL)
 
 dropbox=http://dl.dropbox.com/u/18712538/Synology;    # dropbox-adres
+hostname=$(uname -n)
 
 
 #######################################################################################
@@ -364,7 +365,7 @@ Install_CouchPotato () {
 Summ_CouchPotato () {
 echo "
 Done! Installed $set_app.
-$set_app is by default located @ http://synology_ip:5050
+$set_app is by default located @ http://$hostname:5050
 "
 }
 
@@ -452,7 +453,7 @@ Install_Headphones () {
 Summ_Headphones () {
 echo "
 Done! Installed $set_app.
-$set_app is by default located @ http://synology_ip:8181
+$set_app is by default located @ http://$hostname:8181
 "
 }
 
@@ -555,7 +556,7 @@ Install_SickBeard () {
 Summ_SickBeard () {
 echo "
 Done! Installed $set_app.
-$set_app is by default located @ http://synology_ip:8081
+$set_app is by default located @ http://$hostname:8081
 "
 }
 
@@ -784,7 +785,7 @@ Install_Spotweb () {
 Summ_Spotweb () {
 echo "
 Done! Installed $set_app.
-$set_app is by default located @ http://synology_ip/spotweb
+$set_app is by default located @ http://$hostname/spotweb
 "
 }
 
