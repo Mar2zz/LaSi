@@ -1,13 +1,12 @@
 #!/bin/sh
 
-set -e
 
 # remove stuff if purge
 if [ $1 = 'purge' ]; then
     /usr/sbin/update-rc.d -f sickbeard remove | grep /etc/init.d/sickbeard
-    [ -e /etc/cron.hourly/sickbeard && rm -f /etc/cron.hourly/sickbeard
-    [ -e /etc/cron.daily/sickbeard && rm -f /etc/cron.daily/sickbeard
-    [ -e /etc/cron.weekly/sickbeard && rm -f /etc/cron.weekly/sickbeard
-    [ -e /etc/cron.monthly/sickbeard && rm -f /etc/cron.monthly/sickbeard
+    rm -f /etc/cron.hourly/sickbeard
+    rm -f /etc/cron.daily/sickbeard
+    rm -f /etc/cron.weekly/sickbeard
+    rm -f /etc/cron.monthly/sickbeard
 fi
 

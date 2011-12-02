@@ -1,13 +1,11 @@
 #!/bin/sh
 
-set -e
-
 # remove stuff if purge
 if [ $1 = 'purge' ]; then
     /usr/sbin/update-rc.d -f headphones remove | grep /etc/init.d/headphones
-    [ -e /etc/cron.hourly/headphones && rm -f /etc/cron.hourly/headphones
-    [ -e /etc/cron.daily/headphones && rm -f /etc/cron.daily/headphones
-    [ -e /etc/cron.weekly/headphones && rm -f /etc/cron.weekly/headphones
-    [ -e /etc/cron.monthly/headphones && rm -f /etc/cron.monthly/headphones
+    rm -f /etc/cron.hourly/headphones
+    rm -f /etc/cron.daily/headphones
+    rm -f /etc/cron.weekly/headphones
+    rm -f /etc/cron.monthly/headphones
 fi
 

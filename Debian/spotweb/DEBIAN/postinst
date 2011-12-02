@@ -23,9 +23,4 @@ fi
 # symlink settings to webroot
 ln -s /etc/default/spotweb/ownsettings.php /var/www/spotweb/ownsettings.php
 
-# launch editor if first time
-if grep 'xx\|yy' /etc/default/spotweb/ownsettings.php > /dev/null; then
-    editor /etc/default/spotweb/ownsettings.php
-    echo "Settings are saved in /etc/default/spotweb/ownsettings.php."
-fi
 
