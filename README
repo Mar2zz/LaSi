@@ -42,7 +42,8 @@ entertainment and centered around Sabnzbd and postprocessing.
 They work best on headless linuxservers or dedicated linux HTPC's.
 
 For all program's daemons will be enabled so they will run @ boot.
-Programs can be uninstalled with sudo apt-get remove (or purge) programname.
+Those programs can be uninstalled with sudo apt-get remove (or purge) programname.
+Beets and subliminal can be uninstalled with sudo pip uninstall programname.
 
 Programs supported Ubuntu:
 
