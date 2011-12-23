@@ -69,6 +69,8 @@ Failed! Installing $set_app had errors, try again or:
 Copy the text with errors above and report an issue at the following address:
 https://github.com/Mar2zz/LaSi/issues
 " >> /tmp/lasi_install.log
+
+continue
 }
 
 
@@ -104,7 +106,7 @@ check_Pip () {
 
 check_Easy () {
     if ! which easy_install > /dev/null; then
-        sudo apt-get python-setuptools || error_Msg
+        sudo apt-get install python-setuptools || error_Msg
     fi
     easy_install=`which easy_install`
 }
@@ -118,6 +120,16 @@ check_Log () {
     # remove any previous lasi_install logs
     rm -f /tmp/lasi_install.log
 }
+
+check_Port () {
+    #check if ports are in use before starting
+    if lsof -i tcp@0.0.0.0:$set_port > /dev/null; then
+        echo # port in use
+#    else
+        # port not in use
+    fi
+}
+
 
 ### HELP MESSAGE ###
 Print_Help () {
@@ -258,6 +270,7 @@ LaSi_Menu (){
                 # couchpotato
                 2)
                     set_app=CouchPotato
+                    set_port=5000
                     if [ $unattended = 1 ]; then Install_$set_app; else Info_$set_app; fi
                     if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
                     ;;
@@ -265,6 +278,7 @@ LaSi_Menu (){
                 # headphones
                 3)
                     set_app=Headphones
+                    set_port=8181
                     if [ $unattended = 1 ]; then Install_$set_app; else Info_$set_app; fi
                     if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
                     ;;
@@ -279,12 +293,14 @@ LaSi_Menu (){
                 # sabnzbdplus
                 5)
                     set_app=Sabnzbdplus
+                    set_port=8080
                     if [ $unattended = 1 ]; then Install_$set_app; else Info_$set_app; fi
                     ;;
 
                 # sickbeard
                 6)
                     set_app=SickBeard
+                    set_port=8081
                     if [ $unattended = 1 ]; then Install_$set_app; else Info_$set_app; fi
                     if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
                     ;;
@@ -306,6 +322,7 @@ LaSi_Menu (){
                 # transmission
                 9)
                     set_app=Transmission
+                    set_port=9091
                     if [ $unattended = 1 ]; then Install_$set_app; else Info_$set_app; fi
                     ;;
 
@@ -634,7 +651,7 @@ Install_Sabnzbdplus () {
     # Update list, install and configure
     echo "Checking for newest version..."
     sudo apt-get update > /dev/null
-    if sudo apt-get -y install sabnzbdplus || error_Msg | grep '/etc/default/sabnzbdplus'; then
+    if sudo apt-get -y install sabnzbdplus || error_Depends | grep '/etc/default/sabnzbdplus'; then
         sudo sed -i "
             /=/s/USER.*/USER=$USER/
             /=/s/HOST.*/HOST=0.0.0.0/
@@ -1023,7 +1040,7 @@ Info_Transmission () {
 
 Install_Transmission () {
 
-    sudo apt-get -y install transmission-daemon || error_Msg
+    sudo apt-get -y install transmission-daemon || error_Depends
     sudo /etc/init.d/transmission-daemon stop > /dev/null || error_Msg
 
     # replace running user to user and configdir with home-dir (default dir sucks for configs)
@@ -1150,17 +1167,17 @@ Install_XBMC () {
     sudo apt-get update > /dev/null
     case $VERSION in
         1*)
-            sudo apt-get -y install xbmc xbmc-standalone || error_Msg
+            sudo apt-get -y install xbmc xbmc-standalone || error_Depends
             Summ_XBMC_stable
             Summ_XBMC_stable >> /tmp/lasi_install.log
             ;;
         2*)
-            sudo apt-get -y install xorg alsa-base xbmc xbmc-live  || error_Msg
+            sudo apt-get -y install xorg alsa-base xbmc xbmc-live  || error_Depends
             Summ_XBMC_Live
             Summ_XBMC_Live >> /tmp/lasi_install.log
             ;;
         3*)
-            sudo apt-get -y install xbmc || error_Msg
+            sudo apt-get -y install xbmc || error_Depends
             Summ_XBMC_unstable
             Summ_XBMC_unstable >> /tmp/lasi_install.log
             ;;
@@ -1185,7 +1202,7 @@ Reboot your machine and XBMC will be started
 
 Summ_XBMC_unstable () {
 echo "
-Done! Installed XBMC stable.
+Done! Installed XBMC unstable.
 XBMC can now be started from the menu.
 "
 }
