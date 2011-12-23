@@ -18,6 +18,7 @@ helptext () {
                           defaults to ~/.couchpotato.
         --pidfile=      : Set full path to pidfile, 
                           defaults to /var/run/couchpotato/couchpotato.pid.
+        --port=         : Set forced port where couchpotato has to listen.
 
         --startup       : Edit /etc/default/couchpotato to autostart 
                           couchpotato when this machine starts.
@@ -70,6 +71,7 @@ DAEMON=
 QUIET=
 CONFIG="--config=/home/$USER/.couchpotato/config.ini"
 DATA="--datadir=/home/$USER/.couchpotato"
+PORT=
 PID=
 
 # check if defaults are overwritten @ commandline
@@ -89,6 +91,8 @@ do
         --pidfile*)
             PID=$option
             ;;
+        --port*)
+            PORT=$option
         --quiet)
             QUIET=$option
             ;;

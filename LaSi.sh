@@ -516,6 +516,7 @@ Install_CouchPotato () {
     sudo dpkg -i /tmp/couchpotato.deb || error_Depends
 
     if ! pgrep -f CouchPotato.py > /dev/null; then
+        check_Port
         sudo sed -i "
             s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
             s/RUN_AS.*/RUN_AS=$USER/
