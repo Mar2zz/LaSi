@@ -83,6 +83,14 @@ check_Apt () {
     fi
 }
 
+update_Apt () {
+    # update sources list and tell script its done
+    echo 
+    echo "Checking for newest packages..."
+    sudo apt-get update > /dev/null
+    update_apt=1
+}
+
 check_PPA () {
     if ! which apt-add-repository > /dev/null; then
         echo "Installing python-software-properties to install ppa's"
@@ -106,7 +114,7 @@ check_Pip () {
 
 check_Easy () {
     if ! which easy_install > /dev/null; then
-        sudo apt-get install python-setuptools || error_Msg
+        sudo apt-get -y install python-setuptools || error_Msg
     fi
     easy_install=`which easy_install`
 }
@@ -124,9 +132,29 @@ check_Log () {
 check_Port () {
     #check if ports are in use before starting
     if lsof -i tcp@0.0.0.0:$set_port > /dev/null; then
-        echo # port in use
-#    else
-        # port not in use
+        # ask if user want's to set another port
+        echo 
+        echo "$set_app runs on http://$HOSTNAME:$set_port by default,"
+        echo "but that is in use allready."
+        echo "Trying other ports to run on..."
+
+        # starting a +100 loop to find next availabe port
+        while lsof -i tcp@0.0.0.0:$set_port > /dev/null; do
+            set_port=$(($set_port +100))
+        done
+
+        # new port found, now set it
+        echo "$set_port is free, $set_app wil be set to use it."
+
+        # uncapitalize programname
+        set_app_lower=$(echo $set_app | tr '[A-Z]' '[a-z]')
+
+        # edit configfile to set new port
+        sudo sed -i "
+            /=/s/PORT.*/PORT=$set_port/
+        " /etc/default/$set_app_lower
+        echo "Port $set_port is set in /etc/default/$set_app_lower..."
+        echo "This will always override ports set in config.ini or webinterface!"
     fi
 }
 
@@ -164,8 +192,8 @@ options=( $@ )
 
 check_Variables () {
     # check if input is correct and set them
-    for option in ${options[@]}
-    do
+    for option in ${options[@]}; do
+
         case $option in
 
             --help|-h)
@@ -256,8 +284,11 @@ LaSi_Menu (){
         items=( $SELECT )
 
         # go through array one by one
-        for item in ${items[@]}
-        do
+        for item in ${items[@]}; do
+
+            # first check if sources need an update
+            if [ $unattended = 1 ]; then [ $update_apt = 1 ] || update_Apt; fi
+
             case "$item" in
 
                 # beets
@@ -543,6 +574,7 @@ Install_Headphones () {
     sudo dpkg -i /tmp/headphones.deb || error_Depends
 
     if ! pgrep -f Headphones.py > /dev/null; then
+        check_Port
         sudo sed -i "
             s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
             s/RUN_AS.*/RUN_AS=$USER/
@@ -651,7 +683,10 @@ Install_Sabnzbdplus () {
     # Update list, install and configure
     echo "Checking for newest version..."
     sudo apt-get update > /dev/null
-    if sudo apt-get -y install sabnzbdplus || error_Depends | grep '/etc/default/sabnzbdplus'; then
+    sudo apt-get -y install sabnzbdplus || error_Depends
+
+    if ! pgrep -f /usr/bin/sabnzbplus > /dev/null; then
+        check_Port
         sudo sed -i "
             /=/s/USER.*/USER=$USER/
             /=/s/HOST.*/HOST=0.0.0.0/
@@ -713,6 +748,7 @@ Install_SickBeard () {
     sudo dpkg -i /tmp/sickbeard.deb || error_Depends
 
     if ! pgrep -f SickBeard.py > /dev/null; then
+        check_Port
         sudo sed -i "
             s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
             s/RUN_AS.*/RUN_AS=$USER/
@@ -1041,15 +1077,18 @@ Info_Transmission () {
 Install_Transmission () {
 
     sudo apt-get -y install transmission-daemon || error_Depends
-    sudo /etc/init.d/transmission-daemon stop > /dev/null || error_Msg
 
-    # replace running user to user and configdir with home-dir (default dir sucks for configs)
-    sudo sed -i "s/USER=debian-transmission/USER=$USER/g" /etc/init.d/transmission-daemon
-    sudo sed -i "s#CONFIG_DIR=\"/var/lib/transmission-daemon/info\"#CONFIG_DIR=\"$HOME/.transmission\"#g" /etc/default/transmission-daemon
+    if grep 'USER=debian-transmission' /etc/init.d/transmission-daemon > /dev/null; then
+        sudo /etc/init.d/transmission-daemon stop > /dev/null || error_Msg
+        sudo sed -i "s/USER=debian-transmission/USER=$USER/g" /etc/init.d/transmission-daemon
+        sudo sed -i "s#CONFIG_DIR=\"/var/lib/transmission-daemon/info\"#CONFIG_DIR=\"$HOME/.transmission\"#g" /etc/default/transmission-daemon
+    fi
 
-    # start-stop to create config at new location
-    sudo /etc/init.d/transmission-daemon start > /dev/null || error_Msg
-    sudo /etc/init.d/transmission-daemon stop > /dev/null || error_Msg
+    if ! [ -e $HOME/.transmission/settings.json ]; then
+        # start-stop to create config at new location
+        sudo /etc/init.d/transmission-daemon start > /dev/null || error_Msg
+        sudo /etc/init.d/transmission-daemon stop > /dev/null || error_Msg
+    fi
 
     # download a blocklist to hide from nosy capitalists
     wget -O $HOME/.transmission/blocklists/level1.gz http://rps8755.ovh.net/blocklists/level1.gz || echo "Downloading blocklist failed, try again later"
@@ -1063,11 +1102,23 @@ Install_Transmission () {
     echo "Credentials:"
     echo "\"rpc-password\": \"password_webinterface\","
     echo "\"rpc-username\": \"username_webinterface\","
-    echo
+    echo "And very important:"
     echo "IP-adresses from which you want to connect from"
     echo "\"rpc-whitelist\": \"127.0.0.1,192.168.1.*\","
+
+    # check if default port is in use and tell to set another if it is
+    if lsof -i tcp@0.0.0.0:$set_port > /dev/null; then
+        echo 
+        echo "The default port $set_port is in use, you need to"
+        echo "edit \"rpc-port\": \"9091\" to another port."
+        while lsof -i tcp@0.0.0.0:$set_port > /dev/null; do
+            set_port=$(($set_port +100))
+        done
+        echo "For example port $set_port is free."
+    fi
+
     # give time to read output from above installprocess before returning to menu
-    echo
+    echo 
     read -sn 1 -p "Press a key to edit the $HOME/.transmission/settings.json"
     editor $HOME/.transmission/settings.json
 
@@ -1163,8 +1214,7 @@ Install_XBMC () {
     esac
 
     # Update list, install and configure
-    echo "Checking for newest version..."
-    sudo apt-get update > /dev/null
+
     case $VERSION in
         1*)
             sudo apt-get -y install xbmc xbmc-standalone || error_Depends
@@ -1271,6 +1321,8 @@ cf_Install () {
     echo
     case $REPLY in
     [Yy]*)
+        # update sources if needed
+        [ $update_apt = 1 ] || update_Apt
         Install_$set_app
         # give time to read output from above installprocess before returning to menu
         echo 
@@ -1435,10 +1487,12 @@ fi
 
 }
 
+
 ### RUN ALL FUNCTIONS ###
-check_Apt
-check_Variables
-check_Deb
-check_Log
-LaSi_Menu
+update_apt=0                    # this is set to 1 if one of repo-softwares is installed and updates the sources
+check_Apt                       # checks if this script is run on a debian-based machine
+check_Variables                 # checks for fast install and cronjob options which can be set @ commandline
+check_Deb                       # removes all previous used custommade deb-files from /tmp
+check_Log                       # Shows an installsummary if multiple programs were installed.
+LaSi_Menu                       # Show menu
 
