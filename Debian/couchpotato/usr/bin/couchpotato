@@ -93,6 +93,7 @@ do
             ;;
         --port*)
             PORT=$option
+            ;;
         --quiet)
             QUIET=$option
             ;;
