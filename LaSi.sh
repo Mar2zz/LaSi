@@ -534,7 +534,7 @@ Summ_CouchPotato () {
 echo "
 Done! Installed $set_app.
 Type couchpotato --help for options.
-CouchPotato is by default located @ http://$HOSTNAME:5000
+CouchPotato is by default located @ http://$HOSTNAME:$set_port
 "
 }
 
@@ -593,7 +593,7 @@ Summ_Headphones () {
 echo "
 Done! Installed $set_app.
 Type headphones --help for options
-Headphones is by default located @ http://$HOSTNAME:8181
+Headphones is by default located @ http://$HOSTNAME:$set_port
 "
 }
 
@@ -704,7 +704,7 @@ Summ_Sabnzbdplus () {
 echo "
 Done! Installed $set_app.
 Type sabnzbdplus --help for options
-Sabnzbdplus is by default located @ http://$HOSTNAME:8080
+Sabnzbdplus is by default located @ http://$HOSTNAME:$set_port
 "
 }
 
@@ -767,7 +767,7 @@ Summ_SickBeard () {
 echo "
 Done! Installed $set_app
 Type sickbeard --help for options
-SickBeard is by default located @ http://$HOSTNAME:8081
+SickBeard is by default located @ http://$HOSTNAME:$set_port
 "
 }
 
