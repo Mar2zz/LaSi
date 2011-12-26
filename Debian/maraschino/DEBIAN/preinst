@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -e
+
+# Stop maraschino service.
+# Stop maraschino service.
+if pgrep -f Maraschino.py > /dev/null; then
+    [ -e /etc/init.d/maraschino ] && /etc/init.d/maraschino stop
+fi
+
+# remove path if exists
+if [ -d /opt/maraschino ]; then
+    rm -Rf /opt/maraschino
+fi
+

@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -e
+
+# stop maraschino
+if pgrep -f Maraschino.py > /dev/null; then
+    /etc/init.d/maraschino stop
+fi
+
+# make sure process is killed ok and pidfile is removed
+if pgrep -f Maraschino.py > /dev/null; then
+    rm -f $(ps up $(pgrep -f Maraschino.py) | grep pidfile | sed "s/.*--pidfile=//g") > /dev/null
+    kill -9 $(pgrep -f Maraschino.py) > /dev/null
+fi
+
+# remove path if exists
+if [ -d /opt/maraschino ]; then
+    rm -Rf /opt/maraschino
+fi
+

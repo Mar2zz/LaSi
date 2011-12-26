@@ -1,0 +1,17 @@
+Package: maraschino
+Version: 2011.12.26
+Section: web 
+Priority: optional
+Architecture: all
+Essential: no
+Depends: python (>= 2.6)
+Recommends: git
+Installed-Size: 21000
+Maintainer: Mar2zz <lasi.mar2zz@gmail.com>
+Provides: maraschino
+Description: Maraschino is a webbased monitor for all your media-apps. is an automatic NZB and torrent downloader.
+ .
+ Maraschino can be found @ http://couchpotatoapp.com/ and is written and maintained by Mr. Kipling and others
+ .
+ Maraschino is installed in /opt/maraschino, config and data in ~/.maraschino (configurable).
+ Type maraschino --help for options

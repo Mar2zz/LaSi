@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -e
+
+# remove stuff if purge
+if [ $1 = 'purge' ]; then
+    /usr/sbin/update-rc.d -f maraschino remove | grep /etc/init.d/maraschino
+    rm -f /etc/cron.hourly/maraschino
+    rm -f /etc/cron.daily/maraschino
+    rm -f /etc/cron.weekly/maraschino
+    rm -f /etc/cron.monthly/maraschino
+fi
+
