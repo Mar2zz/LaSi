@@ -653,7 +653,7 @@ Install_Maraschino () {
             s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
             s/RUN_AS.*/RUN_AS=$USER/
             s/WEB_UPDATE=0/WEB_UPDATE=1/g
-        " /etc/default/headphones
+        " /etc/default/maraschino
         echo "Changed daemon settings..."
         sudo /etc/init.d/maraschino start || error_Msg
     fi
@@ -666,8 +666,7 @@ Summ_$set_app >> /tmp/lasi_install.log
 Summ_Maraschino () {
 echo "
 Done! Installed $set_app.
-Type headphones --help for options
-Headphones is by default located @ http://$HOSTNAME:$set_port
+$set_app is by default located @ http://$HOSTNAME:$set_port
 "
 }
 
