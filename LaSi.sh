@@ -70,7 +70,8 @@ Copy the text with errors above and report an issue at the following address:
 https://github.com/Mar2zz/LaSi/issues
 " >> /tmp/lasi_install.log
 
-continue
+# for fast install continue in next item, else quit installer
+if [ "${#items[@]}" > 1 ]; then continue; else break; fi
 }
 
 
