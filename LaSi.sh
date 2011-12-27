@@ -1432,7 +1432,7 @@ set_Cronjob () {
     set_app_lower=$(echo $set_app | tr '[A-Z]' '[a-z]')
 
     case $set_app in
-        CouchPotato|Headphones|SickBeard)
+        CouchPotato|Headphones|SickBeard|Maraschino)
 
             cron_exe=$(which git)
             cron_dir="[ -d /opt/$set_app_lower/.git ] || exit 0"
@@ -1440,13 +1440,13 @@ set_Cronjob () {
             cron_act="    etc/init.d/$set_app_lower restart || exit 1; fi"
             ;;
 
-        Mediafrontpage)
+#        Mediafrontpage)
 
-            cron_exe='[ -x /usr/bin/git ] || exit 0'
-            cron_dir="[ -d /var/www/$set_app_lower/.git ] || exit 0"
-            cron_chk="if $cron_exe --git-dir=/var/www/$set_app_lower pull | grep 'files changed'; then"
-            cron_act="    chown -R www-data /var/www/$set_app_lower || exit 1; fi"
-            ;;
+#            cron_exe='[ -x /usr/bin/git ] || exit 0'
+#            cron_dir="[ -d /var/www/$set_app_lower/.git ] || exit 0"
+#            cron_chk="if $cron_exe --git-dir=/var/www/$set_app_lower pull | grep 'files changed'; then"
+#            cron_act="    chown -R www-data /var/www/$set_app_lower || exit 1; fi"
+#            ;;
 
         Spotweb)
 
