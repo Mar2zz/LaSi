@@ -261,7 +261,7 @@ LaSi_Menu (){
         echo "1. Beets                  6. SickBeard"
         echo "2. CouchPotato            7. Spotweb"
         echo "3. Headphones             8. Subliminal"
-        echo "4. Mediafrontpage         9. Tranmission"
+        echo "4. Maraschino             9. Tranmission"
         echo "5. Sabnzbdplus           10. XBMC (desktop)"
         echo 
         # tell about commandline options
@@ -315,9 +315,17 @@ LaSi_Menu (){
                     if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
                     ;;
 
-                # mediafrontpage
+#                # mediafrontpage
+#                4)
+#                    set_app=Mediafrontpage
+#                    if [ $unattended = 1 ]; then Install_$set_app; else Info_$set_app; fi
+#                    if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
+#                    ;;
+
+                # maraschino
                 4)
-                    set_app=Mediafrontpage
+                    set_app=Maraschino
+                    set_port=7000
                     if [ $unattended = 1 ]; then Install_$set_app; else Info_$set_app; fi
                     if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
                     ;;
@@ -598,6 +606,71 @@ Type headphones --help for options
 Headphones is by default located @ http://$HOSTNAME:$set_port
 "
 }
+
+
+####################
+#### MARASCHINO ####
+####################
+
+Info_Maraschino () {
+    clear
+    echo "
+*###############################################################*
+*###################### MARASCHINO #############################* 
+#                                                               #
+# Maraschino is a webpage that overviews a XBMC-mediacenter     #
+# and serverapplications like Sabnzbd, Sickbeard and others.    #
+#                                                               #
+# Some of it's features are:                                    #
+#   - Customizable applications module with:                    #
+#   - recently added media                                      #
+#   - Currently playing bar                                     #
+#   - Sabnzbd module                                            #
+#   - SickBeard coming episodes                                 #
+#   - Trakt.tv recommendations                                  #
+#   - Diskspace info                                            #
+#                                                               #
+*###############################################################*
+#                                                               #
+# Maraschino is written by Mr. Kipling and others               #
+#                                                               #
+# Visit http://www.maraschinoproject.com/                       #
+*###############################################################*"
+    cf_Choice
+}
+
+
+Install_Maraschino () {
+
+    check_Git
+    wget -O /tmp/maraschino.deb $DROPBOX/LaSi_Repo/maraschino.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
+
+    sudo dpkg -i /tmp/maraschino.deb || error_Depends
+
+    if ! pgrep -f "maraschino.py -q" > /dev/null; then
+        check_Port
+        sudo sed -i "
+            s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
+            s/RUN_AS.*/RUN_AS=$USER/
+            s/WEB_UPDATE=0/WEB_UPDATE=1/g
+        " /etc/default/headphones
+        echo "Changed daemon settings..."
+        sudo /etc/init.d/maraschino start || error_Msg
+    fi
+
+Summ_$set_app
+Summ_$set_app >> /tmp/lasi_install.log
+
+}
+
+Summ_Maraschino () {
+echo "
+Done! Installed $set_app.
+Type headphones --help for options
+Headphones is by default located @ http://$HOSTNAME:$set_port
+"
+}
+
 
 ########################
 #### MEDIAFRONTPAGE ####
