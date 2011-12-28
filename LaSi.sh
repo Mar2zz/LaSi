@@ -520,7 +520,7 @@ Info_CouchPotato () {
 Install_CouchPotato () {
 
     check_Git
-    wget -O /tmp/couchpotato.deb $DROPBOX/LaSi_Repo/couchpotato.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
+    wget -nv -O /tmp/couchpotato.deb $DROPBOX/LaSi_Repo/couchpotato.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
 
     sudo dpkg -i /tmp/couchpotato.deb || error_Depends
 
@@ -579,7 +579,7 @@ Info_Headphones () {
 Install_Headphones () {
 
     check_Git
-    wget -O /tmp/headphones.deb $DROPBOX/LaSi_Repo/headphones.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
+    wget -nv -O /tmp/headphones.deb $DROPBOX/LaSi_Repo/headphones.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
 
     sudo dpkg -i /tmp/headphones.deb || error_Depends
 
@@ -643,9 +643,36 @@ Info_Maraschino () {
 Install_Maraschino () {
 
     check_Git
-    wget -O /tmp/maraschino.deb $DROPBOX/LaSi_Repo/maraschino.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
+    wget -nv -O /tmp/maraschino.deb $DROPBOX/LaSi_Repo/maraschino.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
 
-    sudo dpkg -i /tmp/maraschino.deb || error_Depends
+    Question () {
+        echo 
+        echo "Choose a branch to install"
+        echo "1. Master"
+        echo "2. Experimental"
+        read -p ": " VERSION
+        echo 
+        case $VERSION in
+            1*)
+                check_Pip
+                packages="flask flask-sqlalchemy cherrypy jsonrpclib"
+                echo 
+                echo "Python-setuptools will now install the following packages:"
+                echo "$packages ..."
+                sudo $pip install $packages > /dev/null || { sudo $easy_install $packages > /dev/null || error_Msg; }
+                sudo dpkg -i /tmp/maraschino.deb || error_Depends
+                ;;
+            2*)
+                sudo dpkg -i /tmp/maraschino.deb || error_Depends
+                cd /opt/maraschino && sudo git checkout experimental > /dev/null; cd - >/dev/null
+                ;;
+            *)
+                echo "Answer 1 or 2"
+                Question
+                ;;
+        esac
+    }
+    Question
 
     if ! pgrep -f "maraschino.py -q" > /dev/null; then
         #check_Port
@@ -698,7 +725,7 @@ Info_Mediafrontpage () {
 Install_Mediafrontpage () {
 
     check_Git
-    wget -O /tmp/mediafrontpage.deb $DROPBOX/LaSi_Repo/mediafrontpage.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
+    wget -nv -O /tmp/mediafrontpage.deb $DROPBOX/LaSi_Repo/mediafrontpage.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
     sudo dpkg -i /tmp/mediafrontpage.deb || error_Depends
 
 Summ_$set_app
@@ -818,7 +845,7 @@ Info_SickBeard () {
 Install_SickBeard () {
 
     check_Git
-    wget -O /tmp/sickbeard.deb $DROPBOX/LaSi_Repo/sickbeard.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
+    wget -nv -O /tmp/sickbeard.deb $DROPBOX/LaSi_Repo/sickbeard.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
     sudo dpkg -i /tmp/sickbeard.deb || error_Depends
 
     if ! pgrep -f SickBeard.py > /dev/null; then
@@ -877,7 +904,7 @@ Info_Spotweb () {
 Install_Spotweb () {
 
     check_Git
-    wget -O /tmp/spotweb.deb $DROPBOX/LaSi_Repo/spotweb.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
+    wget -nv -O /tmp/spotweb.deb $DROPBOX/LaSi_Repo/spotweb.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
     sudo dpkg -i /tmp/spotweb.deb || error_Depends
 
     sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/apache2/php.ini
