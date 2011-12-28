@@ -525,7 +525,7 @@ Install_CouchPotato () {
     sudo dpkg -i /tmp/couchpotato.deb || error_Depends
 
     if ! pgrep -f CouchPotato.py > /dev/null; then
-        check_Port
+        #check_Port
         sudo sed -i "
             s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
             s/RUN_AS.*/RUN_AS=$USER/
@@ -584,7 +584,7 @@ Install_Headphones () {
     sudo dpkg -i /tmp/headphones.deb || error_Depends
 
     if ! pgrep -f Headphones.py > /dev/null; then
-        check_Port
+        #check_Port
         sudo sed -i "
             s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
             s/RUN_AS.*/RUN_AS=$USER/
@@ -648,7 +648,7 @@ Install_Maraschino () {
     sudo dpkg -i /tmp/maraschino.deb || error_Depends
 
     if ! pgrep -f "maraschino.py -q" > /dev/null; then
-        check_Port
+        #check_Port
         sudo sed -i "
             s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
             s/RUN_AS.*/RUN_AS=$USER/
@@ -760,7 +760,7 @@ Install_Sabnzbdplus () {
     sudo apt-get -y install sabnzbdplus || error_Depends
 
     if ! pgrep -f /usr/bin/sabnzbplus > /dev/null; then
-        check_Port
+        #check_Port
         sudo sed -i "
             /=/s/USER.*/USER=$USER/
             /=/s/HOST.*/HOST=0.0.0.0/
@@ -822,7 +822,7 @@ Install_SickBeard () {
     sudo dpkg -i /tmp/sickbeard.deb || error_Depends
 
     if ! pgrep -f SickBeard.py > /dev/null; then
-        check_Port
+        #check_Port
         sudo sed -i "
             s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
             s/RUN_AS.*/RUN_AS=$USER/
