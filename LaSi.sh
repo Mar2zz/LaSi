@@ -86,10 +86,27 @@ check_Apt () {
 
 update_Apt () {
     # update sources list and tell script its done
-    echo 
-    echo "Checking for newest packages..."
-    sudo apt-get update > /dev/null
-    update_apt=1
+    if [ -e "/tmp/lasi_apt_update.log" ]; then
+        today=$(date +%Y-%m-%d)
+        yatod=$(cat /tmp/lasi_apt_update.log)
+        if [ "$today" = "$yatod" ]; then
+            echo 
+            echo "Packagelist is up to date"
+            update_apt=1
+        else
+            echo
+            echo "Checking for newest packages..."
+            echo $(date +%Y-%m-%d) > /tmp/lasi_apt_update.log
+            sudo apt-get update > /dev/null
+            update_apt=1
+        fi
+    else
+            echo 
+            echo "Checking for newest packages..."
+            echo $(date +%Y-%m-%d) > /tmp/lasi_apt_update.log
+            sudo apt-get update > /dev/null
+            update_apt=1
+    fi
 }
 
 check_PPA () {
@@ -111,6 +128,7 @@ check_Pip () {
         sudo apt-get -y install python-pip || check_Easy
     fi
     pip=`which pip`
+    pip="$pip -q"
 }
 
 check_Easy () {
@@ -636,6 +654,7 @@ Info_Maraschino () {
 #                                                               #
 # Visit http://www.maraschinoproject.com/                       #
 *###############################################################*"
+    packages="flask flask-sqlalchemy cherrypy jsonrpclib"
     cf_Choice
 }
 
@@ -655,7 +674,6 @@ Install_Maraschino () {
         case $VERSION in
             1*)
                 check_Pip
-                packages="flask flask-sqlalchemy cherrypy jsonrpclib"
                 echo 
                 echo "Python-setuptools will now install the following packages:"
                 echo "$packages ..."
@@ -1370,6 +1388,7 @@ cf_Choice () {
             echo 
             echo "Options:"
             echo "1. Install $set_app"
+            echo "2. Uninstall $set_app"
             echo 
             echo "B. Back to menu"
             echo "Q. Quit"
@@ -1378,7 +1397,8 @@ cf_Choice () {
             echo 
             echo "Options:"
             echo "1. Install $set_app"
-            echo "2. Set cronjob for $set_app"
+            echo "2. Remove $set_app"
+            echo "3. Set cronjob for $set_app"
             echo 
             echo "B. Back to menu"
             echo "Q. Quit"
@@ -1392,6 +1412,9 @@ cf_Choice () {
             cf_Install
             ;;
         2)
+            cf_Uninstall
+            ;;
+        3)
             case $set_app in
                 Sabnzbdplus|Transmission|XBMC)
                     cf_Choice ;;
@@ -1428,7 +1451,10 @@ cf_Install () {
         # give time to read output from above installprocess before returning to menu
         echo 
         read -sn 1 -p "Press a key to continue"
-        Info_$set_app
+        # for multiple install continue in next item, else back to info
+        if [ "${#items[@]}" = 1 ]; then
+            Info_$set_app
+        fi
         ;;
     [Nn]*)
         LaSi_Menu
@@ -1438,6 +1464,49 @@ cf_Install () {
         ;;
     *)
         echo "Answer yes to install" 
+        echo "no for menu"
+        echo "or Q to quit"
+        cf_Install
+        ;;
+    esac
+
+    }
+
+
+cf_Uninstall () {
+
+    set_app_lower=$(echo $set_app | tr '[A-Z]' '[a-z]')
+
+    echo 
+    echo "Are you sure you want to continue and remove $set_app?"
+    read -p "[yes/no]: " REPLY
+    echo
+    case $REPLY in
+    [Yy]*)
+        case $set_app in
+            Beets|Subliminal)
+                sudo $pip uninstall $set_app_lower || error_Msg
+                ;;
+            *)
+                sudo apt-get -y remove $set_app_lower
+            ;;
+        esac
+        # give time to read output from above installprocess before returning to menu
+        echo 
+        read -sn 1 -p "Press a key to continue"
+        # for multiple install continue in next item, else back to info
+        if [ "${#items[@]}" = 1 ]; then
+            Info_$set_app
+        fi
+        ;;
+    [Nn]*)
+        LaSi_Menu
+        ;;
+    [Qq]*)
+        exit
+        ;;
+    *)
+        echo "Answer yes to remove" 
         echo "no for menu"
         echo "or Q to quit"
         cf_Install
@@ -1583,7 +1652,10 @@ if [ $ask_schedule = 0 ]; then
     # give time to read output from above installprocess before returning to menu
     echo 
     read -sn 1 -p "Press a key to continue"
-    Info_$set_app
+    # for multiple install continue in next item, else back to info
+    if [ "${#items[@]}" = 1 ]; then
+        Info_$set_app
+    fi
 fi
 
 }
