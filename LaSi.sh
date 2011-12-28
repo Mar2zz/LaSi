@@ -186,6 +186,8 @@ usage: ./LaSi.sh --options
 OPTIONS:
     --fast | -f         : install unattended (no info shown and no confirmations needed)
                           (note: Beets, Spotweb and XBMC can ask questions)
+    --purge | -p        : instead of removing an application purge it. Purge also
+                          removes the daemon and deamon-settingsfile and cronjobs if set.
 
     --cronjob=value     : value can be ask|hourly|daily|weekly|monthly
 
@@ -205,6 +207,7 @@ OPTIONS:
 unattended=0
 ask_schedule=0
 schedule=0
+uninstaller=remove
 
 # create array
 options=( $@ )
@@ -222,6 +225,10 @@ check_Variables () {
             --fast|-f)
                     unattended=1
                     ;;
+
+            --purge|-p)
+                uninstaller=purge
+                ;;
 
             --cronjob*)
                 crontime=$(echo $option | sed 's/--cronjob=//')
@@ -1478,7 +1485,7 @@ cf_Uninstall () {
     set_app_lower=$(echo $set_app | tr '[A-Z]' '[a-z]')
 
     echo 
-    echo "Are you sure you want to continue and remove $set_app?"
+    echo "Are you sure you want to continue and $uninstaller $set_app?"
     read -p "[yes/no]: " REPLY
     echo
     case $REPLY in
@@ -1488,7 +1495,7 @@ cf_Uninstall () {
                 sudo $pip uninstall $set_app_lower || error_Msg
                 ;;
             *)
-                sudo apt-get -y remove $set_app_lower
+                sudo apt-get -y $uninstaller $set_app_lower
             ;;
         esac
         # give time to read output from above installprocess before returning to menu
@@ -1506,7 +1513,7 @@ cf_Uninstall () {
         exit
         ;;
     *)
-        echo "Answer yes to remove" 
+        echo "Answer yes to $uninstaller" 
         echo "no for menu"
         echo "or Q to quit"
         cf_Install
