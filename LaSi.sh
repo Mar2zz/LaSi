@@ -119,7 +119,7 @@ check_PPA () {
 check_Git () {
     # install git for benefits like updating from commandline
     if ! which git > /dev/null; then
-        sudo apt-get -y install git || error_Msg
+        sudo apt-get -y install git || { sudo apt-get install -y git-core || error_Msg; }
     fi
 }
 
