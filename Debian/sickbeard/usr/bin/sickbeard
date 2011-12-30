@@ -10,6 +10,7 @@ helptext () {
     OPTIONS:
         --daemon        : run in background
         --quiet         : run silent
+        --nolaunch      : don't start a browser
 
     ENVIRONMENT:        : Example --configdir=/path/to/config.ini.
         --config=       : Set full path to config.ini,
@@ -73,6 +74,7 @@ SickBeard=/opt/sickbeard/SickBeard.py
 DAEMON=
 QUIET=
 PORT=
+NOLAUNCH=
 CONFIG="--config=/home/$USER/.sickbeard/config.ini"
 DATA="--datadir=/home/$USER/.sickbeard"
 PID=
@@ -98,10 +100,13 @@ do
             PORT=$option
             ;;
         --quiet)
-            QUIET=$option
+            DAEMON="$DAEMON $option"
             ;;
         --daemon)
-            DAEMON=$option
+            DAEMON="$DAEMON $option"
+            ;;
+        --nolaunch)
+            DAEMON="$DAEMON $option"
             ;;
         --symlink*)
             sympath=$(echo $option | sed 's!--symlink=!!g')
