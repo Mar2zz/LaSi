@@ -10,6 +10,7 @@ helptext () {
     OPTIONS:
         --daemon        : run in background
         --quiet         : run silent
+        --nolaunch      : don't start browser
 
     ENVIRONMENT:        : Example --configdir=/path/to/config.ini.
         --config=       : Set full path to config.ini,
@@ -92,13 +93,16 @@ do
             PID=$option
             ;;
         --port*)
-            PORT=$option
+            port=$option
             ;;
         --quiet)
-            QUIET=$option
+            DAEMON="$DAEMON $option"
             ;;
         --daemon|-d)
-            DAEMON='-d'
+            DAEMON="$DAEMON $option"
+            ;;
+        --nolaunch)
+            DAEMON="$DAEMON $option"
             ;;
         --help)
             helptext
