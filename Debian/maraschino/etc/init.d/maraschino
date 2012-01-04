@@ -69,53 +69,10 @@ load_settings() {
             return 1; }
         [ -z "${RUN_AS%:*}" ] && exit 1
 
-        DAEMON_OPTS="maraschino.py -q"
+        DAEMON_OPTS="maraschino-cherrypy.py"
 
         [ -n "$PID_FILE" ] && PID_FILE=$PID_FILE
-        [ -z "$PID_FILE" ] && PID_FILE=/var/run/maraschino/maraschino.pid
-
-        # dirty solutions until argparse is part of maraschino
-
-        # set settingsfile
-        [ -n "$CONFIG" ] && {
-            CONFIG_PATH=`dirname $CONFIG`;
-            [ -d "$CONFIG_PATH" ] || mkdir-p "$CONFIG_PATH";
-            [ -e "$CONFIG_PATH/settings.py" ] || cp -f $APP_PATH\settings_example.py "$CONFIG_PATH/settings.py";
-            [ -e "$APP_PATH/settings.py" ] && ln -s "$CONFIG" $APP_PATH/settings.py; }
-        [ -z $CONFIG ] && {
-            CONFIG_PATH=/home/$RUN_AS/.maraschino;
-            [ -d "$CONFIG_PATH" ] || mkdir -p "$CONFIG_PATH";
-            [ -e "$CONFIG_PATH/settings.py" ] || cp -f $APP_PATH/settings_example.py "$CONFIG_PATH/settings.py";
-            [ -e "$APP_PATH/settings.py" ] || ln -s "$CONFIG_PATH/settings.py" $APP_PATH/settings.py; }
-
-        # check if settingsfile is created
-        [ -e "$APP_PATH/settings.py" ] || { log_warning_msg "$DESC: config could not be created, aborting. See $SETTINGS" && exit 1; }
-
-        # set port
-        [ -n "$PORT" ] && sed -i "
-                            /#PORT/s/#//g
-                            /=/s/PORT = .*/PORT = $PORT/g
-                        " "$CONFIG_PATH/settings.py"
-
-        # set database
-        # if set
-        [ -n "$DATADIR" ] && {
-            DATADIR_PATH="$DATADIR";
-            sed -i "s!/DATABASE = .*!DATABASE = '$DATADIR/maraschino.db'!g" "$CONFIG_PATH/settings.py"; 
-            [ -e "$DATADIR" ] || $DAEMON $APP_PATH/setup.py; }
-
-        # if not set use default location
-        [ -z "$DATADIR" ] && {
-            DATADIR_PATH=/home/$RUN_AS/.maraschino;
-            sed -i "s!DATABASE = .*!DATABASE = '/home/$RUN_AS/.maraschino/maraschino.db'!g" "$CONFIG_PATH/settings.py";
-            [ -e "/home/$RUN_AS/.maraschino/maraschino.db" ] || $DAEMON $APP_PATH/setup.py; }
-
-        # check if database is created
-        [ -e "$DATADIR_PATH" ] || { log_warning_msg "$DESC: database could not be created, aborting. See $SETTINGS" && exit 1; }
-
-        # set rights
-        chown -R $RUN_AS:$RUN_AS "$CONFIG_PATH"
-        chown -R $RUN_AS:$RUN_AS "$DATADIR_PATH"
+        [ -n "$PID_FILE" ] || PID_FILE=/var/run/maraschino/maraschino.pid
 
         SETTINGS_LOADED=TRUE
     fi

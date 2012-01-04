@@ -3,14 +3,19 @@
 set -e
 
 # stop maraschino
-if pgrep -f Maraschino.py > /dev/null; then
+if pgrep -f maraschino-cherrypy.py > /dev/null; then
     /etc/init.d/maraschino stop
 fi
 
 # make sure process is killed ok and pidfile is removed
-if pgrep -f Maraschino.py > /dev/null; then
-    rm -f $(ps up $(pgrep -f Maraschino.py) | grep pidfile | sed "s/.*--pidfile=//g") > /dev/null
-    kill -9 $(pgrep -f Maraschino.py) > /dev/null
+if pgrep -f maraschino-cherrypy.py > /dev/null; then
+    rm -f $(ps up $(pgrep -f maraschino-cherrypy.py) | grep pidfile | sed "s/.*--pidfile=//g") > /dev/null
+    kill -9 $(pgrep -f maraschino-cherrypy.py) > /dev/null
+fi
+
+# backup settings.py if it exists
+if [ -e /opt/maraschino/settings.py ]; then
+    mv -f /opt/maraschino/settings.py /tmp/maraschino-settings.py
 fi
 
 # remove path if exists
