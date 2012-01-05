@@ -52,7 +52,7 @@ LOG_PATH=$CFG_PATH/Logs
 DAEMON=/opt/bin/python2.6
 
 # startup args
-DAEMON_OPTS=" $APP_PATH/CouchPotato.py -d --nolaunch --config=$CFG_PATH/config.ini --datadir=$CFG_PATH"
+DAEMON_OPTS=" $APP_PATH/CouchPotato.py -d --nolaunch --config=$CFG_PATH/config.ini --datadir=$CFG_PATH --pidfile=$PID_FILE"
 
 # app name
 DESC=CouchPotato
