@@ -12,6 +12,10 @@
 # Location for this script: /opt/etc/init.d/
 #
 # Version:
+# 2012-01-05 by Jeroenve
+# - Browser never started with --nolaunch option
+# - Process ID implemented for shutdown
+#
 # 2011-11-11 by Mar2zz
 # - Override config/data location in daemonsettings
 # - Some cleanups
@@ -38,6 +42,9 @@ APP_PATH=/volume1/@appstore/couchpotato
 # path where config.ini and database is stored
 CFG_PATH=/volume1/@appstore/.couchpotato
 
+# path where the PID file is stored
+PID_FILE=${CFG_PATH}/couchpotato.pid
+
 # log directory
 LOG_PATH=$CFG_PATH/Logs
 
@@ -45,7 +52,7 @@ LOG_PATH=$CFG_PATH/Logs
 DAEMON=/opt/bin/python2.6
 
 # startup args
-DAEMON_OPTS=" $APP_PATH/CouchPotato.py -d --config=$CFG_PATH/config.ini --datadir=$CFG_PATH"
+DAEMON_OPTS=" $APP_PATH/CouchPotato.py -d --nolaunch --config=$CFG_PATH/config.ini --datadir=$CFG_PATH"
 
 # app name
 DESC=CouchPotato
@@ -55,25 +62,10 @@ RUN_AS=couchpotato
 
 ############### END EDIT ME ##################
 
+# Daemon check
+test -x $DAEMON || exit 0
+
 GIT=$(which git)
-
-host_check () {
-    PORT=$(grep -m1 port $CFG_PATH/config.ini | sed 's/port = //g');
-    USERNAME=$(grep -m1 username $CFG_PATH/config.ini | sed 's/username = //g');
-    PASSWORD=$(grep -m2 -n password $CFG_PATH/config.ini | grep [0-9][0-9]: | sed 's/[0-9][0-9]:password = //g');
-    WEBROOT=$(grep -m1 urlbase $CFG_PATH/config.ini | sed 's/urlbase = //g');
-
-    if [ "$WEBROOT" == "\"\"" ]; then WEBROOT=; fi
-    if [ "$USERNAME" == "\"\"" ]; then USERNAME=; fi
-    if [ "$PASSWORD" == "\"\"" ]; then PASSWORD=; fi
-    if [ "$USERNAME" != "" ]; then AUTH="--user=$USERNAME --password=$PASSWORD"; fi
-
-    # Check is webroot is specified, if not use port
-    if [ "$WEBROOT" != "" ]; then URL="http://localhost/$WEBROOT"; else URL="http://localhost:${PORT}"; fi
-
-    # Define exit URL
-    EXIT=$URL/config/exit/
-}
 
 # check if daemon exists and link it
 python_check () {
@@ -90,6 +82,13 @@ conf_dir_check () {
     chown -R ${RUN_AS}:users $CFG_PATH
 }
 
+# Retrieve the process ID
+get_pid () {
+    if [ -f $PID_FILE ]; then
+        PID=$(cat $PID_FILE)
+    fi
+}
+
 start_daemon () {
     echo "* Starting $DESC ..."
 
@@ -101,35 +100,35 @@ start_daemon () {
 }
 
 stop_daemon () {
+    # Shutdown
+    # Get the proces ID
+    get_pid
+    
     echo "* Stopping $DESC ..."
-
-    host_check
-    wget -q --spider $AUTH $EXIT > /dev/null || echo "Fail!"
+    kill $PID
 
     # Wait until shutdown is initiated.
     counter=20
-
-    while [ $counter -gt 0 ] 
-    do
+    while [ $counter -gt 0 ]; do
         daemon_status || break
         let counter=counter-1
-        sleep 1
+        sleep 2
     done
-
-    # Let it die
-    sleep 10
+    
     echo "Done!"
 }
 
 daemon_status () {
-    # Check if it is still listening @ port (and bypass this check first start)
-    if [ -e $CFG_PATH/config.ini ]; then
-        host_check
-        wget -q --spider $AUTH $URL > /dev/null
-    else
-        echo "First run, creating config.ini"
-        return 1
+    # Get the proces ID
+    get_pid
+    if [ $PID ]; then
+        PID_res=$(ps | grep -c $PID)
+        if [ $PID_res -eq 2 ]; then
+            return 0
+        fi
     fi
+    
+    return 1
 }
 
 run_update () {
@@ -159,7 +158,7 @@ case "$1" in
             exit 0
         fi
         ;;
-    restart)
+    restart|force-reload)
         if daemon_status; then
             stop_daemon
             start_daemon
