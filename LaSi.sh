@@ -351,7 +351,6 @@ LaSi_Menu (){
                 4)
                     set_app=Maraschino
                     set_port=7000
-                    packages="flask flask-sqlalchemy cherrypy jsonrpclib"
                     if [ $unattended = 1 ]; then Install_$set_app; else Info_$set_app; fi
                     if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
                     ;;
@@ -680,11 +679,6 @@ Install_Maraschino () {
         echo 
         case $VERSION in
             1*)
-                check_Pip
-                echo 
-                echo "Python-setuptools will now install the following packages:"
-                echo "$packages ..."
-                sudo $pip install $packages > /dev/null || { sudo $easy_install $packages > /dev/null || error_Msg; }
                 sudo dpkg -i /tmp/maraschino.deb || error_Depends
                 ;;
             2*)
