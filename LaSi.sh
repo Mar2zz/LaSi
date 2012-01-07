@@ -670,28 +670,7 @@ Install_Maraschino () {
     check_Git
     wget -nv -O /tmp/maraschino.deb $DROPBOX/LaSi_Repo/maraschino.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
 
-    Question () {
-        echo 
-        echo "Choose a branch to install"
-        echo "1. Master"
-        echo "2. Experimental"
-        read -p ": " VERSION
-        echo 
-        case $VERSION in
-            1*)
-                sudo dpkg -i /tmp/maraschino.deb || error_Depends
-                ;;
-            2*)
-                sudo dpkg -i /tmp/maraschino.deb || error_Depends
-                cd /opt/maraschino && sudo git checkout experimental > /dev/null; cd - >/dev/null
-                ;;
-            *)
-                echo "Answer 1 or 2"
-                Question
-                ;;
-        esac
-    }
-    Question
+    sudo dpkg -i /tmp/maraschino.deb || error_Depends
 
     if ! pgrep -f "cherrypy-maraschino.py" > /dev/null; then
         #check_Port
