@@ -126,16 +126,15 @@ check_Git () {
 check_Pip () {
     if ! which pip > /dev/null; then
         sudo apt-get -y install python-pip || check_Easy
+        pip='pip install'
     fi
-    pip=`which pip`
-    pip="$pip -q"
 }
 
 check_Easy () {
     if ! which easy_install > /dev/null; then
         sudo apt-get -y install python-setuptools || error_Msg
+        pip='easy_install'
     fi
-    easy_install=`which easy_install`
 }
 
 check_Deb () {
@@ -457,8 +456,8 @@ Info_Beets () {
 Install_Beets () {
 
     check_Pip
-    sudo $pip install beets || { sudo $easy_install beets || error_Msg; }
-    sudo $pip install rgain || { sudo $easy_install rgain || echo "Fail!"; }
+    sudo $pip beets || error_Msg
+    sudo $pip rgain || echo "Fail!"
 
     # Enable replaygain which is healthy for ears and speakers (TEMP DISABLED)
     if ! [ -d $HOME/.beets/plugins ]; then
@@ -1133,8 +1132,8 @@ Info_Subliminal () {
 Install_Subliminal () {
 
     check_Pip
-    sudo $pip install subliminal || { sudo $easy_install subliminal || error_Msg; }
-    sudo $pip install argparse || { sudo $easy_install argparse || error_Msg; }
+    sudo $pip subliminal || error_Msg
+    sudo $pip argparse || error_Msg
 
 Summ_$set_app
 Summ_$set_app >> /tmp/lasi_install.log
@@ -1471,7 +1470,12 @@ cf_Uninstall () {
     [Yy]*)
         case $set_app in
             Beets|Subliminal)
-                sudo $pip uninstall $set_app_lower || error_Msg
+                check_Pip
+                if which pip > /dev/null; then
+                    sudo pip uninstall $set_app_lower || error_Msg
+                else
+                    echo "Your system doesn't support python-pip, uninstall not supported."
+                fi
                 ;;
             *)
                 sudo apt-get -y $uninstaller $set_app_lower
