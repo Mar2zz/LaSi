@@ -127,12 +127,16 @@ check_Pip () {
     if ! which pip > /dev/null; then
         sudo apt-get -y install python-pip || check_Easy
         pip='pip install'
+    else
+        pip='pip install'
     fi
 }
 
 check_Easy () {
     if ! which easy_install > /dev/null; then
         sudo apt-get -y install python-setuptools || error_Msg
+        pip='easy_install'
+    else
         pip='easy_install'
     fi
 }
