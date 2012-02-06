@@ -1,0 +1,46 @@
+#!/bin/sh
+#
+# $FreeBSD: ports/net-p2p/transmission-cli/files/transmission.in,v 1.4 2011/03/05 04:17:28 mezz Exp $
+#
+# PROVIDE: transmission
+# REQUIRE: DAEMON 
+#
+# Add the following lines to /etc/rc.conf to enable this service:
+#
+# transmission_enable:	     Set to NO by default. Set it to YES to enable it.
+# transmission_watch_dir:    Directory for torrent files to download
+#			     automatically. Off by default unless you add
+#			     a path.
+# transmission_conf_dir:     Directory where transmission configuration
+#			     data is stored.
+#			     Default: /usr/local/etc/transmission/home
+# transmission_download_dir: Directory to store downloaded data.
+#			     Default: /usr/local/etc/transmission/home/Downloads
+# transmission_user:	     The user account transmission daemon runs as what
+#			     you want it to be. It uses 'transmission' user by
+#			     default. Do not sets it as empty or it will run
+#			     as root.
+#
+
+. /etc/rc.subr
+
+name="transmission"
+rcvar=${name}_enable
+
+command=/usr/local/bin/transmission-daemon
+
+load_rc_config ${name}
+
+: ${transmission_enable:="NO"}
+: ${transmission_user:="nfs"}
+: ${transmission_conf_dir="/usr/home/nfs/transmission"}
+: ${transmission_download_dir="/OS/download/complete/Torrents"}
+: ${transmission_flags="-a 192.168.10.*"}
+
+transmission_flags=" \
+	${transmission_watch_dir:+-c ${transmission_watch_dir}} \
+	${transmission_conf_dir:+-g ${transmission_conf_dir}} \
+	${transmission_download_dir:+-w ${transmission_download_dir}} \
+	${transmission_flags}"
+
+run_rc_command "$1"

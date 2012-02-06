@@ -1,0 +1,76 @@
+#!/bin/sh
+#
+# PROVIDE: couchpotato
+# KEYWORD: shutdown
+#
+# Add the following lines to /etc/rc.conf.local or /etc/rc.conf
+# to enable this service:
+#
+# couchpotato_enable (bool):	Set to NO by default.
+#				Set it to YES to enable it.
+# couchpotato_user:		The user account Couchpotato daemon runs as what
+#				you want it to be. It uses '_sabnzbd' user by
+#				default. Do not sets it as empty or it will run
+#				as root.
+# couchpotato_dir:		Directory where Couchpotato lives.
+#				Default: /usr/local/couchpotato
+# couchpotato_chdir:  		Change to this directory before running Couchpotato.
+#     				Default is same as couchpotato_dir.
+# couchpotato_pid:  		The name of the pidfile to create.
+#     				Default is couchpoato.pid in couchpotato_dir.
+
+. /etc/rc.subr
+
+name="couchpotato"
+rcvar=${name}_enable
+
+load_rc_config ${name}
+
+: ${_enable:="NO"}
+: ${couchpotato_user:="USERNAME"}
+: ${couchpotato_dir:="/usr/local/couchpotato"}
+: ${couchpotato_chdir:="${couchpotato_dir}"}
+: ${couchpotato_pid:="${couchpotato_dir}/couchpotato.pid"}
+
+PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
+WGET="/usr/local/bin/wget" 	# You need wget for this script to safely shutdown couchpotato.
+HOST="localhost" 		# Set couchpotato address here.
+PORT="5000" 			# Set couchpotato port here.
+CPUSR="" 			# Set couchpotato username (if you use one) here.
+CPPWD="" 			# Set couchpotato password (if you use one) here.
+
+status_cmd="${name}_status"
+stop_cmd="${name}_stop"
+
+command="/usr/sbin/daemon"
+command_args="-f -p ${couchpotato_pid} python ${couchpotato_dir}/CouchPotato.py -d"
+
+# Ensure user is root when running this script.
+if [ `id -u` != "0" ]; then
+  echo "Oops, you should be root before running this!"
+  exit 1
+fi
+
+verify_couchpotato_pid() {
+    # Make sure the pid corresponds to the couchpotato process.
+    pid=`cat ${couchpotato_pid} 2>/dev/null`
+    ps -p ${pid} | grep -q "python ${couchpotato_dir}/CouchPotato.py"
+    return $?
+}
+
+# Try to stop couchpotato cleanly by calling shutdown over http.
+couchpotato_stop() {
+    echo "Stopping $name"
+    verify_couchpotato_pid
+    ${WGET} -O - -q --user=${CPUSR} --password=${CPPWD} "http://${HOST}:${PORT}/config/exit/" >/dev/null
+    if [ -n "${pid}" ]; then
+      wait_for_pids ${pid}
+      echo "Stopped"
+    fi
+}
+
+couchpotato_status() {
+    verify_couchpotato_pid && echo "$name is running as ${pid}" || echo "$name is not running"
+}
+
+run_rc_command "$1"
