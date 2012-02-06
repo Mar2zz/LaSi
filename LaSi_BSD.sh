@@ -1233,7 +1233,7 @@ check_App () {
 		echo "$SETAPP is already running on this system"
 		echo
 		sleep 3
-		Info_$SETAPP
+		LaSi_Menu
 	elif [ "$(ls -A $USRDIR/$APPLOW)" ]; then
 		clear
 		echo
@@ -1241,7 +1241,7 @@ check_App () {
 		echo "Assuming $SETAPP is already installed"
 		echo
 		sleep 3
-		Info_$SETAPP
+		LaSi_Menu
 	fi
 }
 
@@ -1356,10 +1356,10 @@ Select_USER () {
 	echo
 	echo "Options (1,2,3,Q + enter):"
 	echo
-	echo "1. share   (recommended for ZFSguru with FreeBSD 9 core)"
+	echo "1. share    (recommended for ZFSguru with FreeBSD 9 core)"
 
 	if [ "$(id -u)" = "0" ]; then
-		echo "2. $CUSER   (current user)"
+		echo "2. $CUSER     (current user)"
 		echo "3. Other user"
 		echo
 		echo "It's NOT recommended to run these programs as root"
@@ -1403,7 +1403,7 @@ cf_Choice () {
 		echo
 		echo "Options:"
 		echo "1. Install $SETAPP"
-		echo "2. Uninstall $SETAPP <= NOT AVAILABLE"
+		echo "2. Uninstall $SETAPP <= not available, YET"
 		echo
 		echo "B. Back to menu"
 		echo "Q. Quit"
@@ -1412,8 +1412,8 @@ cf_Choice () {
 		echo
 		echo "Options:"
 		echo "1. Install $SETAPP"
-		echo "2. Remove $SETAPP           <= NOT AVAILABLE"
-		echo "3. Set cronjob for $SETAPP  <= NOT AVAILABLE"
+		echo "2. Remove $SETAPP           <= not available, YET"
+		echo "3. Set cronjob for $SETAPP  <= not available, YET"
 		echo
 		echo "B. Back to menu"
 		echo "Q. Quit"

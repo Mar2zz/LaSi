@@ -35,12 +35,12 @@
 
 # Debian based
 if which apt-get > /dev/null; then
-	wget -nv -O /tmp/LaSi_Deb.sh http://dl.dropbox.com/u/36835219/LaSi/LaSi_Deb.sh || { echo "Connection to dropbox failed, try again later"; exit 1; }
+	wget -nv -O /tmp/LaSi_Deb.sh http://dl.dropbox.com/u/18712538/LaSi/LaSi_Deb.sh || { echo "Connection to dropbox failed, try again later"; exit 1; }
 	sudo chmod +x LaSi_Deb.sh &&
 	./LaSi_Deb.sh
 # Synology
 elif which ipkg; then
-	wget http://dl.dropbox.com/u/36835219/LaSi/LaSi_syn.sh &&
+	wget -nv -O /tmp/LaSi_syn.sh http://dl.dropbox.com/u/18712538/LaSi/LaSi_syn.sh || { echo "Connection to dropbox failed, try again later"; exit 1; }
 	sudo chmod +x LaSi_Deb.sh &&
 	./LaSi_Deb.sh
 # FreeBSD based
@@ -74,7 +74,7 @@ elif [ "`uname`" = "FreeBSD" ]; then
 	fi
 	
 	cd /usr/local/LaSi &&
-	fetch http://dl.dropbox.com/u/36835219/LaSi/LaSi_BSD.sh &&
+	fetch http://dl.dropbox.com/u/18712538/LaSi/LaSi_BSD.sh || { echo "Connection to dropbox failed, try again later"; exit 1; }
 	sudo chmod +x LaSi_BSD.sh &&
 	./LaSi_BSD.sh
 fi
