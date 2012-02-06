@@ -35,7 +35,7 @@
 
 # Debian based
 if which apt-get > /dev/null; then
-	wget http://dl.dropbox.com/u/36835219/LaSi/LaSi_Deb.sh &&
+	wget -nv -O /tmp/LaSi_Deb.sh http://dl.dropbox.com/u/36835219/LaSi/LaSi_Deb.sh || { echo "Connection to dropbox failed, try again later"; exit 1; }
 	sudo chmod +x LaSi_Deb.sh &&
 	./LaSi_Deb.sh
 # Synology
