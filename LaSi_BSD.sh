@@ -22,15 +22,17 @@
 # | LaSi will install the programs you choose
 # | from the menu:
 # |
-# | - SABnzbd
-# | - Sickbeard
+# | - AutoSub
+# | - Beets
 # | - CouchPotato
 # | - Headphones
-# | - Beets
+# | - LazyLibrarian (alpha stage)
+# | - SABnzbd
+# | - Sickbeard
 # | - SpotWeb
 # |
 # | ############## _
-# | # Auto-Sub      \
+# | #               \
 # | # Subliminal    /_ Not available, yet!
 # | # Transmission  \
 # | #              _/
@@ -71,7 +73,8 @@ LaSi_Menu (){
 	echo
 	echo "Make a choice to see info or install these apps..."
 	echo
-	echo "1. Auto-Sub       5. SABnzbd+  (it's recommended to install this first)"
+	echo "0. SABnzbd+  (it's recommended to first install SABnzbd+)"
+	echo "1. AutoSub        5. LazyLibrarian"
 	echo "2. Beets          6. Sick Beard"
 	echo "3. CouchPotato    7. SpotWeb"
     echo "4. Headphones"
@@ -104,7 +107,15 @@ LaSi_Menu (){
         #if [ $unattended = 1 ]; then [ $update_apt = 1 ] || update_Apt; fi
 
         case "$item" in
-
+        
+        # Sabnzbd
+        0)
+			SETAPP=Sabnzbd
+			APPLOW=sabnzbd
+			set_port=8080
+            if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
+            #if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
+            ;;
         # Auto-Sub
         1)
 			SETAPP=AutoSub
@@ -134,12 +145,12 @@ LaSi_Menu (){
 			if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
             #if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
             ;;
-        # Sabnzbd
+        # LazyLibrarian
         5)
-			SETAPP=Sabnzbd
-			APPLOW=sabnzbd
-			set_port=8080
-            if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
+			SETAPP=LazyLibrarian
+			APPLOW=lazylibrarian
+			set_port=5299
+			if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
             #if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
             ;;
 		# Sickbeard
@@ -478,6 +489,52 @@ echo "
 Done! Installed $SETAPP.
 Type headphones --help for options
 Headphones is by default located @ http://$HOSTNAME:$set_port
+"
+}
+
+#########################
+##### LazyLibrarian #####
+#########################
+Info_LazyLibrarian () {
+    clear
+    echo "
+*###############################################################*
+*#################### LazyLibrarian ############################*
+#                                                               #
+# LazyLibrarian is an automatic NZB downloader.                 #
+# You can keep a 'Books I like to read'-list and it will        #
+# search for NZBs of these books every X hours.                 #
+#                                                               #
+# Once an book is found, it will send it to SABnzbd.            #
+#                                                               #
+*###############################################################*
+#                                                               #
+# Headphones is written by Mar2zz in his spare time...          #
+#                                                               #
+# Visit https://github.com/Mar2zz/LazyLibrarian                 #
+*###############################################################*"
+    cf_Choice
+}
+
+Install_LazyLibrarian () {
+    check_App
+    check_git
+    check_python
+    sudo git clone https://github.com/Mar2zz/LazyLibrarian.git $USRDIR/$APPLOW
+    chown -R $APPUSER $USRDIR/$APPLOW
+    set_RCD
+
+Summ_$SETAPP
+Summ_$SETAPP >> $USRDIR/LaSi/lasi_install.log
+}
+
+Summ_LazyLibrarian () {
+clear
+echo
+echo "
+Done! Installed $SETAPP.
+
+LazyLibrarian is by default located @ http://$HOSTNAME:$set_port
 "
 }
 
@@ -1552,7 +1609,7 @@ exit
 
 ##### Set Variables and Defaults #####
 
-DROPBOX=http://dl.dropbox.com/u/36835219/github/LaSi/FreeBSD
+DROPBOX=http://dl.dropbox.com/u/36835219/LaSi/FreeBSD
 
 USRDIR=/usr/local
 RCPATH=/usr/local/etc/rc.d
