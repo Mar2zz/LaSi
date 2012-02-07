@@ -1523,6 +1523,60 @@ pkg_Choice() {
 }
 
 cf_Uninstall () {
+	
+	uninstaller () {
+	echo 
+    echo "Are you sure you want to continue and $uninstaller $set_app?"
+    read -p "[yes/no]: " REPLY
+    echo
+    case $REPLY in
+    [Yy]*)
+        case $SETAPP in
+            Sabnzbd|Transmission)
+				if ! ls $APPLOW /var/db/pkg > /dev/null; then
+					PKGNAME=`ls $APPLOW /var/db/pkg`  #`grep $APPLOW* /var/db/pkg/_pkg-name_`
+					pkg_delete $PKGNAME || error_Msg
+				elif [ "$APPLOW" = sabnzbd ]; then
+					cd /usr/ports/news/sabnzbdplus &&
+					make deinstall || error_Msg
+				elif [ "$APPLOW" = transmission ]; then
+					cd /usr/ports/net-p2p/transmission-daemon &&
+					make deinstall || error_Msg
+				fi
+				;;
+            *)
+				if ! ls $RCPATH/$APPLOW > /dev/null; then
+					$RCPATH/$APPLOW stop
+				fi
+				
+				if ! ls $USRDIR/$APPLOW > /dev/null; then
+					rm -rf $USRDIR/$APPLOW
+				fi
+            ;;
+        esac
+        # give time to read output from above installprocess before returning to menu
+        echo 
+        read -sn 1 -p "Press a key to continue"
+        # for multiple install continue in next item, else back to info
+        if [ "${#items[@]}" = 1 ]; then
+            Info_$set_app
+        fi
+        ;;
+    [Nn]*)
+        LaSi_Menu
+        ;;
+    [Qq]*)
+        exit
+        ;;
+    *)
+        echo "Answer yes to $uninstaller" 
+        echo "no for menu"
+        echo "or Q to quit"
+        cf_Install
+        ;;
+    esac
+	}
+
 	clear
 	echo
 	echo "Uninstaller NOT available, Yet!"
@@ -1611,14 +1665,13 @@ exit
 
 DROPBOX=http://dl.dropbox.com/u/36835219/LaSi/FreeBSD
 
-USRDIR=/usr/local
+USRDIR=/usr/local			# Installation folder
 RCPATH=/usr/local/etc/rc.d
 
 # defaults
 unattended=0
 ask_schedule=0
 schedule=0
-uninstaller=remove
 
 # create array
 options=( $@ )
