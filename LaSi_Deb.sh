@@ -1297,12 +1297,16 @@ Install_XBMC () {
                 # check if python-software-properties is installed (not by default on minimal servers)
                 check_PPA
                 sudo add-apt-repository ppa:team-xbmc || error_Msg
+                echo 'Updating apt-sources ...'
+                sudo apt-get update > /dev/null
                 distro=$(ls /etc/apt/sources.list.d/team-xbmc* | sed "s/.*ppa-\|\.list//g")
                 ;;
             3*)
                 # check if python-software-properties is installed (not by default on minimal servers)
                 check_PPA
                 sudo add-apt-repository ppa:team-xbmc/unstable || error_Msg
+                echo 'Updating apt-sources ...'
+                sudo apt-get update > /dev/null
                 distro=$(ls /etc/apt/sources.list.d/team-xbmc* | sed "s/.*unstable-\|\.list//g")
                 ;;
             *)
