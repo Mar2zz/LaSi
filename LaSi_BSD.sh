@@ -1623,18 +1623,15 @@ Uninstaller () {
     [Yy]*)
         case $SETAPP in
             Sabnzbd|Transmission)
-				if ls /var/db/pkg/$APPLOW* > /dev/null; then
-					pkg_delete "$APPLOW*" || error_Msg
-					sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
-				else
-					error_Msg
-				fi
+				sudo $RCPATH/$APPLOW stop
+				sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
+				pkg_delete "$APPLOW*" || error_Msg
 				;;
             *)
 				if ls $RCPATH/$APPLOW > /dev/null; then
 					if pgrep -f $SETAPP.py > /dev/null; then
 						$RCPATH/$APPLOW stop
-						sudo sed -i ".backup" "s/$APPLOW/#$APPLOW/" /etc/rc.conf
+						sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
 					fi					
 					APPDIR=`sed -n "/"$APPLOW"_dir:=/p" $RCPATH/$APPLOW | awk -F '"' '{ print $2 }'`
 				fi 
