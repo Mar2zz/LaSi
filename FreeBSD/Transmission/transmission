@@ -32,10 +32,10 @@ command=/usr/local/bin/transmission-daemon
 load_rc_config ${name}
 
 : ${transmission_enable:="NO"}
-: ${transmission_user:="nfs"}
-: ${transmission_conf_dir="/usr/home/nfs/transmission"}
-: ${transmission_download_dir="/OS/download/complete/Torrents"}
-: ${transmission_flags="-a 192.168.10.*"}
+: ${transmission_user:="USERNAME"}
+: ${transmission_conf_dir="/usr/local/transmission"}
+: ${transmission_download_dir="DOWNDIR"}
+: ${transmission_flags="-a IPRANGE"}
 
 transmission_flags=" \
 	${transmission_watch_dir:+-c ${transmission_watch_dir}} \

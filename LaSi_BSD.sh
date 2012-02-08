@@ -73,26 +73,27 @@ LaSi_Menu (){
 	echo
 	echo "Make a choice to see info or install these apps..."
 	echo
-	echo "0. SABnzbd+  (it's recommended to first install SABnzbd+)"
-	echo "1. AutoSub        5. LazyLibrarian"
-	echo "2. Beets          6. Sick Beard"
-	echo "3. CouchPotato    7. SpotWeb"
-    echo "4. Headphones"
+	echo "1. SABnzbd+  (it's recommended to first install SABnzbd+)"
+	echo
+	echo "2. AutoSub        6. LazyLibrarian (alpha stage)"
+	echo "3. Beets          7. Sick Beard"
+	echo "4. CouchPotato    8. SpotWeb"
+    echo "5. Headphones     9. Transmission (incl. webinterface)"
     echo
     # tell about commandline options
-    if [ $unattended != 0 ]; then
-        echo "Unattended installation enabled"
-    else
-        echo "Tip: Type LaSi.sh --help for more install options!"
-    fi
+    #if [ $unattended != 0 ]; then
+    #    echo "Unattended installation enabled"
+    #else
+    #    echo "Tip: Type LaSi.sh --help for more install options!"
+    #fi
 
-    if [ $ask_schedule = 1 ]; then
-        echo "Cronjobs set to 'ask'."
-    elif [ $schedule != 0 ]; then
-        echo "Cronjobs set to $schedule."
-    fi
+    #if [ $ask_schedule = 1 ]; then
+    #    echo "Cronjobs set to 'ask'."
+    #elif [ $schedule != 0 ]; then
+    #    echo "Cronjobs set to $schedule."
+    #fi
 
-    echo
+    #echo
     echo "Q. Quit"
 
     read SELECT
@@ -109,7 +110,7 @@ LaSi_Menu (){
         case "$item" in
         
         # Sabnzbd
-        0)
+        1)
 			SETAPP=Sabnzbd
 			APPLOW=sabnzbd
 			set_port=8080
@@ -117,20 +118,20 @@ LaSi_Menu (){
             #if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
             ;;
         # Auto-Sub
-        1)
+        2)
 			SETAPP=AutoSub
 			APPLOW=autosub
 			if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
         	;;
 		# beets
-        2)
+        3)
 			SETAPP=Beets
 			APPLOW=beets
 			if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
 			#if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
 			;;
 		# Couchpotato
-        3)
+        4)
 			SETAPP=CouchPotato
 			APPLOW=couchpotato
         	set_port=5000
@@ -138,7 +139,7 @@ LaSi_Menu (){
            	#if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
 			;;
         # Headphones
-        4)
+        5)
 			SETAPP=Headphones
 			APPLOW=headphones
 			set_port=8181
@@ -146,7 +147,7 @@ LaSi_Menu (){
             #if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
             ;;
         # LazyLibrarian
-        5)
+        6)
 			SETAPP=LazyLibrarian
 			APPLOW=lazylibrarian
 			set_port=5299
@@ -154,7 +155,7 @@ LaSi_Menu (){
             #if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
             ;;
 		# Sickbeard
-        6)
+        7)
 			SETAPP=SickBeard
 			APPLOW=sickbeard
         	set_port=8081
@@ -162,13 +163,13 @@ LaSi_Menu (){
             #if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
             ;;
         # Spotweb
-        7)
+        8)
 			SETAPP=Spotweb
             if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
             #if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
             ;;
 		# subliminal
-		8)
+		10)
 			echo
 			echo "Subliminal  COMING SOON"
 			sleep 2
@@ -179,13 +180,10 @@ LaSi_Menu (){
 			;;
 		# transmission
 		9)
-			echo
-			echo "Transmission  COMING SOON"
-			sleep 2
-			LaSi_Menu
-			#set_app=Transmission
-			#set_port=9091
-			#if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
+			SETAPP=Transmission
+			APPLOW=transmission
+			set_port=9091
+			if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
 			;;
 
 		[Qq]) exit ;;
@@ -859,6 +857,95 @@ After configuring run $SPOTDIR/retrieve.php to fill the database with spots
 "
 }
 
+######################
+#### TRANSMISSION ####
+######################
+Info_Transmission () {
+    clear
+    echo "
+*###############################################################*
+*##################### TRANSMISSION ############################*
+#                                                               #
+# Transmission is a powerfull torrentclient which can run as    #
+# a daemon with a webinterface. It has a very small footprint,  #
+# so it can run on devices with low cpu power and low memory.   #
+#                                                               #
+# Transmission has the features you want from a Torrent client: #
+# encryption, a webinterface, peer exchange, magnet links, DHT, #
+# µTP, UPnP and NAT-PMP port forwarding, webseed support, watch #
+# directories, tracker editing, global and per-torrent          #
+# speedlimits, and more.                                        #
+#                                                               #
+*###############################################################*
+#                                                               #
+# Transmission is written by volunteers.                        #
+#                                                               #
+# Visit http://www.transmissionbt.com/                          #
+*###############################################################*"
+    cf_Choice
+}
+
+Install_Transmission () {
+	
+	set_DOWNDIR () {
+		clear
+		echo
+		echo "Where do you like Transmission to store your downloads?"
+		echo "Enter the full path e.g. /tank/download/torrents"
+		echo
+		read -p 'PATH : ' DOWNDIR
+		if ! ls $DOWNDIR > /dev/null; then
+			sudo mkdir $DOWNDIR
+			sudo chown -r $APPUSER $DOWNDIR
+		fi
+		echo
+		echo
+		echo
+		echo "Last question; What is the IP-range of your network?"
+		echo "Something like: 192.168.10.128"
+		echo "Replace the last number with an asterix, e.g. 192.168.10.*"
+		echo
+		read -p 'IP-range : ' IPRANGE
+		
+	}
+
+	if which transmission-daemon > /dev/null; then
+		clear
+		echo
+		echo "Transmission is already installed on this system"
+		echo
+		sleep 3
+		Info_$SETAPP
+	else
+		pkg_Choice
+		if [ "$SETPKG" = "ports" ]; then
+			cd /usr/ports/net-p2p/transmission-daemon &&
+			sudo make -DBATCH install clean || error_Msg
+		else
+			sudo pkg_add -r transmission-daemon || error_Msg
+		fi
+		
+		if ! ls $USRDIR/$APPLOW > /dev/null; then
+			sudo mkdir $USRDIR/$APPLOW
+		fi
+		
+		sudo chown -R $APPUSER $USRDIR/$APPLOW
+		set_DOWNDIR
+		set_RCD
+	fi
+
+Summ_$SETAPP
+Summ_$SETAPP >> /tmp/lasi_install.log
+}
+
+Summ_Transmission () {
+echo "
+Done! Installed $SETAPP.
+
+Transmission is by default located @ http://$HOSTNAME:9091
+"
+}
+
 ###############################################
 ######## Check System and Requirements ########
 ###############################################
@@ -906,7 +993,7 @@ check_Portstree() {
 
 	if ! ls /usr/ports > /dev/null; then
 		install_Portstree
-	elif ! find /var/db/portsnap -iname "INDEX" -mtime -1 > /dev/null; then
+	elif find /var/db/portsnap -iname "INDEX" -mtime -1 > /dev/null; then
 		SETPKG=ports
 		echo
         echo "Ports Tree is up to date"
@@ -1349,10 +1436,8 @@ Select_USER () {
 	local CUSER=`whoami`
 	LaSi_Logo
 	echo
-	echo "Congratulations!!"
-	echo "You're running FreeBSD and like to install some nice apps"
-	echo "First you have to choose which user will be running the apps"
-	echo "Then you'll be forwarded to the actual menu"
+	echo "WELCOME!  First you have to choose which user will be running"
+	echo "the apps, then you'll be forwarded to the actual menu"
 	echo
 	echo "Options (1,2,3,Q + enter):"
 	echo
@@ -1540,7 +1625,7 @@ Uninstaller () {
             Sabnzbd|Transmission)
 				if ls /var/db/pkg/$APPLOW* > /dev/null; then
 					pkg_delete "$APPLOW*" || error_Msg
-					sudo sed -i ".backup" "s/$APPLOW/#$APPLOW/" /etc/rc.conf
+					sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
 				else
 					error_Msg
 				fi
@@ -1602,13 +1687,21 @@ set_RCD () {
 		if ! ls $RCPATH/$APPLOW > /dev/null; then
 			cd $RCPATH &&
 			sudo fetch $DROPBOX/$SETAPP/$APPLOW &&
-			sudo sed -i "" "s/USERNAME/$APPUSER/g" $RCPATH/$APPLOW &&
+			sudo sed -i "" "s/USERNAME/$APPUSER/g" $RCPATH/$APPLOW
+			if [ "$APPLOW" = "transmission" ]; then
+				sudo sed -i "" "s|DOWNDIR|$DOWNDIR|g" $RCPATH/$APPLOW &&
+				sudo sed -i "" "s|IPRANGE|$IPRANGE|g" $RCPATH/$APPLOW
+			fi
 			sudo chmod 555 $RCPATH/$APPLOW
 		else
 			cd $RCPATH &&
 			sudo mv -f $APPLOW $APPLOW.backup &&
 			sudo fetch $DROPBOX/$SETAPP/$APPLOW &&
-			sudo sed -i "" "s/USERNAME/$APPUSER/g" $RCPATH/$APPLOW &&
+			sudo sed -i "" "s/USERNAME/$APPUSER/g" $RCPATH/$APPLOW
+			if [ "$APPLOW" = "transmission" ]; then
+				sudo sed -i "" "s|DOWNDIR|$DOWNDIR|g" $RCPATH/$APPLOW &&
+				sudo sed -i "" "s|IPRANGE|$IPRANGE|g" $RCPATH/$APPLOW
+			fi
 			sudo chmod 555 $RCPATH/$APPLOW
 		fi
 	fi
