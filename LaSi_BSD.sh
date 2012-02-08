@@ -906,7 +906,7 @@ check_Portstree() {
 
 	if ! ls /usr/ports > /dev/null; then
 		install_Portstree
-	elif find /var/db/portsnap -iname "INDEX" -mtime -1 > /dev/null; then
+	elif ! find /var/db/portsnap -iname "INDEX" -mtime -1 > /dev/null; then
 		SETPKG=ports
 		echo
         echo "Ports Tree is up to date"
@@ -1403,7 +1403,7 @@ cf_Choice () {
 		echo
 		echo "Options:"
 		echo "1. Install $SETAPP"
-		echo "2. Uninstall $SETAPP <= not available, YET"
+		echo "2. Uninstall $SETAPP"
 		echo
 		echo "B. Back to menu"
 		echo "Q. Quit"
@@ -1412,7 +1412,7 @@ cf_Choice () {
 		echo
 		echo "Options:"
 		echo "1. Install $SETAPP"
-		echo "2. Remove $SETAPP           <= not available, YET"
+		echo "2. Remove $SETAPP"
 		echo "3. Set cronjob for $SETAPP  <= not available, YET"
 		echo
 		echo "B. Back to menu"
@@ -1426,7 +1426,13 @@ cf_Choice () {
             cf_Install
             ;;
         2)
-            cf_Uninstall
+			if [ "$SETAPP" = "Spotweb" ] || [ "$SETAPP" = "AutoSub" ]; then
+				echo
+				echo "Uninstaller for $SETAPP is not available, yet!"
+				Info_$SETAPP
+			else
+				Uninstaller
+			fi
             ;;
         3)
             case $SETAPP in
@@ -1480,7 +1486,7 @@ cf_Install () {
     esac
 }
 
-#### Chose Ports Tree or PKG system #####
+##### Chose Ports Tree or PKG system #####
 pkg_Choice() {
 	if ! [ "$SETPKG" = "pkg" ] || [ "$SETPKG" = "ports" ]; then
 	clear
@@ -1522,48 +1528,52 @@ pkg_Choice() {
 	fi
 }
 
-cf_Uninstall () {
-	
-	uninstaller () {
+##### Un-Installer #####
+Uninstaller () {
 	echo 
-    echo "Are you sure you want to continue and $uninstaller $set_app?"
+    echo "Are you sure you want to continue and remove/uninstall $SETAPP?"
     read -p "[yes/no]: " REPLY
     echo
     case $REPLY in
     [Yy]*)
         case $SETAPP in
             Sabnzbd|Transmission)
-				if ! ls $APPLOW /var/db/pkg > /dev/null; then
-					PKGNAME=`ls $APPLOW /var/db/pkg`  #`grep $APPLOW* /var/db/pkg/_pkg-name_`
-					pkg_delete $PKGNAME || error_Msg
-				elif [ "$APPLOW" = sabnzbd ]; then
-					cd /usr/ports/news/sabnzbdplus &&
-					make deinstall || error_Msg
-				elif [ "$APPLOW" = transmission ]; then
-					cd /usr/ports/net-p2p/transmission-daemon &&
-					make deinstall || error_Msg
+				if ls /var/db/pkg/$APPLOW* > /dev/null; then
+					pkg_delete "$APPLOW*" || error_Msg
+					sudo sed -i ".backup" "s/$APPLOW/#$APPLOW/" /etc/rc.conf
+				else
+					error_Msg
 				fi
 				;;
             *)
-				if ! ls $RCPATH/$APPLOW > /dev/null; then
-					$RCPATH/$APPLOW stop
-				fi
+				if ls $RCPATH/$APPLOW > /dev/null; then
+					if pgrep -f $SETAPP.py > /dev/null; then
+						$RCPATH/$APPLOW stop
+						sudo sed -i ".backup" "s/$APPLOW/#$APPLOW/" /etc/rc.conf
+					fi					
+					APPDIR=`sed -n "/"$APPLOW"_dir:=/p" $RCPATH/$APPLOW | awk -F '"' '{ print $2 }'`
+				fi 
 				
-				if ! ls $USRDIR/$APPLOW > /dev/null; then
-					rm -rf $USRDIR/$APPLOW
+				if ls $APPDIR > /dev/null; then
+					sudo rm -rf $APPDIR
+				else
+					echo "Can't find $SETAPP installation folder"
+					error_Msg
 				fi
             ;;
         esac
         # give time to read output from above installprocess before returning to menu
         echo 
+		echo "$SETAPP has been removed from this system"
+		echo
         read -sn 1 -p "Press a key to continue"
         # for multiple install continue in next item, else back to info
         if [ "${#items[@]}" = 1 ]; then
-            Info_$set_app
+            Info_$SETAPP
         fi
         ;;
     [Nn]*)
-        LaSi_Menu
+        Info_$SETAPP
         ;;
     [Qq]*)
         exit
@@ -1575,13 +1585,6 @@ cf_Uninstall () {
         cf_Install
         ;;
     esac
-	}
-
-	clear
-	echo
-	echo "Uninstaller NOT available, Yet!"
-	sleep 3
-	Info_$SETAPP
 }
 
 ##### CRONJOBS #####
