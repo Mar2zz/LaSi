@@ -1305,8 +1305,6 @@ Install_XBMC () {
                 # check if python-software-properties is installed (not by default on minimal servers)
                 check_PPA
                 sudo add-apt-repository ppa:team-xbmc/unstable || error_Msg
-                echo 'Updating apt-sources ...'
-                sudo apt-get update > /dev/null
                 distro=$(ls /etc/apt/sources.list.d/team-xbmc* | sed "s/.*unstable-\|\.list//g")
                 ;;
             *)
@@ -1317,15 +1315,29 @@ Install_XBMC () {
     }
     Question
 
-    # Highest available distro is Maverick, change oneiric, natty and precise to maverick
     ppa=$(ls /etc/apt/sources.list.d/team-xbmc*)
-    case $distro in
-        oneiric|natty|precise)
-        sudo sed -i "s/$distro/maverick/g" $ppa
-        ;;
+    case $VERSION in
+        1*|2*)
+            # Highest available distro is Maverick, change oneiric, natty and precise to maverick
+            case $distro in
+                oneiric|natty|precise)
+                sudo sed -i "s/$distro/maverick/g" $ppa
+                ;;
+            esac
+            ;;
+        3*)
+            # Highest available distro is oneiric, change precise to oneiric
+            case $distro in
+                precise)
+                    sudo sed -i "s/$distro/oneiric/g" $ppa
+                    ;;
+            esac
+            ;;
     esac
 
     # Update list, install and configure
+    echo 'Updating apt-sources ...'
+    sudo apt-get update > /dev/null
 
     case $VERSION in
         1*)
