@@ -202,7 +202,7 @@ LaSi_Menu (){
     if [ ${#items[@]} -gt 1 ]; then
         echo "*###############################################################*"
         echo "*################### INSTALL SUMMARY ###########################*"
-        cat $USRDIR/LaSi/lasi_install.log
+        cat /tmp/LaSi/lasi_install.log
         echo "*###############################################################*"
     fi
 
@@ -320,7 +320,7 @@ Install_Sabnzbd () {
 	fi
 
 Summ_$SETAPP
-Summ_$SETAPP >> $USRDIR/LaSi/lasi_install.log
+Summ_$SETAPP >> /tmp/LaSi/lasi_install.log
 }
 
 Summ_Sabnzbd () {
@@ -376,7 +376,7 @@ Install_SickBeard () {
     set_RCD
 
 Summ_$SETAPP
-Summ_$SETAPP >> $USRDIR/LaSi/lasi_install.log
+Summ_$SETAPP >> /tmp/LaSi/lasi_install.log
 }
 
 Summ_SickBeard () {
@@ -431,7 +431,7 @@ Install_CouchPotato () {
     set_RCD
 
 Summ_$SETAPP
-Summ_$SETAPP >> $USRDIR/LaSi/lasi_install.log
+Summ_$SETAPP >> /tmp/LaSi/lasi_install.log
 }
 
 Summ_CouchPotato () {
@@ -479,7 +479,7 @@ Install_Headphones () {
     set_RCD
 
 Summ_$SETAPP
-Summ_$SETAPP >> $USRDIR/LaSi/lasi_install.log
+Summ_$SETAPP >> /tmp/LaSi/lasi_install.log
 }
 
 Summ_Headphones () {
@@ -525,7 +525,7 @@ Install_LazyLibrarian () {
     set_RCD
 
 Summ_$SETAPP
-Summ_$SETAPP >> $USRDIR/LaSi/lasi_install.log
+Summ_$SETAPP >> /tmp/LaSi/lasi_install.log
 }
 
 Summ_LazyLibrarian () {
@@ -604,7 +604,7 @@ Install_Beets () {
     fi
 
 Summ_$SETAPP
-Summ_$SETAPP >> $USRDIR/LaSi/lasi_install.log
+Summ_$SETAPP > /tmp/LaSi/lasi_install.log
 }
 
 Summ_Beets () {
@@ -757,7 +757,7 @@ Install_Spotweb () {
 	cd $SPOTDIR && /usr/local/bin/php $SPOTDIR/upgrade-db.php
 
 	Summ_Spotweb
-	Summ_Spotweb >> $USRDIR/LaSi/lasi_install.log
+	Summ_Spotweb >> /tmp/LaSi/lasi_install.log
 	}
 
 	cf_CronRetrieve () {
@@ -786,9 +786,9 @@ set -e
 [ -e $SPOTDIR/retrieve.php ] || exit 0
 
 /usr/local/bin/php $SPOTDIR/retrieve.php || exit 1
-" > $USRDIR/LaSi/spotweb_spots
+" > /tmp/LaSi/spotweb_spots
 
-                sudo mv -f $USRDIR/LaSi/spotweb_spots /etc/cron.hourly/spotweb_spots
+                sudo mv -f /tmp/LaSi/spotweb_spots /etc/cron.hourly/spotweb_spots
                 sudo chmod +x /etc/cron.hourly/spotweb_spots
 
                 echo
@@ -989,14 +989,14 @@ install_phpext () {
 		sudo make config &&
 		sudo make BATCH=yes install clean || error_REQ
 	else
-		PHPEXT1=`sed -n '1p' $USRDIR/LaSi/php.ext`
-		PHPEXT2=`sed -n '2p' $USRDIR/LaSi/php.ext`
-		PHPEXT3=`sed -n '3p' $USRDIR/LaSi/php.ext`
-		PHPEXT4=`sed -n '4p' $USRDIR/LaSi/php.ext`
-		PHPEXT5=`sed -n '5p' $USRDIR/LaSi/php.ext`
-		PHPEXT6=`sed -n '6p' $USRDIR/LaSi/php.ext`
-		PHPEXT7=`sed -n '7p' $USRDIR/LaSi/php.ext`
-		PHPEXT8=`sed -n '8p' $USRDIR/LaSi/php.ext`
+		PHPEXT1=`sed -n '1p' /tmp/LaSi/php.ext`
+		PHPEXT2=`sed -n '2p' /tmp/LaSi/php.ext`
+		PHPEXT3=`sed -n '3p' /tmp/LaSi/php.ext`
+		PHPEXT4=`sed -n '4p' /tmp/LaSi/php.ext`
+		PHPEXT5=`sed -n '5p' /tmp/LaSi/php.ext`
+		PHPEXT6=`sed -n '6p' /tmp/LaSi/php.ext`
+		PHPEXT7=`sed -n '7p' /tmp/LaSi/php.ext`
+		PHPEXT8=`sed -n '8p' /tmp/LaSi/php.ext`
 		sudo pkg_add -r php5-extensions $PHPEXT1 $PHPEXT2 $PHPEXT3 $PHPEXT4 $PHPEXT5 $PHPEXT6 $PHPEXT7 $PHPEXT8 || error_REQ
 	fi
 }
@@ -1082,45 +1082,45 @@ check_php () {
 }
 
 check_phpext () {
-	sudo rm -f $USRDIR/LaSi/php.ext &&
-	sudo rm -f $USRDIR/LaSi/php.dext
+	sudo rm -f /tmp/LaSi/php.ext &&
+	sudo rm -f /tmp/LaSi/php.dext
 	## Check php-extensions needed for Spotweb
 	if ! grep ctype /usr/local/etc/php/extensions.ini > /dev/null; then
-		echo "CTYPE" >> $USRDIR/LaSi/php.dext
+		echo "CTYPE" >> /tmp/LaSi/php.dext
 		fi
 	if ! grep curl /usr/local/etc/php/extensions.ini > /dev/null; then
-		echo "php5-curl" >> $USRDIR/LaSi/php.ext
+		echo "php5-curl" >> /tmp/LaSi/php.ext
 		fi
 	if ! grep dom /usr/local/etc/php/extensions.ini > /dev/null; then
-		echo "DOM" >> $USRDIR/LaSi/php.dext
+		echo "DOM" >> /tmp/LaSi/php.dext
 		fi
 	if ! grep gd.so /usr/local/etc/php/extensions.ini > /dev/null; then
-		echo "php5-gd" >> $USRDIR/LaSi/php.ext
+		echo "php5-gd" >> /tmp/LaSi/php.ext
 		fi
 	if ! grep gettext /usr/local/etc/php/extensions.ini > /dev/null; then
-		echo "php5-gettext" >> $USRDIR/LaSi/php.ext
+		echo "php5-gettext" >> /tmp/LaSi/php.ext
 		fi
 	if ! grep mbstring /usr/local/etc/php/extensions.ini > /dev/null; then
-		echo "php5-mbstring" >> $USRDIR/LaSi/php.ext
+		echo "php5-mbstring" >> /tmp/LaSi/php.ext
 		fi
 	if ! grep mysql /usr/local/etc/php/extensions.ini > /dev/null; then
-		echo "php5-mysql" >> $USRDIR/LaSi/php.ext
+		echo "php5-mysql" >> /tmp/LaSi/php.ext
 		fi
 	if ! grep openssl /usr/local/etc/php/extensions.ini > /dev/null; then
-		echo "php5-openssl" >> $USRDIR/LaSi/php.ext
+		echo "php5-openssl" >> /tmp/LaSi/php.ext
 		fi
 	if ! grep xml /usr/local/etc/php/extensions.ini > /dev/null; then
-		echo "XML" >> $USRDIR/LaSi/php.dext
+		echo "XML" >> /tmp/LaSi/php.dext
 		fi
 	if ! grep zip /usr/local/etc/php/extensions.ini > /dev/null; then
-		echo "php5-zip" >> $USRDIR/LaSi/php.ext
+		echo "php5-zip" >> /tmp/LaSi/php.ext
 		fi
 	if ! grep zlib /usr/local/etc/php/extensions.ini > /dev/null; then
-		echo "php5-zlib" >> $USRDIR/LaSi/php.ext
+		echo "php5-zlib" >> /tmp/LaSi/php.ext
 		fi
 	## any ?
-	if ls $USRDIR/LaSi/php.ext > /dev/null; then
-		PHPEXT=`cat $USRDIR/LaSi/php.ext`
+	if ls /tmp/LaSi/php.ext > /dev/null; then
+		PHPEXT=`cat /tmp/LaSi/php.ext`
 		REQ=php5-extensions
 		REQPATH=/usr/ports/lang/php5-extensions
 		install_REQ
@@ -1223,7 +1223,7 @@ check_WEBSRV () {
 
 check_Log () {
     # remove any previous lasi_install logs
-    rm -f $USRDIR/LaSi/lasi_install.log
+    rm -f /tmp/LaSi/lasi_install.log
 }
 
 check_App () {
@@ -1642,7 +1642,7 @@ echo "
 Failed! Installing $SETAPP had errors, try again or:
 Copy the text with errors above and report an issue at the following address:
 https://github.com/Mar2zz/LaSi/issues
-" >> $USRDIR/LaSi/lasi_install.log
+" >> /tmp/LaSi/lasi_install.log
 
 # for fast install continue in next item, else quit installer
 if [ "${#items[@]}" > 1 ]; then continue; else break; fi
@@ -1656,7 +1656,7 @@ Copy the text above and report an issue at the following address:
 https://github.com/Mar2zz/LaSi/issues"
 # log error message
 echo "
-Failed! Installing $REQ had errors" >> $USRDIR/LaSi/lasi_install.log
+Failed! Installing $REQ had errors" >> /tmp/LaSi/lasi_install.log
 exit
 }
 

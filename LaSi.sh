@@ -69,11 +69,11 @@ elif [ "`uname`" = "FreeBSD" ]; then
 				exit
 			fi
 		fi
-	elif ! ls /usr/local/LaSi > /dev/null; then
-		sudo mkdir /usr/local/LaSi
+	elif ! ls /tmp/LaSi > /dev/null; then
+		sudo mkdir /tmp/LaSi
 	fi
 	
-	cd /usr/local/LaSi &&
+	cd /tmp/LaSi &&
 	fetch http://dl.dropbox.com/u/18712538/LaSi/LaSi_BSD.sh || { echo "Connection to dropbox failed, try again later"; exit 1; }
 	sudo chmod +x LaSi_BSD.sh &&
 	./LaSi_BSD.sh
