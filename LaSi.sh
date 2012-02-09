@@ -37,7 +37,7 @@
 if which apt-get > /dev/null; then
 	wget -nv -O /tmp/LaSi_Deb.sh http://dl.dropbox.com/u/18712538/LaSi/LaSi_Deb.sh || { echo "Connection to dropbox failed, try again later"; exit 1; }
 	sudo chmod +x /tmp/LaSi_Deb.sh &&
-	./tmp/LaSi_Deb.sh
+	/tmp/./LaSi_Deb.sh
 # Synology
 elif which ipkg; then
 	wget -nv -O /tmp/LaSi_syn.sh http://dl.dropbox.com/u/18712538/LaSi/LaSi_syn.sh || { echo "Connection to dropbox failed, try again later"; exit 1; }
