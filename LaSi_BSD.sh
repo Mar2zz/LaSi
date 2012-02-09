@@ -74,7 +74,7 @@ LaSi_Menu (){
 	echo "Make a choice to see info and/or install these apps..."
 	echo
 	echo "1. SABnzbd+       6.  LazyLibrarian (alpha stage)"
-	echo "2. AutoSub        7.  Marashino"
+	echo "2. AutoSub        7.  Maraschino"
 	echo "3. Beets          8.  SickBeard"
 	echo "4. CouchPotato    9.  SpotWeb"
     echo "5. Headphones     10. Transmission (incl. webinterface)"
@@ -1361,16 +1361,51 @@ check_App () {
 		clear
 		echo
 		echo "$SETAPP is already running on this system"
+		echo "You could try to update"
 		echo
 		sleep 3
-		LaSi_Menu
-	elif [ "$(ls -A $USRDIR/$APPLOW)" ]; then
+		Info_$SETAPP
+	fi
+
+	if [ "$(ls -A $USRDIR/$APPLOW)" ]; then
 		clear
 		echo
 		echo "Installation folder for $SETAPP is not empty"
 		echo "Assuming $SETAPP is already installed"
+		echo "You could try to update"
 		echo
 		sleep 3
+		Info_$SETAPP
+	fi
+}
+
+update_App () {
+	Summ_Update () {
+		echo
+		echo
+		echo "Finished updating $SETAPP"
+		sleep 2
+		LaSi_Menu
+	}
+	
+	if [ "$APPLOW" = "autosub" ]; then
+		echo
+		echo "Checking for updates $SETAPP"
+		echo
+		cd $USRDIR/$APPLOW
+		hg pull
+		Summ_Update
+	elif [ "$APPLOW" = "beets" ] || [ "$APPLOW" = "couchpotato" ] || [ "$APPLOW" = "headphones" ] || [ "$APPLOW" = "sickbeard" ] || [ "$APPLOW" = "lazylibrarian" ]; then
+		echo
+		echo "Checking for updates $SETAPP"
+		echo
+		cd $USRDIR/$APPLOW
+		if ! git pull | grep "Already up-to-date"
+			then
+			$RCPATH/$APPLOW restart
+			Summ_Update
+		fi
+		sleep 2
 		LaSi_Menu
 	fi
 }
@@ -1526,8 +1561,8 @@ Select_USER () {
 ######## BACKTOMENU OR INSTALL ########
 #######################################
 cf_Choice () {
-	case $SETAPP in
-	Sabnzbdplus|Transmission)
+	case $APPLOW in
+	sabnzbd|transmission)
 		echo
 		echo "Options:"
 		echo "1. Install $SETAPP"
@@ -1541,7 +1576,7 @@ cf_Choice () {
 		echo "Options:"
 		echo "1. Install $SETAPP"
 		echo "2. Remove $SETAPP"
-		echo "3. Set cronjob for $SETAPP  <= not available, YET"
+		echo "3. Update $SETAPP"
 		echo
 		echo "B. Back to menu"
 		echo "Q. Quit"
@@ -1554,20 +1589,21 @@ cf_Choice () {
             cf_Install
             ;;
         2)
-			if [ "$SETAPP" = "Spotweb" ] || [ "$SETAPP" = "AutoSub" ]; then
+			if [ "$APPLOW" = "spotweb" ] || [ "$APPLOW" = "autosub" ]; then
 				echo
 				echo "Uninstaller for $SETAPP is not available, yet!"
+				sleep 2
 				Info_$SETAPP
 			else
 				Uninstaller
 			fi
             ;;
         3)
-            case $SETAPP in
-                Sabnzbdplus|Transmission)
+            case $APPLOW in
+                maraschino|sabnzbd|spotweb|transmission)
                     cf_Choice ;;
                 *)
-                    cf_Cronjob ;;
+                    update_App ;;
             esac
             ;;
         [Bb]*)
@@ -1798,11 +1834,9 @@ exit
 ######################################
 
 ##### Set Variables and Defaults #####
-
 DROPBOX=http://dl.dropbox.com/u/36835219/LaSi/FreeBSD
-
-USRDIR=/usr/local			# Installation folder
 RCPATH=/usr/local/etc/rc.d
+USRDIR=/usr/local
 
 # defaults
 unattended=0
@@ -1811,7 +1845,6 @@ schedule=0
 
 # create array
 options=( $@ )
-
 
 ##### Check if user can sudo #####
 if [ "$(id -u)" != "0" ]; then
