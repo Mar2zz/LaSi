@@ -896,7 +896,7 @@ Install_Transmission () {
 		read -p 'PATH : ' DOWNDIR
 		if ! ls $DOWNDIR > /dev/null; then
 			sudo mkdir $DOWNDIR
-			sudo chown -r $APPUSER $DOWNDIR
+			sudo chown -R $APPUSER $DOWNDIR
 		fi
 		echo
 		echo
