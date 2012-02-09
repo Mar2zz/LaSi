@@ -17,7 +17,7 @@
 # |
 # | execute this script with the command: sudo chmod +x LaSi.sh
 # | then run with ./LaSi.sh
-# | 
+# |
 # |
 # | LaSi will install the programs you choose
 # | from the menu:
@@ -107,7 +107,7 @@ LaSi_Menu (){
         #if [ $unattended = 1 ]; then [ $update_apt = 1 ] || update_Apt; fi
 
         case "$item" in
-        
+
         # Sabnzbd
         1)
 			SETAPP=Sabnzbd
@@ -172,6 +172,7 @@ LaSi_Menu (){
         # Spotweb
         9)
 			SETAPP=Spotweb
+			APPLOW=spotweb
             if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
             #if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
             ;;
@@ -239,11 +240,10 @@ Install_AutoSub () {
 	sudo hg clone https://code.google.com/p/auto-sub/ $USRDIR/$APPLOW &&
 	sudo sed -i ".backup" 's|path = /home/user/auto-sub|path = /usr/local/autosub|' /usr/local/autosub/config.properties &&
     chown -R $APPUSER $USRDIR/$APPLOW
-    
+
     if ! grep 'AutoSub.py' /etc/crontab > /dev/null; then
 		sudo echo "@reboot $APPUSER cd /usr/local/autosub/ && /usr/local/bin/python AutoSub.py > /dev/null" >> /etc/crontab
     fi
-    
     echo
     echo "Now set your defaults in AutoSub config"
     echo "You need to change the rootpath to the path where"
@@ -251,7 +251,7 @@ Install_AutoSub () {
     echo
     read -sn 1 -p "Press a key to continue"
     ee $USRDIR/$APPLOW/config.properties
-    
+
 Summ_$SETAPP
 Summ_$SETAPP >> /tmp/lasi_install.log
 }
@@ -384,7 +384,7 @@ Type sickbeard --help for options
 SickBeard is by default located @ http://$HOSTNAME:$set_port
 
 Also configured SABnzbd+ to look in the Sick Beard script folder and
-created an autoProcessTV.cfg file. 
+created an autoProcessTV.cfg file.
 
 The remaining configuration is up to you and can be done using the webinterface.
 "
@@ -540,7 +540,7 @@ Info_Maraschino () {
     clear
     echo "
 *###############################################################*
-*###################### MARASCHINO #############################* 
+*###################### MARASCHINO #############################*
 #                                                               #
 # Maraschino is a webpage that overviews a XBMC-mediacenter     #
 # and serverapplications like Sabnzbd, Sickbeard and others.    #
@@ -564,10 +564,13 @@ Info_Maraschino () {
 }
 
 Install_Maraschino () {
+	check_App
+	check_git
+	check_python
 	echo "NOT available, YET!"
 	sleep 2
 	LaSi_Menu
-    
+
 #Summ_$SETAPP
 #Summ_$SETAPP >> /tmp/lasi_install.log
 }
@@ -687,7 +690,7 @@ Info_Spotweb () {
 }
 
 Install_Spotweb () {
-	
+
 	install_Spotweb () {
 		if [ "$WEBSRV" = "lighttpd" ]; then
 			DOCUROOT=`sed -ne '/^server.document-root =/p' /usr/local/etc/lighttpd/lighttpd.conf | awk -F '"' '{ print $2 }'`
@@ -696,7 +699,7 @@ Install_Spotweb () {
 			DOCUROOT=`sed -ne '/^var.server_root =/p' /usr/local/etc/apache22/httpd.conf | awk -F '"' '{ print $2 }'`
 			SPOTDIR=$DOCUROOT/spotweb
 		fi
-		
+
 		if [ "$(ls -A $SPOTDIR)" ]; then
 			clear
 			echo
@@ -929,7 +932,7 @@ Info_Transmission () {
 }
 
 Install_Transmission () {
-	
+
 	set_DOWNDIR () {
 		clear
 		echo
@@ -949,7 +952,7 @@ Install_Transmission () {
 		echo "Replace the last number with an asterix, e.g. 192.168.10.*"
 		echo
 		read -p 'IP-range : ' IPRANGE
-		
+
 	}
 
 	if which transmission-daemon > /dev/null; then
@@ -967,11 +970,11 @@ Install_Transmission () {
 		else
 			sudo pkg_add -r transmission-daemon || error_Msg
 		fi
-		
+
 		if ! ls $USRDIR/$APPLOW > /dev/null; then
 			sudo mkdir $USRDIR/$APPLOW
 		fi
-		
+
 		sudo chown -R $APPUSER $USRDIR/$APPLOW
 		set_DOWNDIR
 		set_RCD
@@ -992,8 +995,8 @@ Transmission is by default located @ http://$HOSTNAME:9091
 ###############################################
 ######## Check System and Requirements ########
 ###############################################
-check_Portstree() {
-	
+check_Portstree () {
+
 	install_Portstree() {
 		clear
 		LaSi_Logo
@@ -1073,7 +1076,7 @@ install_REQ () {
 						if [ "$REQ" = "php" ] && [ "$WEBSRV" = "apache22" ]; then
 							cd /usr/ports/lang/php5 &&
 							sudo make WITH_APACHE=yes BATCH=yes install clean
-						else							
+						else
 							cd $REQPATH &&
 							sudo make -DBATCH install clean || error_REQ
 						fi
@@ -1161,7 +1164,7 @@ check_python () {
 	REQPATH=/usr/ports/lang/python
 	install_REQ
 	fi
-	
+
 	if [ "$APPLOW" = "sickbeard" ]; then
 		if ! which cheetah > /dev/null; then
 		REQ=py27-cheetah
@@ -1169,7 +1172,7 @@ check_python () {
 		intall_REQ
 		fi
 	fi
-	
+
 	if [ "$APPLOW" = "beets" ]; then
 		if ! ls /usr/local/lib/python2.7/site-packages/setuptools* > /dev/null; then
 		REQ=py27-setuptools
@@ -1192,7 +1195,7 @@ check_mysql () {
 		stty $stty_orig
 		mysqladmin -u root password $SQLPASSWORD
 	}
-	
+
 	if ! which mysql > /dev/null; then
 	APPLOW=mysql
 	REQ=mysql55-server
@@ -1258,7 +1261,7 @@ check_phpext () {
 }
 
 check_WEBSRV () {
-	
+
 	cf_Webserver () {
 		clear
 		LaSi_Logo
@@ -1332,7 +1335,7 @@ check_WEBSRV () {
 		else
 			sudo pkg_add -r $WEBSRV || error_REQ
 		fi
-		
+
 		if [ "$WEBSRV" = "apache22" ]; then
 			check_php
 			sed -i ".backup" 's/DirectoryIndex index.html/DirectoryIndex index.php index.html/' /usr/local/etc/apache22/httpd.conf &&
@@ -1387,7 +1390,7 @@ update_App () {
 		sleep 2
 		LaSi_Menu
 	}
-	
+
 	if [ "$APPLOW" = "autosub" ]; then
 		echo
 		echo "Checking for updates $SETAPP"
@@ -1694,7 +1697,7 @@ pkg_Choice() {
 
 ##### Un-Installer #####
 Uninstaller () {
-	echo 
+	echo
     echo "Are you sure you want to continue and remove/uninstall $SETAPP?"
     read -p "[yes/no]: " REPLY
     echo
@@ -1711,10 +1714,10 @@ Uninstaller () {
 					if pgrep -f $SETAPP.py > /dev/null; then
 						$RCPATH/$APPLOW stop
 						sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
-					fi					
+					fi
 					APPDIR=`sed -n "/"$APPLOW"_dir:=/p" $RCPATH/$APPLOW | awk -F '"' '{ print $2 }'`
-				fi 
-				
+				fi
+
 				if ls $APPDIR > /dev/null; then
 					sudo rm -rf $APPDIR
 				else
