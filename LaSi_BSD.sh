@@ -71,14 +71,13 @@ LaSi_Logo () {
 LaSi_Menu (){
 	LaSi_Logo
 	echo
-	echo "Make a choice to see info or install these apps..."
+	echo "Make a choice to see info and/or install these apps..."
 	echo
-	echo "1. SABnzbd+  (it's recommended to first install SABnzbd+)"
-	echo
-	echo "2. AutoSub        6. LazyLibrarian (alpha stage)"
-	echo "3. Beets          7. Sick Beard"
-	echo "4. CouchPotato    8. SpotWeb"
-    echo "5. Headphones     9. Transmission (incl. webinterface)"
+	echo "1. SABnzbd+       6.  LazyLibrarian (alpha stage)"
+	echo "2. AutoSub        7.  Marashino"
+	echo "3. Beets          8.  SickBeard"
+	echo "4. CouchPotato    9.  SpotWeb"
+    echo "5. Headphones     10. Transmission (incl. webinterface)"
     echo
     # tell about commandline options
     #if [ $unattended != 0 ]; then
@@ -154,8 +153,16 @@ LaSi_Menu (){
 			if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
             #if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
             ;;
-		# Sickbeard
+        # maraschino
         7)
+			SETAPP=Maraschino
+			APPLOW=maraschino
+			set_port=7000
+			if [ $unattended = 1 ]; then Install_$set_app; else Info_$set_app; fi
+			#if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
+			;;
+		# Sickbeard
+        8)
 			SETAPP=SickBeard
 			APPLOW=sickbeard
         	set_port=8081
@@ -163,23 +170,13 @@ LaSi_Menu (){
             #if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
             ;;
         # Spotweb
-        8)
+        9)
 			SETAPP=Spotweb
             if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
             #if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
             ;;
-		# subliminal
+		# Transmission
 		10)
-			echo
-			echo "Subliminal  COMING SOON"
-			sleep 2
-			LaSi_Menu
-			#set_app=Subliminal
-			#if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
-			#if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
-			;;
-		# transmission
-		9)
 			SETAPP=Transmission
 			APPLOW=transmission
 			set_port=9091
@@ -240,11 +237,11 @@ Install_AutoSub () {
 	check_App
 	check_mercurial
 	sudo hg clone https://code.google.com/p/auto-sub/ $USRDIR/$APPLOW &&
-	sudo sed -i ".backup" 's/path = \/home\/user\/auto-sub/path = \/usr\/local\/autosub/' /usr/local/autosub/config.properties &&
+	sudo sed -i ".backup" 's|path = /home/user/auto-sub|path = /usr/local/autosub|' /usr/local/autosub/config.properties &&
     chown -R $APPUSER $USRDIR/$APPLOW
     
     if ! grep 'AutoSub.py' /etc/crontab > /dev/null; then
-		sudo echo "@reboot share cd /usr/local/autosub/ && /usr/local/bin/python AutoSub.py > /dev/null" >> /etc/crontab
+		sudo echo "@reboot $APPUSER cd /usr/local/autosub/ && /usr/local/bin/python AutoSub.py > /dev/null" >> /etc/crontab
     fi
     
     echo
@@ -533,6 +530,52 @@ echo "
 Done! Installed $SETAPP.
 
 LazyLibrarian is by default located @ http://$HOSTNAME:$set_port
+"
+}
+
+######################
+##### MARASCHINO #####
+######################
+Info_Maraschino () {
+    clear
+    echo "
+*###############################################################*
+*###################### MARASCHINO #############################* 
+#                                                               #
+# Maraschino is a webpage that overviews a XBMC-mediacenter     #
+# and serverapplications like Sabnzbd, Sickbeard and others.    #
+#                                                               #
+# Some of it's features are:                                    #
+#   - Customizable applications module with:                    #
+#   - recently added media                                      #
+#   - Currently playing bar                                     #
+#   - Sabnzbd module                                            #
+#   - SickBeard coming episodes                                 #
+#   - Trakt.tv recommendations                                  #
+#   - Diskspace info                                            #
+#                                                               #
+*###############################################################*
+#                                                               #
+# Maraschino is written by Mr. Kipling and others               #
+#                                                               #
+# Visit http://www.maraschinoproject.com/                       #
+*###############################################################*"
+    cf_Choice
+}
+
+Install_Maraschino () {
+	echo "NOT available, YET!"
+	sleep 2
+	LaSi_Menu
+    
+#Summ_$SETAPP
+#Summ_$SETAPP >> /tmp/lasi_install.log
+}
+
+Summ_Maraschino () {
+echo "
+Done! Installed $set_app.
+$set_app is by default located @ http://$HOSTNAME:$set_port
 "
 }
 
