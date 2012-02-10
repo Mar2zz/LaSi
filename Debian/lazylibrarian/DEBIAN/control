@@ -1,0 +1,19 @@
+Package: lazylibrarian
+Version: 2012.02.10
+Section: web 
+Priority: optional
+Architecture: all
+Essential: no
+Depends: python (>= 2.6)
+Recommends: git
+Installed-Size: 3900
+Maintainer: Mar2zz <lasi.mar2zz@gmail.com>
+Provides: lazylibrarian
+Description: LazyLibrarian (LL) is an automatic NZB and torrent downloader.
+ You can keep a 'authors/books I want'-list and it will search for NZBs of these books every X hours.
+ Once a book is found, it will send it to SABnzbd or download the nzb to a specified directory.
+ .
+ LazyLibrarian can be found @ https://github.com/Mar2zz/LazyLibrarian and it is written and maintained by Mar2zz
+ .
+ LazyLibrarian is installed in /opt/lazylibrarian, config and data in ~/.lazylibrarian (configurable).
+ Type lazylibrarian --help for options

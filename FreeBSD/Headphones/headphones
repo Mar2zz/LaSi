@@ -19,7 +19,6 @@
 #     Default is same as headphones_dir.
 # headphones_pid:  The name of the pidfile to create.
 #     Default is headphones.pid in headphones_dir.
-PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
 
 . /etc/rc.subr
 
@@ -33,6 +32,13 @@ load_rc_config ${name}
 : ${headphones_dir:="/usr/local/headphones"}
 : ${headphones_chdir:="${headphones_dir}"}
 : ${headphones_pid:="${headphones_dir}/headphones.pid"}
+PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
+
+WGET="/usr/local/bin/wget" 	# You need wget for this script to safely shutdown couchpotato.
+HOST="localhost" 			# Set headphones address here.
+PORT="8181" 				# Set headphones port here.
+HPUSR="" 					# Set headphones username (if you use one) here.
+HPPWD=""					# Set headphones password (if you use one) here.
 
 status_cmd="${name}_status"
 stop_cmd="${name}_stop"
@@ -57,6 +63,7 @@ verify_headphones_pid() {
 headphones_stop() {
     echo "Stopping $name"
     verify_headphones_pid
+    ${WGET} -O - -q --user=${HPUSR} --password=${HPPWD} "http://${HOST}:${PORT}/shutdown/" >/dev/null
     if [ -n "${pid}" ]; then
       wait_for_pids ${pid}
       echo "Stopped"

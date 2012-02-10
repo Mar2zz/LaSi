@@ -1,0 +1,25 @@
+#!/bin/sh
+
+set -e
+
+# if git exists clone repo, else wget lazylibrarian.tar.gz
+if which git > /dev/null; then
+    git clone https://github.com/Mar2zz/LazyLibrarian.git /opt/lazylibrarian
+elif wget -O /tmp/lazylibrarian.tar.gz https://github.com/Mar2zz/LazyLibrarian/tarball/master; then
+    # create path again
+    mkdir -p /opt/lazylibrarian || exit 1
+    tar -xzf /tmp/lazylibrarian.tar.gz --strip 1 -C /opt/lazylibrarian
+    rm -f /tmp/lazylibrarian.tar.gz
+else
+    echo "Both git clone and wget file failed, to solve this execute: 
+    git clone https://github.com/Mar2zz/LazyLibrarian.git /opt/lazylibrarian
+        or:
+    wget -O /tmp/lazylibrarian.tar.gz https://github.com/Mar2zz/LazyLibrarian/tarball/master && tar -xzf /tmp/lazylibrarian.tar.gz --strip 1 -C /opt/lazylibrarian
+    
+    or download, extract and copy the files from github to /opt/lazylibrarian"
+    exit 1
+fi
+
+# execute init.script
+update-rc.d lazylibrarian defaults  | grep /etc/init.d/lazylibrarian
+/etc/init.d/lazylibrarian start

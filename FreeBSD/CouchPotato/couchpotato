@@ -31,13 +31,13 @@ load_rc_config ${name}
 : ${couchpotato_dir:="/usr/local/couchpotato"}
 : ${couchpotato_chdir:="${couchpotato_dir}"}
 : ${couchpotato_pid:="${couchpotato_dir}/couchpotato.pid"}
-
 PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
+
 WGET="/usr/local/bin/wget" 	# You need wget for this script to safely shutdown couchpotato.
-HOST="localhost" 		# Set couchpotato address here.
-PORT="5000" 			# Set couchpotato port here.
-CPUSR="" 			# Set couchpotato username (if you use one) here.
-CPPWD="" 			# Set couchpotato password (if you use one) here.
+HOST="localhost" 			# Set couchpotato address here.
+PORT="5000" 				# Set couchpotato port here.
+CPUSR="" 					# Set couchpotato username (if you use one) here.
+CPPWD="" 					# Set couchpotato password (if you use one) here.
 
 status_cmd="${name}_status"
 stop_cmd="${name}_stop"

@@ -343,6 +343,14 @@ LaSi_Menu (){
                     if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
                     ;;
 
+                # lazylibrarian
+                ll)
+                    set_app=LazyLibrarian
+                    set_port=5299
+                    if [ $unattended = 1 ]; then Install_$set_app; else Info_$set_app; fi
+                    if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
+                    ;;
+
                 # mediafrontpage
                 mfp)
                     set_app=Mediafrontpage
@@ -635,6 +643,61 @@ Headphones is by default located @ http://$HOSTNAME:$set_port
 "
 }
 
+
+#########################
+##### LazyLibrarian #####
+#########################
+Info_LazyLibrarian () {
+    clear
+    echo "
+*###############################################################*
+*#################### LazyLibrarian ############################*
+#                                                               #
+# LazyLibrarian is an automatic NZB downloader.                 #
+# You can keep a 'Authors/Books I like to read'-list and it will#
+# search for NZBs of these books                                #
+#                                                               #
+# Once an book is found, it will send it to SABnzbd.            #
+#                                                               #
+*###############################################################*
+#                                                               #
+# Headphones is written by Mar2zz in his spare time...          #
+#                                                               #
+# Visit https://github.com/Mar2zz/LazyLibrarian                 #
+*###############################################################*"
+    cf_Choice
+}
+
+Install_LazyLibrarian () {
+    check_git
+    wget -nv -O /tmp/lazylibrarian.deb $DROPBOX/LaSi_Repo/lazylibrarian.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
+
+    sudo dpkg -i /tmp/lazylibrarian.deb || error_Depends
+
+    if ! pgrep -f LazyLibrarian.py > /dev/null; then
+        #check_Port
+        sudo sed -i "
+            s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
+            s/RUN_AS.*/RUN_AS=$USER/
+            s/WEB_UPDATE=0/WEB_UPDATE=1/g
+        " /etc/default/lazylibrarian
+        echo "Changed daemon settings..."
+        sudo /etc/init.d/lazylibrarian start || error_Msg
+    fi
+
+Summ_$SETAPP
+Summ_$SETAPP >> /tmp/LaSi/lasi_install.log
+}
+
+Summ_LazyLibrarian () {
+clear
+echo
+echo "
+Done! Installed $SETAPP.
+
+LazyLibrarian is by default located @ http://$HOSTNAME:$set_port
+"
+}
 
 ####################
 #### MARASCHINO ####

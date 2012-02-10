@@ -1,0 +1,67 @@
+#!/bin/sh
+#
+# PROVIDE: maraschino
+# KEYWORD: shutdown
+#
+# Add the following lines to /etc/rc.conf.local or /etc/rc.conf
+# to enable this service:
+#
+# maraschino_enable (bool):	Set to NO by default.
+#			Set it to YES to enable it.
+# maraschino_user:  The user account Sick Beard daemon runs as what
+#			you want it to be.
+# maraschino_dir:	Directory where Sick Beard lives.
+#			Default: /usr/local/maraschino
+# maraschino_chdir:  Change to this directory before running Sick Beard.
+#     Default is same as maraschino_dir.
+# maraschino_pid:  The name of the pidfile to create.
+#     Default is maraschino.pid in maraschino_dir.
+
+. /etc/rc.subr
+
+name="maraschino"
+rcvar=${name}_enable
+
+load_rc_config ${name}
+
+: ${maraschino_enable:="NO"}
+: ${maraschino_user:="USERNAME"}
+: ${maraschino_dir:="/usr/local/maraschino"}
+: ${maraschino_chdir:="${maraschino_dir}"}
+: ${maraschino_pid:="${maraschino_dir}/maraschino.pid"}
+PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
+
+status_cmd="${name}_status"
+stop_cmd="${name}_stop"
+
+command="/usr/sbin/daemon"
+command_args="-f -p ${maraschino_pid} python ${maraschino_dir}/maraschino-cherrypy.py -q"
+
+# Ensure user is root when running this script.
+if [ `id -u` != "0" ]; then
+  echo "Oops, you should be root before running this!"
+  exit 1
+fi
+
+verify_maraschino_pid() {
+    # Make sure the pid corresponds to the Maraschino process.
+    pid=`cat ${maraschino_pid} 2>/dev/null`
+    ps -p ${pid} | grep -q "python ${maraschino_dir}/maraschino-cherrypy.py"
+    return $?
+}
+
+maraschino_stop() {
+    echo "Stopping $name"
+    verify_maraschino_pid
+	maraschino_pid=`ps -U ${maraschino_user} | grep "python.*maraschino-cherrypy.py.*--daemon" | grep -v 'grep' | awk '{print $1}'`
+    if [ -n "${pid}" ]; then
+        kill ${pid}
+    fi
+}
+
+maraschino_status() {
+    verify_maraschino_pid && echo "$name is running as ${pid}" || echo "$name is not running"
+}
+
+run_rc_command "$1"
+

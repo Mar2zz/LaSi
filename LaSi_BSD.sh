@@ -17,7 +17,7 @@
 # |
 # | execute this script with the command: sudo chmod +x LaSi.sh
 # | then run with ./LaSi.sh
-# | 
+# |
 # |
 # | LaSi will install the programs you choose
 # | from the menu:
@@ -27,16 +27,11 @@
 # | - CouchPotato
 # | - Headphones
 # | - LazyLibrarian (alpha stage)
+# | - Maraschino
 # | - SABnzbd
 # | - Sickbeard
 # | - SpotWeb
-# |
-# | ############## _
-# | #               \
-# | # Subliminal    /_ Not available, yet!
-# | # Transmission  \
-# | #              _/
-# | ##############
+# | - Transmission
 # |___________________________________________________________________________________
 #
 #######################################################################################
@@ -71,28 +66,28 @@ LaSi_Logo () {
 LaSi_Menu (){
 	LaSi_Logo
 	echo
-	echo "Make a choice to see info or install these apps..."
+	echo "Make a choice to see info and/or install these apps..."
 	echo
-	echo "0. SABnzbd+  (it's recommended to first install SABnzbd+)"
-	echo "1. AutoSub        5. LazyLibrarian"
-	echo "2. Beets          6. Sick Beard"
-	echo "3. CouchPotato    7. SpotWeb"
-    echo "4. Headphones"
+	echo "1. SABnzbd+       6.  LazyLibrarian (alpha stage)"
+	echo "2. AutoSub        7.  Maraschino"
+	echo "3. Beets          8.  SickBeard"
+	echo "4. CouchPotato    9.  SpotWeb"
+    echo "5. Headphones     10. Transmission (incl. webinterface)"
     echo
     # tell about commandline options
-    if [ $unattended != 0 ]; then
-        echo "Unattended installation enabled"
-    else
-        echo "Tip: Type LaSi.sh --help for more install options!"
-    fi
+    #if [ $unattended != 0 ]; then
+    #    echo "Unattended installation enabled"
+    #else
+    #    echo "Tip: Type LaSi.sh --help for more install options!"
+    #fi
 
-    if [ $ask_schedule = 1 ]; then
-        echo "Cronjobs set to 'ask'."
-    elif [ $schedule != 0 ]; then
-        echo "Cronjobs set to $schedule."
-    fi
+    #if [ $ask_schedule = 1 ]; then
+    #    echo "Cronjobs set to 'ask'."
+    #elif [ $schedule != 0 ]; then
+    #    echo "Cronjobs set to $schedule."
+    #fi
 
-    echo
+    #echo
     echo "Q. Quit"
 
     read SELECT
@@ -107,9 +102,9 @@ LaSi_Menu (){
         #if [ $unattended = 1 ]; then [ $update_apt = 1 ] || update_Apt; fi
 
         case "$item" in
-        
+
         # Sabnzbd
-        0)
+        1)
 			SETAPP=Sabnzbd
 			APPLOW=sabnzbd
 			set_port=8080
@@ -117,20 +112,20 @@ LaSi_Menu (){
             #if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
             ;;
         # Auto-Sub
-        1)
+        2)
 			SETAPP=AutoSub
 			APPLOW=autosub
 			if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
         	;;
 		# beets
-        2)
+        3)
 			SETAPP=Beets
 			APPLOW=beets
 			if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
 			#if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
 			;;
 		# Couchpotato
-        3)
+        4)
 			SETAPP=CouchPotato
 			APPLOW=couchpotato
         	set_port=5000
@@ -138,7 +133,7 @@ LaSi_Menu (){
            	#if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
 			;;
         # Headphones
-        4)
+        5)
 			SETAPP=Headphones
 			APPLOW=headphones
 			set_port=8181
@@ -146,15 +141,23 @@ LaSi_Menu (){
             #if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
             ;;
         # LazyLibrarian
-        5)
+        6)
 			SETAPP=LazyLibrarian
 			APPLOW=lazylibrarian
 			set_port=5299
 			if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
             #if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
             ;;
+        # maraschino
+        7)
+			SETAPP=Maraschino
+			APPLOW=maraschino
+			set_port=7000
+			if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
+			#if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
+			;;
 		# Sickbeard
-        6)
+        8)
 			SETAPP=SickBeard
 			APPLOW=sickbeard
         	set_port=8081
@@ -162,30 +165,18 @@ LaSi_Menu (){
             #if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
             ;;
         # Spotweb
-        7)
+        9)
 			SETAPP=Spotweb
+			APPLOW=spotweb
             if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
             #if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
             ;;
-		# subliminal
-		8)
-			echo
-			echo "Subliminal  COMING SOON"
-			sleep 2
-			LaSi_Menu
-			#set_app=Subliminal
-			#if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
-			#if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
-			;;
-		# transmission
-		9)
-			echo
-			echo "Transmission  COMING SOON"
-			sleep 2
-			LaSi_Menu
-			#set_app=Transmission
-			#set_port=9091
-			#if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
+		# Transmission
+		10)
+			SETAPP=Transmission
+			APPLOW=transmission
+			set_port=9091
+			if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
 			;;
 
 		[Qq]) exit ;;
@@ -202,7 +193,7 @@ LaSi_Menu (){
     if [ ${#items[@]} -gt 1 ]; then
         echo "*###############################################################*"
         echo "*################### INSTALL SUMMARY ###########################*"
-        cat $USRDIR/LaSi/lasi_install.log
+        cat /tmp/LaSi/lasi_install.log
         echo "*###############################################################*"
     fi
 
@@ -242,13 +233,12 @@ Install_AutoSub () {
 	check_App
 	check_mercurial
 	sudo hg clone https://code.google.com/p/auto-sub/ $USRDIR/$APPLOW &&
-	sudo sed -i ".backup" 's/path = \/home\/user\/auto-sub/path = \/usr\/local\/autosub/' /usr/local/autosub/config.properties &&
+	sudo sed -i ".backup" 's|path = /home/user/auto-sub|path = /usr/local/autosub|' /usr/local/autosub/config.properties &&
     chown -R $APPUSER $USRDIR/$APPLOW
-    
+
     if ! grep 'AutoSub.py' /etc/crontab > /dev/null; then
-		sudo echo "@reboot share cd /usr/local/autosub/ && /usr/local/bin/python AutoSub.py > /dev/null" >> /etc/crontab
+		sudo echo "@reboot $APPUSER cd /usr/local/autosub/ && /usr/local/bin/python AutoSub.py > /dev/null" >> /etc/crontab
     fi
-    
     echo
     echo "Now set your defaults in AutoSub config"
     echo "You need to change the rootpath to the path where"
@@ -256,7 +246,7 @@ Install_AutoSub () {
     echo
     read -sn 1 -p "Press a key to continue"
     ee $USRDIR/$APPLOW/config.properties
-    
+
 Summ_$SETAPP
 Summ_$SETAPP >> /tmp/lasi_install.log
 }
@@ -320,7 +310,7 @@ Install_Sabnzbd () {
 	fi
 
 Summ_$SETAPP
-Summ_$SETAPP >> $USRDIR/LaSi/lasi_install.log
+Summ_$SETAPP >> /tmp/LaSi/lasi_install.log
 }
 
 Summ_Sabnzbd () {
@@ -376,7 +366,7 @@ Install_SickBeard () {
     set_RCD
 
 Summ_$SETAPP
-Summ_$SETAPP >> $USRDIR/LaSi/lasi_install.log
+Summ_$SETAPP >> /tmp/LaSi/lasi_install.log
 }
 
 Summ_SickBeard () {
@@ -389,7 +379,7 @@ Type sickbeard --help for options
 SickBeard is by default located @ http://$HOSTNAME:$set_port
 
 Also configured SABnzbd+ to look in the Sick Beard script folder and
-created an autoProcessTV.cfg file. 
+created an autoProcessTV.cfg file.
 
 The remaining configuration is up to you and can be done using the webinterface.
 "
@@ -431,7 +421,7 @@ Install_CouchPotato () {
     set_RCD
 
 Summ_$SETAPP
-Summ_$SETAPP >> $USRDIR/LaSi/lasi_install.log
+Summ_$SETAPP >> /tmp/LaSi/lasi_install.log
 }
 
 Summ_CouchPotato () {
@@ -479,7 +469,7 @@ Install_Headphones () {
     set_RCD
 
 Summ_$SETAPP
-Summ_$SETAPP >> $USRDIR/LaSi/lasi_install.log
+Summ_$SETAPP >> /tmp/LaSi/lasi_install.log
 }
 
 Summ_Headphones () {
@@ -525,7 +515,7 @@ Install_LazyLibrarian () {
     set_RCD
 
 Summ_$SETAPP
-Summ_$SETAPP >> $USRDIR/LaSi/lasi_install.log
+Summ_$SETAPP >> /tmp/LaSi/lasi_install.log
 }
 
 Summ_LazyLibrarian () {
@@ -535,6 +525,57 @@ echo "
 Done! Installed $SETAPP.
 
 LazyLibrarian is by default located @ http://$HOSTNAME:$set_port
+"
+}
+
+######################
+##### MARASCHINO #####
+######################
+Info_Maraschino () {
+    clear
+    echo "
+*###############################################################*
+*###################### MARASCHINO #############################*
+#                                                               #
+# Maraschino is a webpage that overviews a XBMC-mediacenter     #
+# and serverapplications like Sabnzbd, Sickbeard and others.    #
+#                                                               #
+# Some of it's features are:                                    #
+#   - Customizable applications module with:                    #
+#   - recently added media                                      #
+#   - Currently playing bar                                     #
+#   - Sabnzbd module                                            #
+#   - SickBeard coming episodes                                 #
+#   - Trakt.tv recommendations                                  #
+#   - Diskspace info                                            #
+#                                                               #
+*###############################################################*
+#                                                               #
+# Maraschino is written by Mr. Kipling and others               #
+#                                                               #
+# Visit http://www.maraschinoproject.com/                       #
+*###############################################################*"
+    cf_Choice
+}
+
+Install_Maraschino () {
+	check_App
+	check_git
+	check_python
+	git clone https://github.com/mrkipling/maraschino.git $USRDIR/$APPLOW
+	cp $USRDIR/$APPLOW/settings_example.py $USRDIR/$APPLOW/settings.py
+	sed -i "" 's|/path/to/maraschino.db|/usr/local/maraschino/maraschino.db|' $USRDIR/$APPLOW/settings.py
+	chown -R $APPUSER $USRDIR/$APPLOW
+	set_RCD
+
+Summ_$SETAPP
+Summ_$SETAPP >> /tmp/lasi_install.log
+}
+
+Summ_Maraschino () {
+echo "
+Done! Installed $set_app.
+$set_app is by default located @ http://$HOSTNAME:$set_port
 "
 }
 
@@ -604,7 +645,7 @@ Install_Beets () {
     fi
 
 Summ_$SETAPP
-Summ_$SETAPP >> $USRDIR/LaSi/lasi_install.log
+Summ_$SETAPP > /tmp/LaSi/lasi_install.log
 }
 
 Summ_Beets () {
@@ -646,7 +687,7 @@ Info_Spotweb () {
 }
 
 Install_Spotweb () {
-	
+
 	install_Spotweb () {
 		if [ "$WEBSRV" = "lighttpd" ]; then
 			DOCUROOT=`sed -ne '/^server.document-root =/p' /usr/local/etc/lighttpd/lighttpd.conf | awk -F '"' '{ print $2 }'`
@@ -655,7 +696,7 @@ Install_Spotweb () {
 			DOCUROOT=`sed -ne '/^var.server_root =/p' /usr/local/etc/apache22/httpd.conf | awk -F '"' '{ print $2 }'`
 			SPOTDIR=$DOCUROOT/spotweb
 		fi
-		
+
 		if [ "$(ls -A $SPOTDIR)" ]; then
 			clear
 			echo
@@ -757,7 +798,7 @@ Install_Spotweb () {
 	cd $SPOTDIR && /usr/local/bin/php $SPOTDIR/upgrade-db.php
 
 	Summ_Spotweb
-	Summ_Spotweb >> $USRDIR/LaSi/lasi_install.log
+	Summ_Spotweb >> /tmp/LaSi/lasi_install.log
 	}
 
 	cf_CronRetrieve () {
@@ -786,9 +827,9 @@ set -e
 [ -e $SPOTDIR/retrieve.php ] || exit 0
 
 /usr/local/bin/php $SPOTDIR/retrieve.php || exit 1
-" > $USRDIR/LaSi/spotweb_spots
+" > /tmp/LaSi/spotweb_spots
 
-                sudo mv -f $USRDIR/LaSi/spotweb_spots /etc/cron.hourly/spotweb_spots
+                sudo mv -f /tmp/LaSi/spotweb_spots /etc/cron.hourly/spotweb_spots
                 sudo chmod +x /etc/cron.hourly/spotweb_spots
 
                 echo
@@ -859,11 +900,100 @@ After configuring run $SPOTDIR/retrieve.php to fill the database with spots
 "
 }
 
+######################
+#### TRANSMISSION ####
+######################
+Info_Transmission () {
+    clear
+    echo "
+*###############################################################*
+*##################### TRANSMISSION ############################*
+#                                                               #
+# Transmission is a powerfull torrentclient which can run as    #
+# a daemon with a webinterface. It has a very small footprint,  #
+# so it can run on devices with low cpu power and low memory.   #
+#                                                               #
+# Transmission has the features you want from a Torrent client: #
+# encryption, a webinterface, peer exchange, magnet links, DHT, #
+# µTP, UPnP and NAT-PMP port forwarding, webseed support, watch #
+# directories, tracker editing, global and per-torrent          #
+# speedlimits, and more.                                        #
+#                                                               #
+*###############################################################*
+#                                                               #
+# Transmission is written by volunteers.                        #
+#                                                               #
+# Visit http://www.transmissionbt.com/                          #
+*###############################################################*"
+    cf_Choice
+}
+
+Install_Transmission () {
+
+	set_DOWNDIR () {
+		clear
+		echo
+		echo "Where do you like Transmission to store your downloads?"
+		echo "Enter the full path e.g. /tank/download/torrents"
+		echo
+		read -p 'PATH : ' DOWNDIR
+		if ! ls $DOWNDIR > /dev/null; then
+			sudo mkdir $DOWNDIR
+			sudo chown -R $APPUSER $DOWNDIR
+		fi
+		echo
+		echo
+		echo
+		echo "Last question; What is the IP-range of your network?"
+		echo "Something like: 192.168.10.128"
+		echo "Replace the last number with an asterix, e.g. 192.168.10.*"
+		echo
+		read -p 'IP-range : ' IPRANGE
+
+	}
+
+	if which transmission-daemon > /dev/null; then
+		clear
+		echo
+		echo "Transmission is already installed on this system"
+		echo
+		sleep 3
+		Info_$SETAPP
+	else
+		pkg_Choice
+		if [ "$SETPKG" = "ports" ]; then
+			cd /usr/ports/net-p2p/transmission-daemon &&
+			sudo make -DBATCH install clean || error_Msg
+		else
+			sudo pkg_add -r transmission-daemon || error_Msg
+		fi
+
+		if ! ls $USRDIR/$APPLOW > /dev/null; then
+			sudo mkdir $USRDIR/$APPLOW
+		fi
+
+		sudo chown -R $APPUSER $USRDIR/$APPLOW
+		set_DOWNDIR
+		set_RCD
+	fi
+
+Summ_$SETAPP
+Summ_$SETAPP >> /tmp/lasi_install.log
+}
+
+Summ_Transmission () {
+echo "
+Done! Installed $SETAPP.
+
+Transmission is by default located @ http://$HOSTNAME:9091
+"
+}
+
 ###############################################
 ######## Check System and Requirements ########
 ###############################################
-check_Portstree() {
-	
+check_Portstree () {
+
 	install_Portstree() {
 		clear
 		LaSi_Logo
@@ -943,7 +1073,7 @@ install_REQ () {
 						if [ "$REQ" = "php" ] && [ "$WEBSRV" = "apache22" ]; then
 							cd /usr/ports/lang/php5 &&
 							sudo make WITH_APACHE=yes BATCH=yes install clean
-						else							
+						else
 							cd $REQPATH &&
 							sudo make -DBATCH install clean || error_REQ
 						fi
@@ -989,14 +1119,14 @@ install_phpext () {
 		sudo make config &&
 		sudo make BATCH=yes install clean || error_REQ
 	else
-		PHPEXT1=`sed -n '1p' $USRDIR/LaSi/php.ext`
-		PHPEXT2=`sed -n '2p' $USRDIR/LaSi/php.ext`
-		PHPEXT3=`sed -n '3p' $USRDIR/LaSi/php.ext`
-		PHPEXT4=`sed -n '4p' $USRDIR/LaSi/php.ext`
-		PHPEXT5=`sed -n '5p' $USRDIR/LaSi/php.ext`
-		PHPEXT6=`sed -n '6p' $USRDIR/LaSi/php.ext`
-		PHPEXT7=`sed -n '7p' $USRDIR/LaSi/php.ext`
-		PHPEXT8=`sed -n '8p' $USRDIR/LaSi/php.ext`
+		PHPEXT1=`sed -n '1p' /tmp/LaSi/php.ext`
+		PHPEXT2=`sed -n '2p' /tmp/LaSi/php.ext`
+		PHPEXT3=`sed -n '3p' /tmp/LaSi/php.ext`
+		PHPEXT4=`sed -n '4p' /tmp/LaSi/php.ext`
+		PHPEXT5=`sed -n '5p' /tmp/LaSi/php.ext`
+		PHPEXT6=`sed -n '6p' /tmp/LaSi/php.ext`
+		PHPEXT7=`sed -n '7p' /tmp/LaSi/php.ext`
+		PHPEXT8=`sed -n '8p' /tmp/LaSi/php.ext`
 		sudo pkg_add -r php5-extensions $PHPEXT1 $PHPEXT2 $PHPEXT3 $PHPEXT4 $PHPEXT5 $PHPEXT6 $PHPEXT7 $PHPEXT8 || error_REQ
 	fi
 }
@@ -1031,7 +1161,7 @@ check_python () {
 	REQPATH=/usr/ports/lang/python
 	install_REQ
 	fi
-	
+
 	if [ "$APPLOW" = "sickbeard" ]; then
 		if ! which cheetah > /dev/null; then
 		REQ=py27-cheetah
@@ -1039,11 +1169,19 @@ check_python () {
 		intall_REQ
 		fi
 	fi
-	
+
 	if [ "$APPLOW" = "beets" ]; then
 		if ! ls /usr/local/lib/python2.7/site-packages/setuptools* > /dev/null; then
 		REQ=py27-setuptools
 		REQPATH=/usr/ports/devel/py-setuptools
+		intall_REQ
+		fi
+	fi
+	
+	if [ "$APPLOW" = "maraschino" ]; then
+		if ! ls /usr/local/lib/python2.7/site-packages/CherryPy* > /dev/null; then
+		REQ=py27-cherrypy
+		REQPATH=/usr/ports/www/py-cherrypy
 		intall_REQ
 		fi
 	fi
@@ -1062,7 +1200,7 @@ check_mysql () {
 		stty $stty_orig
 		mysqladmin -u root password $SQLPASSWORD
 	}
-	
+
 	if ! which mysql > /dev/null; then
 	APPLOW=mysql
 	REQ=mysql55-server
@@ -1082,45 +1220,45 @@ check_php () {
 }
 
 check_phpext () {
-	sudo rm -f $USRDIR/LaSi/php.ext &&
-	sudo rm -f $USRDIR/LaSi/php.dext
+	sudo rm -f /tmp/LaSi/php.ext &&
+	sudo rm -f /tmp/LaSi/php.dext
 	## Check php-extensions needed for Spotweb
 	if ! grep ctype /usr/local/etc/php/extensions.ini > /dev/null; then
-		echo "CTYPE" >> $USRDIR/LaSi/php.dext
+		echo "CTYPE" >> /tmp/LaSi/php.dext
 		fi
 	if ! grep curl /usr/local/etc/php/extensions.ini > /dev/null; then
-		echo "php5-curl" >> $USRDIR/LaSi/php.ext
+		echo "php5-curl" >> /tmp/LaSi/php.ext
 		fi
 	if ! grep dom /usr/local/etc/php/extensions.ini > /dev/null; then
-		echo "DOM" >> $USRDIR/LaSi/php.dext
+		echo "DOM" >> /tmp/LaSi/php.dext
 		fi
 	if ! grep gd.so /usr/local/etc/php/extensions.ini > /dev/null; then
-		echo "php5-gd" >> $USRDIR/LaSi/php.ext
+		echo "php5-gd" >> /tmp/LaSi/php.ext
 		fi
 	if ! grep gettext /usr/local/etc/php/extensions.ini > /dev/null; then
-		echo "php5-gettext" >> $USRDIR/LaSi/php.ext
+		echo "php5-gettext" >> /tmp/LaSi/php.ext
 		fi
 	if ! grep mbstring /usr/local/etc/php/extensions.ini > /dev/null; then
-		echo "php5-mbstring" >> $USRDIR/LaSi/php.ext
+		echo "php5-mbstring" >> /tmp/LaSi/php.ext
 		fi
 	if ! grep mysql /usr/local/etc/php/extensions.ini > /dev/null; then
-		echo "php5-mysql" >> $USRDIR/LaSi/php.ext
+		echo "php5-mysql" >> /tmp/LaSi/php.ext
 		fi
 	if ! grep openssl /usr/local/etc/php/extensions.ini > /dev/null; then
-		echo "php5-openssl" >> $USRDIR/LaSi/php.ext
+		echo "php5-openssl" >> /tmp/LaSi/php.ext
 		fi
 	if ! grep xml /usr/local/etc/php/extensions.ini > /dev/null; then
-		echo "XML" >> $USRDIR/LaSi/php.dext
+		echo "XML" >> /tmp/LaSi/php.dext
 		fi
 	if ! grep zip /usr/local/etc/php/extensions.ini > /dev/null; then
-		echo "php5-zip" >> $USRDIR/LaSi/php.ext
+		echo "php5-zip" >> /tmp/LaSi/php.ext
 		fi
 	if ! grep zlib /usr/local/etc/php/extensions.ini > /dev/null; then
-		echo "php5-zlib" >> $USRDIR/LaSi/php.ext
+		echo "php5-zlib" >> /tmp/LaSi/php.ext
 		fi
 	## any ?
-	if ls $USRDIR/LaSi/php.ext > /dev/null; then
-		PHPEXT=`cat $USRDIR/LaSi/php.ext`
+	if ls /tmp/LaSi/php.ext > /dev/null; then
+		PHPEXT=`cat /tmp/LaSi/php.ext`
 		REQ=php5-extensions
 		REQPATH=/usr/ports/lang/php5-extensions
 		install_REQ
@@ -1128,7 +1266,7 @@ check_phpext () {
 }
 
 check_WEBSRV () {
-	
+
 	cf_Webserver () {
 		clear
 		LaSi_Logo
@@ -1202,7 +1340,7 @@ check_WEBSRV () {
 		else
 			sudo pkg_add -r $WEBSRV || error_REQ
 		fi
-		
+
 		if [ "$WEBSRV" = "apache22" ]; then
 			check_php
 			sed -i ".backup" 's/DirectoryIndex index.html/DirectoryIndex index.php index.html/' /usr/local/etc/apache22/httpd.conf &&
@@ -1223,7 +1361,7 @@ check_WEBSRV () {
 
 check_Log () {
     # remove any previous lasi_install logs
-    rm -f $USRDIR/LaSi/lasi_install.log
+    rm -f /tmp/LaSi/lasi_install.log
 }
 
 check_App () {
@@ -1231,16 +1369,51 @@ check_App () {
 		clear
 		echo
 		echo "$SETAPP is already running on this system"
+		echo "You could try to update"
 		echo
 		sleep 3
-		LaSi_Menu
-	elif [ "$(ls -A $USRDIR/$APPLOW)" ]; then
+		Info_$SETAPP
+	fi
+
+	if [ "$(ls -A $USRDIR/$APPLOW)" ]; then
 		clear
 		echo
 		echo "Installation folder for $SETAPP is not empty"
 		echo "Assuming $SETAPP is already installed"
+		echo "You could try to update"
 		echo
 		sleep 3
+		Info_$SETAPP
+	fi
+}
+
+update_App () {
+	Summ_Update () {
+		echo
+		echo
+		echo "Finished updating $SETAPP"
+		sleep 2
+		LaSi_Menu
+	}
+
+	if [ "$APPLOW" = "autosub" ]; then
+		echo
+		echo "Checking for updates $SETAPP"
+		echo
+		cd $USRDIR/$APPLOW
+		hg pull
+		Summ_Update
+	elif [ "$APPLOW" = "beets" ] || [ "$APPLOW" = "couchpotato" ] || [ "$APPLOW" = "headphones" ] || [ "$APPLOW" = "sickbeard" ] || [ "$APPLOW" = "lazylibrarian" ]; then
+		echo
+		echo "Checking for updates $SETAPP"
+		echo
+		cd $USRDIR/$APPLOW
+		if ! git pull | grep "Already up-to-date"
+			then
+			$RCPATH/$APPLOW restart
+			Summ_Update
+		fi
+		sleep 2
 		LaSi_Menu
 	fi
 }
@@ -1349,10 +1522,8 @@ Select_USER () {
 	local CUSER=`whoami`
 	LaSi_Logo
 	echo
-	echo "Congratulations!!"
-	echo "You're running FreeBSD and like to install some nice apps"
-	echo "First you have to choose which user will be running the apps"
-	echo "Then you'll be forwarded to the actual menu"
+	echo "WELCOME!  First you have to choose which user will be running"
+	echo "the apps, then you'll be forwarded to the actual menu"
 	echo
 	echo "Options (1,2,3,Q + enter):"
 	echo
@@ -1398,12 +1569,12 @@ Select_USER () {
 ######## BACKTOMENU OR INSTALL ########
 #######################################
 cf_Choice () {
-	case $SETAPP in
-	Sabnzbdplus|Transmission)
+	case $APPLOW in
+	sabnzbd|transmission)
 		echo
 		echo "Options:"
 		echo "1. Install $SETAPP"
-		echo "2. Uninstall $SETAPP <= not available, YET"
+		echo "2. Uninstall $SETAPP"
 		echo
 		echo "B. Back to menu"
 		echo "Q. Quit"
@@ -1412,8 +1583,8 @@ cf_Choice () {
 		echo
 		echo "Options:"
 		echo "1. Install $SETAPP"
-		echo "2. Remove $SETAPP           <= not available, YET"
-		echo "3. Set cronjob for $SETAPP  <= not available, YET"
+		echo "2. Remove $SETAPP"
+		echo "3. Update $SETAPP"
 		echo
 		echo "B. Back to menu"
 		echo "Q. Quit"
@@ -1426,14 +1597,21 @@ cf_Choice () {
             cf_Install
             ;;
         2)
-            cf_Uninstall
+			if [ "$APPLOW" = "spotweb" ] || [ "$APPLOW" = "autosub" ]; then
+				echo
+				echo "Uninstaller for $SETAPP is not available, yet!"
+				sleep 2
+				Info_$SETAPP
+			else
+				Uninstaller
+			fi
             ;;
         3)
-            case $SETAPP in
-                Sabnzbdplus|Transmission)
+            case $APPLOW in
+                maraschino|sabnzbd|spotweb|transmission)
                     cf_Choice ;;
                 *)
-                    cf_Cronjob ;;
+                    update_App ;;
             esac
             ;;
         [Bb]*)
@@ -1480,7 +1658,7 @@ cf_Install () {
     esac
 }
 
-#### Chose Ports Tree or PKG system #####
+##### Chose Ports Tree or PKG system #####
 pkg_Choice() {
 	if ! [ "$SETPKG" = "pkg" ] || [ "$SETPKG" = "ports" ]; then
 	clear
@@ -1522,12 +1700,60 @@ pkg_Choice() {
 	fi
 }
 
-cf_Uninstall () {
-	clear
+##### Un-Installer #####
+Uninstaller () {
 	echo
-	echo "Uninstaller NOT available, Yet!"
-	sleep 3
-	Info_$SETAPP
+    echo "Are you sure you want to continue and remove/uninstall $SETAPP?"
+    read -p "[yes/no]: " REPLY
+    echo
+    case $REPLY in
+    [Yy]*)
+        case $SETAPP in
+            Sabnzbd|Transmission)
+				sudo $RCPATH/$APPLOW stop
+				sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
+				pkg_delete "$APPLOW*" || error_Msg
+				;;
+            *)
+				if ls $RCPATH/$APPLOW > /dev/null; then
+					if pgrep -f $SETAPP.py > /dev/null; then
+						$RCPATH/$APPLOW stop
+						sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
+					fi
+					APPDIR=`sed -n "/"$APPLOW"_dir:=/p" $RCPATH/$APPLOW | awk -F '"' '{ print $2 }'`
+				fi
+
+				if ls $APPDIR > /dev/null; then
+					sudo rm -rf $APPDIR
+				else
+					echo "Can't find $SETAPP installation folder"
+					error_Msg
+				fi
+            ;;
+        esac
+        # give time to read output from above installprocess before returning to menu
+        echo 
+		echo "$SETAPP has been removed from this system"
+		echo
+        read -sn 1 -p "Press a key to continue"
+        # for multiple install continue in next item, else back to info
+        if [ "${#items[@]}" = 1 ]; then
+            Info_$SETAPP
+        fi
+        ;;
+    [Nn]*)
+        Info_$SETAPP
+        ;;
+    [Qq]*)
+        exit
+        ;;
+    *)
+        echo "Answer yes to $uninstaller" 
+        echo "no for menu"
+        echo "or Q to quit"
+        cf_Install
+        ;;
+    esac
 }
 
 ##### CRONJOBS #####
@@ -1545,13 +1771,21 @@ set_RCD () {
 		if ! ls $RCPATH/$APPLOW > /dev/null; then
 			cd $RCPATH &&
 			sudo fetch $DROPBOX/$SETAPP/$APPLOW &&
-			sudo sed -i "" "s/USERNAME/$APPUSER/g" $RCPATH/$APPLOW &&
+			sudo sed -i "" "s/USERNAME/$APPUSER/g" $RCPATH/$APPLOW
+			if [ "$APPLOW" = "transmission" ]; then
+				sudo sed -i "" "s|DOWNDIR|$DOWNDIR|g" $RCPATH/$APPLOW &&
+				sudo sed -i "" "s|IPRANGE|$IPRANGE|g" $RCPATH/$APPLOW
+			fi
 			sudo chmod 555 $RCPATH/$APPLOW
 		else
 			cd $RCPATH &&
 			sudo mv -f $APPLOW $APPLOW.backup &&
 			sudo fetch $DROPBOX/$SETAPP/$APPLOW &&
-			sudo sed -i "" "s/USERNAME/$APPUSER/g" $RCPATH/$APPLOW &&
+			sudo sed -i "" "s/USERNAME/$APPUSER/g" $RCPATH/$APPLOW
+			if [ "$APPLOW" = "transmission" ]; then
+				sudo sed -i "" "s|DOWNDIR|$DOWNDIR|g" $RCPATH/$APPLOW &&
+				sudo sed -i "" "s|IPRANGE|$IPRANGE|g" $RCPATH/$APPLOW
+			fi
 			sudo chmod 555 $RCPATH/$APPLOW
 		fi
 	fi
@@ -1585,7 +1819,7 @@ echo "
 Failed! Installing $SETAPP had errors, try again or:
 Copy the text with errors above and report an issue at the following address:
 https://github.com/Mar2zz/LaSi/issues
-" >> $USRDIR/LaSi/lasi_install.log
+" >> /tmp/LaSi/lasi_install.log
 
 # for fast install continue in next item, else quit installer
 if [ "${#items[@]}" > 1 ]; then continue; else break; fi
@@ -1599,7 +1833,7 @@ Copy the text above and report an issue at the following address:
 https://github.com/Mar2zz/LaSi/issues"
 # log error message
 echo "
-Failed! Installing $REQ had errors" >> $USRDIR/LaSi/lasi_install.log
+Failed! Installing $REQ had errors" >> /tmp/LaSi/lasi_install.log
 exit
 }
 
@@ -1608,21 +1842,17 @@ exit
 ######################################
 
 ##### Set Variables and Defaults #####
-
 DROPBOX=http://dl.dropbox.com/u/36835219/LaSi/FreeBSD
-
-USRDIR=/usr/local
 RCPATH=/usr/local/etc/rc.d
+USRDIR=/usr/local
 
 # defaults
 unattended=0
 ask_schedule=0
 schedule=0
-uninstaller=remove
 
 # create array
 options=( $@ )
-
 
 ##### Check if user can sudo #####
 if [ "$(id -u)" != "0" ]; then
