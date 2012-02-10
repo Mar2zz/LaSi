@@ -62,7 +62,7 @@ verify_headphones_pid() {
 # Try to stop Headphones cleanly by calling shutdown over http.
 headphones_stop() {
     echo "Stopping $name"
-    verify_headphones_pid_pid
+    verify_headphones_pid
     ${WGET} -O - -q --user=${HPUSR} --password=${HPPWD} "http://${HOST}:${PORT}/shutdown/" >/dev/null
     if [ -n "${pid}" ]; then
       wait_for_pids ${pid}
