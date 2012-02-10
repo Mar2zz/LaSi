@@ -19,7 +19,6 @@
 #                       you want it to be. It uses '_sabnzbd' group by
 #                       default. Do not sets it as empty or it will run
 #                       as wheel.
-PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
 
 . /etc/rc.subr
 
@@ -32,6 +31,7 @@ load_rc_config ${name}
 : ${sabnzbd_user:="USERNAME"}
 : ${sabnzbd_group:="USERNAME"}
 : ${sabnzbd_conf_dir:="/usr/local/sabnzbd"}
+PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
 
 required_dirs=${sabnzbd_conf_dir}
 
@@ -40,8 +40,6 @@ start_cmd="${name}_start"
 status_cmd="${name}_status"
 stop_cmd="${name}_stop"
 start_precmd=sabnzbd_check_dir
-
-
 
 sabnzbd_start()
 {

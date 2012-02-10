@@ -19,7 +19,6 @@
 #     Default is same as sickbeard_dir.
 # sickbeard_pid:  The name of the pidfile to create.
 #     Default is sickbeard.pid in sickbeard_dir.
-PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
 
 . /etc/rc.subr
 
@@ -33,12 +32,13 @@ load_rc_config ${name}
 : ${sickbeard_dir:="/usr/local/sickbeard"}
 : ${sickbeard_chdir:="${sickbeard_dir}"}
 : ${sickbeard_pid:="${sickbeard_dir}/sickbeard.pid"}
+PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
 
-WGET="/usr/local/bin/wget" # You need wget for this script to safely shutdown Sick Beard.
-HOST="127.0.0.1" # Set Sick Beard address here.
-PORT="8081" # Set Sick Beard port here.
-SBUSR="" # Set Sick Beard username (if you use one) here.
-SBPWD="" # Set Sick Beard password (if you use one) here.
+WGET="/usr/local/bin/wget" 	# You need wget for this script to safely shutdown Sick Beard.
+HOST="127.0.0.1" 			# Set Sick Beard address here.
+PORT="8081" 				# Set Sick Beard port here.
+SBUSR="" 					# Set Sick Beard username (if you use one) here.
+SBPWD="" 					# Set Sick Beard password (if you use one) here.
 
 status_cmd="${name}_status"
 stop_cmd="${name}_stop"

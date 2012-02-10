@@ -31,6 +31,7 @@
 # | - SABnzbd
 # | - Sickbeard
 # | - SpotWeb
+# | - Transmission
 # |___________________________________________________________________________________
 #
 #######################################################################################
@@ -152,7 +153,7 @@ LaSi_Menu (){
 			SETAPP=Maraschino
 			APPLOW=maraschino
 			set_port=7000
-			if [ $unattended = 1 ]; then Install_$set_app; else Info_$set_app; fi
+			if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
 			#if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
 			;;
 		# Sickbeard
@@ -564,6 +565,7 @@ Install_Maraschino () {
 	git clone https://github.com/mrkipling/maraschino.git $USRDIR/$APPLOW
 	cp $USRDIR/$APPLOW/settings_example.py $USRDIR/$APPLOW/settings.py
 	sed -i "" 's|/path/to/maraschino.db|/usr/local/maraschino/maraschino.db|' $USRDIR/$APPLOW/settings.py
+	chown -R $APPUSER $USRDIR/$APPLOW
 	set_RCD
 
 Summ_$SETAPP
