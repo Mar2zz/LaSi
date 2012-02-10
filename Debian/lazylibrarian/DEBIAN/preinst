@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -e
+
+# Stop lazylibrarian service.
+# Stop lazylibrarian service.
+if pgrep -f LazyLibrarian.py > /dev/null; then
+    [ -e /etc/init.d/lazylibrarian ] && /etc/init.d/lazylibrarian stop
+fi
+
+# remove path if exists
+if [ -d /opt/lazylibrarian ]; then
+    rm -Rf /opt/lazylibrarian
+fi
+

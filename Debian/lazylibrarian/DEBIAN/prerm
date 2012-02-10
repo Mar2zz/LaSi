@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -e
+
+# stop lazylibrarian
+if pgrep -f LazyLibrarian.py > /dev/null; then
+    /etc/init.d/lazylibrarian stop
+fi
+
+# make sure process is killed ok and pidfile is removed
+if pgrep -f LazyLibrarian.py > /dev/null; then
+    rm -f $(ps up $(pgrep -f LazyLibrarian.py) | grep pidfile | sed "s/.*--pidfile=//g") > /dev/null
+    kill -9 $(pgrep -f LazyLibrarian.py) > /dev/null
+fi
+
+# remove path if exists
+if [ -d /opt/lazylibrarian ]; then
+    rm -Rf /opt/lazylibrarian
+fi
+
