@@ -180,6 +180,38 @@ check_Port () {
     fi
 }
 
+check_Apache () {
+    if ! which apache2 > /dev/null; then
+        echo "$set_app needs a webserver by default."
+        echo "Do you want to install an apache-webserver too?"
+        echo "If not, I will assume you have your own webserver enabled"
+        read -p "[yes/no]: " SERVERREPLY
+        case $SERVERREPLY in
+            [YyJj]*)
+                APACHE=1
+                SERVERPATH=/var/www
+                ;;
+            [Nn]*)
+                echo "Skipping apacheserver install"
+                APACHE=0
+                SERVERPATH=0
+                echo "Type the path where your webroot is located, e.g.: /var/www"
+                while ! [ -d $SERVERPATH ]; do
+                    read -p "PATH: " SERVERPATH
+                    [ -d $SERVERPATH ] || echo "Path does not exist, try again"
+                done
+                ;;
+            *)
+                echo "Answer yes or no"
+                cf_SQL
+                ;;
+        esac
+    else
+        APACHE=1
+        SERVERPATH=/var/www
+    fi
+    }
+
 
 ### HELP MESSAGE ###
 Print_Help () {
@@ -976,11 +1008,17 @@ Info_Spotweb () {
 Install_Spotweb () {
 
     check_Git
-    wget -nv -O /tmp/spotweb.deb $DROPBOX/LaSi_Repo/spotweb.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
-    sudo dpkg -i /tmp/spotweb.deb || error_Depends
+    check_Apache
 
-    sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/apache2/php.ini
-    sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/cli/php.ini
+    if [ $APACHE = 1 ]; then
+        wget -nv -O /tmp/spotweb.deb $DROPBOX/LaSi_Repo/spotweb.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
+        sudo dpkg -i /tmp/spotweb.deb || error_Depends
+
+        sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/apache2/php.ini
+        sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/cli/php.ini
+    else
+        sudo git clone https://github.com/spotweb/spotweb.git $SERVERPATH/spotweb
+    fi
 
     # this function creates a mysql database for spotweb
     config_SQL () {
@@ -1067,7 +1105,7 @@ Install_Spotweb () {
     config_SQL
 
     # update database
-    cd /var/www/spotweb && /usr/bin/php /var/www/spotweb/upgrade-db.php
+    cd $SERVERPATH/spotweb && /usr/bin/php $SERVERPATH/spotweb/upgrade-db.php
     cd - > /dev/null
 
 
@@ -1100,9 +1138,9 @@ echo "#!/bin/sh
 set -e
 
 [ -x /usr/bin/php ] || exit 0
-[ -e /var/www/spotweb/retrieve.php ] || exit 0
+[ -e $SERVERPATH/spotweb/retrieve.php ] || exit 0
 
-/usr/bin/php /var/www/spotweb/retrieve.php || exit 1
+/usr/bin/php $SERVERPATH/spotweb/retrieve.php || exit 1
 " > /tmp/spotweb_spots
 
                 sudo mv -f /tmp/spotweb_spots /etc/cron.hourly/spotweb_spots
@@ -1144,7 +1182,7 @@ set -e
                     read -sn 1 -p "Press a key to continue"
                 fi
                 echo "This will take a while!"
-                /usr/bin/php /var/www/spotweb/retrieve.php
+                /usr/bin/php $SERVERPATH/spotweb/retrieve.php
                 ;;
             [Nn]*)
                 ;;
@@ -1162,7 +1200,7 @@ Summ_Spotweb () {
 echo "
 Done! Installed $set_app.
 Spotweb is now located @ http://$HOSTNAME/spotweb
-Run /var/www/spotweb/retrieve.php to fill the database with spots
+Run $SERVERPATH/spotweb/retrieve.php to fill the database with spots
 "
 }
 
