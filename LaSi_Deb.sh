@@ -657,11 +657,13 @@ Info_LazyLibrarian () {
 # You can keep a 'Authors/Books I like to read'-list and it will#
 # search for NZBs of these books                                #
 #                                                               #
-# Once an book is found, it will send it to SABnzbd.            #
+# Once an book is found, it will send it to SABnzbd and when    #
+# a download is finished it wil process it and add cover and    #
+# metadata to it.                                               #
 #                                                               #
 *###############################################################*
 #                                                               #
-# Headphones is written by Mar2zz in his spare time...          #
+# LazyLibrarian is written by Mar2zz in his spare time...       #
 #                                                               #
 # Visit https://github.com/Mar2zz/LazyLibrarian                 #
 *###############################################################*"
