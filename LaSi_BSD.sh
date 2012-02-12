@@ -232,8 +232,10 @@ Info_AutoSub () {
 Install_AutoSub () {
 	check_App
 	check_mercurial
-	sudo hg clone https://code.google.com/p/auto-sub/ $USRDIR/$APPLOW &&
-	sudo sed -i ".backup" 's|path = /home/user/auto-sub|path = /usr/local/autosub|' /usr/local/autosub/config.properties &&
+	sudo hg clone https://code.google.com/p/auto-sub/ $USRDIR/$APPLOW
+	#sudo cp $USRDIR/$APPLOW/config.properties $USRDIR/$APPLOW/config
+	#/usr/local/bin/python $USRDIR/$APPLOW/AutoSub.py --config=$USRDIR/$APPLOW/config --daemon
+	sudo sed -i ".backup" 's|path = /home/user/auto-sub|path = /usr/local/autosub|' /usr/local/autosub/config.properties
     chown -R $APPUSER $USRDIR/$APPLOW
 
     if ! grep 'AutoSub.py' /etc/crontab > /dev/null; then
@@ -957,7 +959,6 @@ update_App () {
 		echo
 		echo "Finished updating $SETAPP"
 		sleep 2
-		LaSi_Menu
 	}
 
 	case $APPLOW in
@@ -974,9 +975,27 @@ update_App () {
 		couchpotato|headphones|lazylibrarian|maraschino|sickbeard)
 			APPDIR=`sed -n "/"$APPLOW"_dir:=/p" $RCPATH/$APPLOW | awk -F '"' '{ print $2 }'`
 			if ! pgrep -f $SETAPP.py > /dev/null; then
-				if ! [ "$APPDIR" = "" ]; then 
+				if [ "$APPDIR" = "" ]; then 
 					echo
 					echo "Can't find where $SETAPP is installed"
+					sleep 2
+					Info_$SETAPP
+				elif [ "$(ls -A $USRDIR/$APPLOW)" ]; then
+					echo
+					echo "Checking for updates $SETAPP"
+					echo
+					cd $APPDIR
+					if ! git pull | grep "Already up-to-date"
+						then
+						$RCPATH/$APPLOW start
+						Summ_Update
+					fi
+					sleep 2
+					Info_$SETAPP
+				else
+					echo
+					echo "Can't find where $SETAPP is installed"
+					echo "or folder is empty; not updating"
 					sleep 2
 					Info_$SETAPP
 				fi
