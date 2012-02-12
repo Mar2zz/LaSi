@@ -611,34 +611,14 @@ Install_Beets () {
 	check_python
     sudo git clone https://github.com/sampsyo/beets.git $USRDIR/$APPLOW &&
     cd $USRDIR/$APPLOW && /usr/local/bin/python setup.py install
+    chmod -R $APPUSER $USRDIR/$APPLOW
 
     # create a configfile and databasefile
-    if ! [ -e $USRDIR/$APPLOW/.beetsconfig ]; then
-        echo "[beets]
-        library: $USRDIR/beets/musiclibrary.blb
-        directory: /home/Music
-        import_copy: yes
-        import_delete: yes
-        import_write: yes
-        import_resume: no
-        import_art: yes
-        import_quiet_fallback: skip
-        import_timid: no
-        import_log: $USRDIR/beets/beetslog.txt
-        art_filename: folder
-        pluginpath: $USRDIR/beets/plugins/
-        plugins:
-        threaded: yes
-        color: yes
-
-        [paths]
-        default: \$albumartist/\$album (\$year)/\$track. \$artist - \$title
-        soundtrack: Soundtracks/\$album/\$track. \$artist - \$title
-        comp: Various \$genre/\$album (\$year)/\$track. \$artist - \$title
-        " > $USRDIR/$APPLOW/.beetsconfig
-        sed -i "" 's/^[ \t]*//' $USRDIR/$APPLOW/.beetsconfig
-
-        echo
+    if ! ls $USRDIR/$APPLOW/.beetsconfig > /dev/null; then
+        cd $USRDIR/$APPLOW
+        fetch $DROPBOX/$SETAPP/.beetsconfig
+        #sed -i "" "s|USRDIR|$USRDIR|" $USRDIR/$APPLOW/.beetsconfig
+		echo
         echo "Now set the path to your music (directory:) in Beets config"
         read -sn 1 -p "Press a key to continue"
         ee $USRDIR/$APPLOW/.beetsconfig
@@ -1177,7 +1157,7 @@ check_python () {
 		intall_REQ
 		fi
 	fi
-	
+
 	if [ "$APPLOW" = "maraschino" ]; then
 		if ! ls /usr/local/lib/python2.7/site-packages/CherryPy* > /dev/null; then
 		REQ=py27-cherrypy
@@ -1702,36 +1682,44 @@ pkg_Choice() {
 
 ##### Un-Installer #####
 Uninstaller () {
-	echo
-    echo "Are you sure you want to continue and remove/uninstall $SETAPP?"
-    read -p "[yes/no]: " REPLY
-    echo
-    case $REPLY in
-    [Yy]*)
-        case $SETAPP in
-            Sabnzbd|Transmission)
-				sudo $RCPATH/$APPLOW stop
-				sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
-				pkg_delete "$APPLOW*" || error_Msg
-				;;
-            *)
-				if ls $RCPATH/$APPLOW > /dev/null; then
-					if pgrep -f $SETAPP.py > /dev/null; then
-						$RCPATH/$APPLOW stop
-						sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
-					fi
-					APPDIR=`sed -n "/"$APPLOW"_dir:=/p" $RCPATH/$APPLOW | awk -F '"' '{ print $2 }'`
+	
+	uninstall () {
+		if [ "APPLOW" = "sabnzbd" ] || [ "APPLOW" = "transmission" ]; then
+			sudo $RCPATH/$APPLOW stop
+			sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
+			pkg_delete "$APPLOW*" || error_Msg
+		fi
+		
+		if [ "APPLOW" = "beets" ]; then
+			if which beet > /dev/null;then
+				sudo rm -rf $USRDIR/$APPLOW
+				sudo rm /usr/local/bin/beet
+			else
+				clear
+				echo
+				echo "No Beets installed on this system"
+				sleep 2
+				Info_$SETAPP
+			fi
+		fi
+		
+		if [ "$APPLOW" = "couchpotato" ] || [ "$APPLOW" = "headphones" ] || [ "$APPLOW" = "sickbeard" ] || [ "$APPLOW" = "lazylibrarian" ] || [ "$APPLOW" = "maraschino" ]; then
+			if ls $RCPATH/$APPLOW > /dev/null; then
+				if pgrep -f $SETAPP.py > /dev/null; then
+					RCPATH/$APPLOW stop
+					sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
 				fi
+				APPDIR=`sed -n "/"$APPLOW"_dir:=/p" $RCPATH/$APPLOW | awk -F '"' '{ print $2 }'`
+			fi
 
-				if ls $APPDIR > /dev/null; then
-					sudo rm -rf $APPDIR
-				else
-					echo "Can't find $SETAPP installation folder"
-					error_Msg
-				fi
-            ;;
-        esac
-        # give time to read output from above installprocess before returning to menu
+			if ls $APPDIR > /dev/null; then
+				sudo rm -rf $APPDIR
+			else
+				echo "Can't find $SETAPP installation folder"
+				error_Msg
+			fi
+		fi
+		# give time to read output from above installprocess before returning to menu
         echo 
 		echo "$SETAPP has been removed from this system"
 		echo
@@ -1740,7 +1728,16 @@ Uninstaller () {
         if [ "${#items[@]}" = 1 ]; then
             Info_$SETAPP
         fi
-        ;;
+	}
+
+	echo
+    echo "Are you sure you want to continue and remove/uninstall $SETAPP?"
+    read -p "[yes/no]: " REPLY
+    echo
+    case $REPLY in
+    [Yy]*)
+		uninstall
+		;;
     [Nn]*)
         Info_$SETAPP
         ;;
