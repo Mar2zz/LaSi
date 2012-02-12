@@ -1,29 +1,21 @@
 LaSi: Lazy admin Scripted installers
 
-# Author:  Mar2zz
-# blogs: mar2zz.tweakblogs.net
+# Authors:  Mar2zz, Kriss1981 and Jeroenve
+# url: mar2zz.tweakblogs.net
+# url: http://synology.brickman.nl/
+# url: https://github.com/Kriss1981
 # License: GNU GPL v3
 # 
 # please report bugs/issues @
 # https://github.com/Mar2zz/LaSi/issues
 
-The purpose of the main script LaSi(_syn).sh is to present a menu
-in the terminal. This menu presents some info about installable
-programs and those programs can be installed from
-this menu.
+The purpose of the main script LaSi.sh is to download the installer for your system and
+show a menu in the terminal. This menu presents some info about installable
+programs and those programs can be installed from this menu.
 
-INSTALL UBUNTU:
-Make LaSi.sh executable with sudo chmod +x LaSi.sh
-and execute with: ./LaSi.sh
-
-or completely by commandline:
-wget http://dl.dropbox.com/u/18712538/LaSi/LaSi.sh
-sudo chmod +x LaSi.sh
-./LaSi.sh
-
-INSTALL SYNOLOGY:
-wget http://dl.dropbox.com/u/18712538/Synology/LaSi_syn.sh
-sh LaSi_syn.sh
+INSTALL:
+Download LaSi.sh @ http://dl.dropbox.com/u/18712538/LaSi/LaSi.sh
+Make it executable (sudo chmod +x LaSi.sh on Debian*/freeBSD* or chmod +x LaSi.sh on Synology)
 
 USAGE:
 When choosing a program LaSi will show some info about it
@@ -45,7 +37,7 @@ For all program's daemons will be enabled so they will run @ boot.
 Those programs can be uninstalled with sudo apt-get remove (or purge) programname.
 Beets and subliminal can be uninstalled with sudo pip uninstall programname.
 
-Programs supported Ubuntu:
+Programs supported:
 
 * Beets
 -- Musicmanager (pip install)
@@ -88,16 +80,6 @@ URL: http://www.transmissionbt.com/
 URL: http://www.xbmc.org
 
 
-############################
-Programs supported Synology:
-* Spotweb
-* Periscope
-* Mediafrontpage
-* Sickbeard
-* Couchpotato
-* Headphones
-############################
-
 
 ##############################################################
 ##############################################################
@@ -116,7 +98,7 @@ Programs supported Synology:
 "    \::/  /       \:\__\         /:/  /        /:/  /  "
 "     \/__/         \/__/         \/__/         \/__/   "
 
-"----------------------------------------------- Mar2zz "
+"-------------------------- Kriss1981, Jeroenve, Mar2zz "
 	 
 ##############################################################
 ##############################################################	 
