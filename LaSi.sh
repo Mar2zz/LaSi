@@ -73,8 +73,8 @@ elif [ "`uname`" = "FreeBSD" ]; then
 		sudo mkdir /tmp/LaSi
 	fi
 	
-	cd /tmp/LaSi &&
-	fetch http://dl.dropbox.com/u/18712538/LaSi/LaSi_BSD.sh || { echo "Connection to dropbox failed, try again later"; exit 1; }
-	sudo chmod +x LaSi_BSD.sh &&
+	cd /tmp/LaSi
+	fetch http://dl.dropbox.com/u/36835219/LaSi/LaSi_BSD.sh || { echo "Connection to dropbox failed, try again later"; exit 1; }
+	sudo chmod +x LaSi_BSD.sh
 	./LaSi_BSD.sh
 fi
