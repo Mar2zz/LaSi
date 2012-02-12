@@ -180,6 +180,38 @@ check_Port () {
     fi
 }
 
+check_Apache () {
+    if ! which apache2 > /dev/null; then
+        echo "$set_app needs a webserver by default."
+        echo "Do you want to install an apache-webserver too?"
+        echo "If not, I will assume you have your own webserver enabled"
+        read -p "[yes/no]: " SERVERREPLY
+        case $SERVERREPLY in
+            [YyJj]*)
+                APACHE=1
+                SERVERPATH=/var/www
+                ;;
+            [Nn]*)
+                echo "Skipping apacheserver install"
+                APACHE=0
+                SERVERPATH=0
+                echo "Type the path where your webroot is located, e.g.: /var/www"
+                while ! [ -d $SERVERPATH ]; do
+                    read -p "PATH: " SERVERPATH
+                    [ -d $SERVERPATH ] || echo "Path does not exist, try again"
+                done
+                ;;
+            *)
+                echo "Answer yes or no"
+                cf_SQL
+                ;;
+        esac
+    else
+        APACHE=1
+        SERVERPATH=/var/www
+    fi
+    }
+
 
 ### HELP MESSAGE ###
 Print_Help () {
@@ -339,6 +371,14 @@ LaSi_Menu (){
                 3)
                     set_app=Headphones
                     set_port=8181
+                    if [ $unattended = 1 ]; then Install_$set_app; else Info_$set_app; fi
+                    if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
+                    ;;
+
+                # lazylibrarian
+                ll)
+                    set_app=LazyLibrarian
+                    set_port=5299
                     if [ $unattended = 1 ]; then Install_$set_app; else Info_$set_app; fi
                     if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
                     ;;
@@ -636,6 +676,63 @@ Headphones is by default located @ http://$HOSTNAME:$set_port
 }
 
 
+#########################
+##### LazyLibrarian #####
+#########################
+Info_LazyLibrarian () {
+    clear
+    echo "
+*###############################################################*
+*#################### LazyLibrarian ############################*
+#                                                               #
+# LazyLibrarian is an automatic NZB downloader.                 #
+# You can keep a 'Authors/Books I like to read'-list and it will#
+# search for NZBs of these books                                #
+#                                                               #
+# Once an book is found, it will send it to SABnzbd and when    #
+# a download is finished it wil process it and add cover and    #
+# metadata to it.                                               #
+#                                                               #
+*###############################################################*
+#                                                               #
+# LazyLibrarian is written by Mar2zz in his spare time...       #
+#                                                               #
+# Visit https://github.com/Mar2zz/LazyLibrarian                 #
+*###############################################################*"
+    cf_Choice
+}
+
+Install_LazyLibrarian () {
+    check_git
+    wget -nv -O /tmp/lazylibrarian.deb $DROPBOX/LaSi_Repo/lazylibrarian.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
+
+    sudo dpkg -i /tmp/lazylibrarian.deb || error_Depends
+
+    if ! pgrep -f LazyLibrarian.py > /dev/null; then
+        #check_Port
+        sudo sed -i "
+            s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
+            s/RUN_AS.*/RUN_AS=$USER/
+            s/WEB_UPDATE=0/WEB_UPDATE=1/g
+        " /etc/default/lazylibrarian
+        echo "Changed daemon settings..."
+        sudo /etc/init.d/lazylibrarian start || error_Msg
+    fi
+
+Summ_$SETAPP
+Summ_$SETAPP >> /tmp/LaSi/lasi_install.log
+}
+
+Summ_LazyLibrarian () {
+clear
+echo
+echo "
+Done! Installed $SETAPP.
+
+LazyLibrarian is by default located @ http://$HOSTNAME:$set_port
+"
+}
+
 ####################
 #### MARASCHINO ####
 ####################
@@ -911,11 +1008,17 @@ Info_Spotweb () {
 Install_Spotweb () {
 
     check_Git
-    wget -nv -O /tmp/spotweb.deb $DROPBOX/LaSi_Repo/spotweb.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
-    sudo dpkg -i /tmp/spotweb.deb || error_Depends
+    check_Apache
 
-    sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/apache2/php.ini
-    sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/cli/php.ini
+    if [ $APACHE = 1 ]; then
+        wget -nv -O /tmp/spotweb.deb $DROPBOX/LaSi_Repo/spotweb.deb || { echo "Connection to dropbox failed, try again later"; exit 1; }
+        sudo dpkg -i /tmp/spotweb.deb || error_Depends
+
+        sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/apache2/php.ini
+        sudo sed -i "s#;date.timezone =#date.timezone = \"Europe/Amsterdam\"#g" /etc/php5/cli/php.ini
+    else
+        sudo git clone https://github.com/spotweb/spotweb.git $SERVERPATH/spotweb
+    fi
 
     # this function creates a mysql database for spotweb
     config_SQL () {
@@ -1002,7 +1105,7 @@ Install_Spotweb () {
     config_SQL
 
     # update database
-    cd /var/www/spotweb && /usr/bin/php /var/www/spotweb/upgrade-db.php
+    cd $SERVERPATH/spotweb && /usr/bin/php $SERVERPATH/spotweb/upgrade-db.php
     cd - > /dev/null
 
 
@@ -1035,9 +1138,9 @@ echo "#!/bin/sh
 set -e
 
 [ -x /usr/bin/php ] || exit 0
-[ -e /var/www/spotweb/retrieve.php ] || exit 0
+[ -e $SERVERPATH/spotweb/retrieve.php ] || exit 0
 
-/usr/bin/php /var/www/spotweb/retrieve.php || exit 1
+/usr/bin/php $SERVERPATH/spotweb/retrieve.php || exit 1
 " > /tmp/spotweb_spots
 
                 sudo mv -f /tmp/spotweb_spots /etc/cron.hourly/spotweb_spots
@@ -1079,7 +1182,7 @@ set -e
                     read -sn 1 -p "Press a key to continue"
                 fi
                 echo "This will take a while!"
-                /usr/bin/php /var/www/spotweb/retrieve.php
+                /usr/bin/php $SERVERPATH/spotweb/retrieve.php
                 ;;
             [Nn]*)
                 ;;
@@ -1097,7 +1200,7 @@ Summ_Spotweb () {
 echo "
 Done! Installed $set_app.
 Spotweb is now located @ http://$HOSTNAME/spotweb
-Run /var/www/spotweb/retrieve.php to fill the database with spots
+Run $SERVERPATH/spotweb/retrieve.php to fill the database with spots
 "
 }
 

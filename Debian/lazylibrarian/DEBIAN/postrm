@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -e
+
+# remove stuff if purge
+if [ $1 = 'purge' ]; then
+    /usr/sbin/update-rc.d -f lazylibrarian remove | grep /etc/init.d/lazylibrarian
+    rm -f /etc/cron.hourly/lazylibrarian
+    rm -f /etc/cron.daily/lazylibrarian
+    rm -f /etc/cron.weekly/lazylibrarian
+    rm -f /etc/cron.monthly/lazylibrarian
+fi
+
