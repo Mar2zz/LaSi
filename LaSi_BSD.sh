@@ -64,15 +64,15 @@ LaSi_Logo () {
 }
 
 LaSi_Menu (){
-	LaSi_Logo
-	echo
-	echo "Make a choice to see info and/or install these apps..."
-	echo
-	echo "1. SABnzbd+       6.  LazyLibrarian (alpha stage)"
-	echo "2. AutoSub        7.  Maraschino"
-	echo "3. Beets          8.  SickBeard"
-	echo "4. CouchPotato    9.  SpotWeb"
-    echo "5. Headphones     10. Transmission (incl. webinterface)"
+	  LaSi_Logo
+	  echo
+	  echo "Make a choice to see info and/or install these apps..."
+	  echo
+	  echo "1. SABnzbd+       6.  LazyLibrarian (alpha stage)"
+	  echo "2. AutoSub        7.  Maraschino"
+	  echo "3. Beets          8.  SickBeard"
+	  echo "4. CouchPotato    9.  SpotWeb"
+		echo "5. Headphones     10. Transmission (incl. webinterface)"
     echo
     # tell about commandline options
     #if [ $unattended != 0 ]; then
@@ -573,9 +573,10 @@ Summ_$SETAPP >> /tmp/lasi_install.log
 }
 
 Summ_Maraschino () {
+clear
 echo "
-Done! Installed $set_app.
-$set_app is by default located @ http://$HOSTNAME:$set_port
+Done! Installed $SETAPP.
+$SETAPP is by default located @ http://$HOSTNAME:$set_port
 "
 }
 
@@ -1759,9 +1760,20 @@ Uninstaller () {
 	fi
 		
 	if [ "$APPLOW" = "couchpotato" ] || [ "$APPLOW" = "headphones" ] || [ "$APPLOW" = "sickbeard" ] || [ "$APPLOW" = "lazylibrarian" ] || [ "$APPLOW" = "maraschino" ]; then
+		if [ "$APPLOW" = "maraschino" ]; then
+			local SETAPP=maraschino-cherrypy
+			if ls $RCPATH/$APPLOW > /dev/null; then
+				if pgrep -f $SETAPP.py > /dev/null; then
+				$RCPATH/$APPLOW stop
+				sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
+				fi
+				APPDIR=`sed -n "/"$APPLOW"_dir:=/p" $RCPATH/$APPLOW | awk -F '"' '{ print $2 }'`
+			fi
+		fi
+		
 		if ls $RCPATH/$APPLOW > /dev/null; then
 			if pgrep -f $SETAPP.py > /dev/null; then
-				RCPATH/$APPLOW stop
+				$RCPATH/$APPLOW stop
 				sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
 			fi
 			APPDIR=`sed -n "/"$APPLOW"_dir:=/p" $RCPATH/$APPLOW | awk -F '"' '{ print $2 }'`
@@ -1813,18 +1825,18 @@ set_RCD () {
 	if ! grep ''$APPLOW'_enable="YES"' /etc/rc.conf > /dev/null; then
 		sudo echo ''$APPLOW'_enable="YES"' >> /etc/rc.conf
 			if [ "$APPLOW" = "mysql" ]; then
-				APPLOW=mysql-server
+				local APPLOW=mysql-server
 			fi
 		sudo $RCPATH/$APPLOW start || error_Msg
 	elif grep '#'$APPLOW'_enable="YES"' /etc/rc.conf > /dev/null; then
 		sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
 		sudo echo ''$APPLOW'_enable="YES"' >> /etc/rc.conf
 			if [ "$APPLOW" = "mysql" ]; then
-				APPLOW=mysql-server
+				local APPLOW=mysql-server
 			fi
 		sudo $RCPATH/$APPLOW start || error_Msg
 	elif [ "$APPLOW" = "mysql" ]; then
-		APPLOW=mysql-server
+		local APPLOW=mysql-server
 		sudo $RCPATH/$APPLOW restart || error_Msg
 	else
 		sudo $RCPATH/$APPLOW restart || error_Msg
