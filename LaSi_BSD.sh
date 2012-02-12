@@ -925,6 +925,10 @@ check_Log () {
 }
 
 check_App () {
+	if [ "$APPLOW" = "maraschino" ]; then
+		local SETAPP=maraschino-cherrypy
+	fi
+	
 	if pgrep -f $SETAPP.py > /dev/null; then
 		clear
 		echo
@@ -942,7 +946,7 @@ check_App () {
 		echo "Assuming $SETAPP is already installed"
 		echo "You could try to update"
 		echo
-		sleep 3
+		sleep 4
 		Info_$SETAPP
 	fi
 }
@@ -956,28 +960,54 @@ update_App () {
 		LaSi_Menu
 	}
 
-	if [ "$APPLOW" = "autosub" ]; then
-		echo
-		echo "Checking for updates $SETAPP"
-		echo
-		chown -R root $USRDIR/$APPLOW/.hg
-		cd $USRDIR/$APPLOW
-		hg pull
-		hg update
-		Summ_Update
-	elif [ "$APPLOW" = "beets" ] || [ "$APPLOW" = "couchpotato" ] || [ "$APPLOW" = "headphones" ] || [ "$APPLOW" = "sickbeard" ] || [ "$APPLOW" = "lazylibrarian" ] || [ "$APPLOW" = "maraschino" ]; then
-		echo
-		echo "Checking for updates $SETAPP"
-		echo
-		cd $USRDIR/$APPLOW
-		if ! git pull | grep "Already up-to-date"
-			then
-			$RCPATH/$APPLOW restart
+	case $APPLOW in
+		autosub)
+			echo
+			echo "Checking for updates $SETAPP"
+			echo
+			chown -R root $USRDIR/$APPLOW/.hg
+			cd $USRDIR/$APPLOW
+			hg pull
+			hg update
 			Summ_Update
-		fi
-		sleep 2
-		LaSi_Menu
-	fi
+			;;
+		couchpotato|headphones|lazylibrarian|maraschino|sickbeard)
+			APPDIR=`sed -n "/"$APPLOW"_dir:=/p" $RCPATH/$APPLOW | awk -F '"' '{ print $2 }'`
+			if ! pgrep -f $SETAPP.py > /dev/null; then
+				if ! [ "$APPDIR" = "" ]; then 
+					echo
+					echo "Can't find where $SETAPP is installed"
+					sleep 2
+					Info_$SETAPP
+				fi
+			else
+				echo
+				echo "Checking for updates $SETAPP"
+				echo
+				cd $APPDIR
+				if ! git pull | grep "Already up-to-date"
+					then
+					$RCPATH/$APPLOW restart
+					Summ_Update
+				fi
+				sleep 2
+				Info_$SETAPP
+			fi
+			;;
+		beets)
+			echo
+			echo "Checking for updates $SETAPP"
+			echo
+			cd $USRDIR/$APPLOW
+			if ! git pull | grep "Already up-to-date"
+				then
+				$RCPATH/$APPLOW restart
+				Summ_Update
+			fi
+			sleep 2
+			Info_$SETAPP
+			;;
+		esac
 }
 
 check_Port () {
