@@ -610,7 +610,7 @@ Install_Beets () {
 	check_App
 	check_python
     sudo git clone https://github.com/sampsyo/beets.git $USRDIR/$APPLOW &&
-    cd $USRDIR/$APPLOW && /usr/local/bin/python setup.py install
+    cd $USRDIR/$APPLOW && /usr/local/bin/python setup.py install &&
     chmod -R $APPUSER $USRDIR/$APPLOW
 
     # create a configfile and databasefile
@@ -1583,14 +1583,14 @@ cf_Choice () {
 						sleep 2
 						Info_$SETAPP
 					else
-						Uninstaller
+						cf_Uninstall
 					fi
 					;;
         3)
             case "$APPLOW" in
                 maraschino|sabnzbd|spotweb|transmission)
                 echo
-                echo "Uninstaller for $SETAPP is not available, yet!"
+                echo "Unpdating $SETAPP is not available, yet!"
                 sleep 2
                 Info_$SETAPP
                 ;;
@@ -1643,6 +1643,39 @@ cf_Install () {
     esac
 }
 
+cf_Uninstall () {
+	echo
+	echo "Are you sure you want to continue and remove/uninstall $SETAPP?"
+	read -p "[yes/no]: " REPLY
+	echo
+	case $REPLY in
+		[Yy]*)
+			Uninstaller
+			# give time to read output from above installprocess before returning to menu
+      echo 
+      echo "$SETAPP has been removed from this system"
+      echo
+      read -sn 1 -p "Press a key to continue"
+      # for multiple install continue in next item, else back to info
+      if [ "${#items[@]}" = 1 ]; then
+      Info_$SETAPP
+      fi
+			;;
+    [Nn]*)
+			Info_$SETAPP
+			;;
+    [Qq]*)
+			exit
+      ;;
+    *)
+      echo "Answer yes to $uninstaller" 
+      echo "no for menu"
+      echo "or Q to quit"
+      cf_Uninstall
+      ;;
+	esac
+}
+
 ##### Chose Ports Tree or PKG system #####
 pkg_Choice() {
 	if ! [ "$SETPKG" = "pkg" ] || [ "$SETPKG" = "ports" ]; then
@@ -1687,95 +1720,60 @@ pkg_Choice() {
 
 ##### Un-Installer #####
 Uninstaller () {
-	
-	uninstall () {
+	if [ "$APPLOW" = "sabnzbd" ]; then
+		if ! which SABnzbd.py > /dev/null; then
+			echo
+			echo "No $SETAPP installed on this system"
+			sleep 2
+			Info_$SETAPP
+		else
+			sudo $RCPATH/$APPLOW stop
+			sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
+			pkg_delete "$APPLOW*" || error_Msg
+		fi
+	fi
+
+	if [ "$APPLOW" = "transmission" ]; then
+		if ! which transmission-daemon > /dev/null; then
+			echo
+			echo "No $SETAPP installed on this system"
+			sleep 2
+			Info_$SETAPP
+		else
+			sudo $RCPATH/$APPLOW stop
+			sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
+			pkg_delete "$APPLOW*" || error_Msg
+		fi
+	fi
+
+	if [ "$APPLOW" = "beets" ]; then
+		if ! which beet > /dev/null;then
+			echo
+			echo "No $SETAPP installed on this system"
+			sleep 2
+			Info_$SETAPP
+		else
+			sudo rm -rf $USRDIR/$APPLOW
+			sudo rm /usr/local/bin/beet				
+		fi
+	fi
 		
-		if [ "APPLOW" = "sabnzbd" ]; then
-			if ! which SABnzbd.py > /dev/null; then
-				echo
-				echo "No $SETAPP installed on this system"
-				sleep 2
-				Info_$SETAPP
-			else
-				sudo $RCPATH/$APPLOW stop
+	if [ "$APPLOW" = "couchpotato" ] || [ "$APPLOW" = "headphones" ] || [ "$APPLOW" = "sickbeard" ] || [ "$APPLOW" = "lazylibrarian" ] || [ "$APPLOW" = "maraschino" ]; then
+		if ls $RCPATH/$APPLOW > /dev/null; then
+			if pgrep -f $SETAPP.py > /dev/null; then
+				RCPATH/$APPLOW stop
 				sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
-				pkg_delete "$APPLOW*" || error_Msg
 			fi
+			APPDIR=`sed -n "/"$APPLOW"_dir:=/p" $RCPATH/$APPLOW | awk -F '"' '{ print $2 }'`
 		fi
 
-		if [ "APPLOW" = "transmission" ]; then
-			if ! which transmission-daemon > /dev/null; then
-				echo
-				echo "No $SETAPP installed on this system"
-				sleep 2
-				Info_$SETAPP
-			else
-				sudo $RCPATH/$APPLOW stop
-				sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
-				pkg_delete "$APPLOW*" || error_Msg
-			fi
+		if ls $APPDIR > /dev/null; then
+			sudo rm -rf $APPDIR
+		else
+			echo "Can't find $SETAPP installation folder"
+			error_Msg
 		fi
-
-		if [ "APPLOW" = "beets" ]; then
-			if which beet > /dev/null;then
-				sudo rm -rf $USRDIR/$APPLOW
-				sudo rm /usr/local/bin/beet
-			else
-				echo
-				echo "No $SETAPP installed on this system"
-				sleep 2
-				Info_$SETAPP
-			fi
-		fi
-		
-		if [ "$APPLOW" = "couchpotato" ] || [ "$APPLOW" = "headphones" ] || [ "$APPLOW" = "sickbeard" ] || [ "$APPLOW" = "lazylibrarian" ] || [ "$APPLOW" = "maraschino" ]; then
-			if ls $RCPATH/$APPLOW > /dev/null; then
-				if pgrep -f $SETAPP.py > /dev/null; then
-					RCPATH/$APPLOW stop
-					sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
-				fi
-				APPDIR=`sed -n "/"$APPLOW"_dir:=/p" $RCPATH/$APPLOW | awk -F '"' '{ print $2 }'`
-			fi
-
-			if ls $APPDIR > /dev/null; then
-				sudo rm -rf $APPDIR
-			else
-				echo "Can't find $SETAPP installation folder"
-				error_Msg
-			fi
-		fi
-		# give time to read output from above installprocess before returning to menu
-        echo 
-		echo "$SETAPP has been removed from this system"
-		echo
-        read -sn 1 -p "Press a key to continue"
-        # for multiple install continue in next item, else back to info
-        if [ "${#items[@]}" = 1 ]; then
-            Info_$SETAPP
-        fi
-	}
-
-	echo
-    echo "Are you sure you want to continue and remove/uninstall $SETAPP?"
-    read -p "[yes/no]: " REPLY
-    echo
-    case $REPLY in
-    [Yy]*)
-		uninstall
-		;;
-    [Nn]*)
-        Info_$SETAPP
-        ;;
-    [Qq]*)
-        exit
-        ;;
-    *)
-        echo "Answer yes to $uninstaller" 
-        echo "no for menu"
-        echo "or Q to quit"
-        cf_Install
-        ;;
-    esac
+	fi
 }
 
 ##### CRONJOBS #####
