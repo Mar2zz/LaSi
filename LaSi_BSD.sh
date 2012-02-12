@@ -1574,24 +1574,29 @@ cf_Choice () {
     read SELECT
     case "$SELECT" in
         1)
-            cf_Install
-            ;;
+					cf_Install
+					;;
         2)
-			if [ "$APPLOW" = "spotweb" ] || [ "$APPLOW" = "autosub" ]; then
-				echo
-				echo "Uninstaller for $SETAPP is not available, yet!"
-				sleep 2
-				Info_$SETAPP
-			else
-				Uninstaller
-			fi
-            ;;
+					if [ "$APPLOW" = "spotweb" ] || [ "$APPLOW" = "autosub" ]; then
+						echo
+						echo "Uninstaller for $SETAPP is not available, yet!"
+						sleep 2
+						Info_$SETAPP
+					else
+						Uninstaller
+					fi
+					;;
         3)
-            case $APPLOW in
+            case "$APPLOW" in
                 maraschino|sabnzbd|spotweb|transmission)
-                    cf_Choice ;;
+                echo
+                echo "Uninstaller for $SETAPP is not available, yet!"
+                sleep 2
+                Info_$SETAPP
+                ;;
                 *)
-                    update_App ;;
+                update_App
+                ;;
             esac
             ;;
         [Bb]*)
@@ -1684,20 +1689,40 @@ pkg_Choice() {
 Uninstaller () {
 	
 	uninstall () {
-		if [ "APPLOW" = "sabnzbd" ] || [ "APPLOW" = "transmission" ]; then
-			sudo $RCPATH/$APPLOW stop
-			sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
-			pkg_delete "$APPLOW*" || error_Msg
-		fi
 		
+		if [ "APPLOW" = "sabnzbd" ]; then
+			if ! which SABnzbd.py > /dev/null; then
+				echo
+				echo "No $SETAPP installed on this system"
+				sleep 2
+				Info_$SETAPP
+			else
+				sudo $RCPATH/$APPLOW stop
+				sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
+				pkg_delete "$APPLOW*" || error_Msg
+			fi
+		fi
+
+		if [ "APPLOW" = "transmission" ]; then
+			if ! which transmission-daemon > /dev/null; then
+				echo
+				echo "No $SETAPP installed on this system"
+				sleep 2
+				Info_$SETAPP
+			else
+				sudo $RCPATH/$APPLOW stop
+				sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
+				pkg_delete "$APPLOW*" || error_Msg
+			fi
+		fi
+
 		if [ "APPLOW" = "beets" ]; then
 			if which beet > /dev/null;then
 				sudo rm -rf $USRDIR/$APPLOW
 				sudo rm /usr/local/bin/beet
 			else
-				clear
 				echo
-				echo "No Beets installed on this system"
+				echo "No $SETAPP installed on this system"
 				sleep 2
 				Info_$SETAPP
 			fi
@@ -1788,6 +1813,13 @@ set_RCD () {
 	fi
 
 	if ! grep ''$APPLOW'_enable="YES"' /etc/rc.conf > /dev/null; then
+		sudo echo ''$APPLOW'_enable="YES"' >> /etc/rc.conf
+			if [ "$APPLOW" = "mysql" ]; then
+				APPLOW=mysql-server
+			fi
+		sudo $RCPATH/$APPLOW start || error_Msg
+	elif grep '#'$APPLOW'_enable="YES"' /etc/rc.conf > /dev/null; then
+		sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
 		sudo echo ''$APPLOW'_enable="YES"' >> /etc/rc.conf
 			if [ "$APPLOW" = "mysql" ]; then
 				APPLOW=mysql-server
