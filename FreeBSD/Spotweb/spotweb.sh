@@ -324,7 +324,7 @@ check_WEBSRV () {
 		echo "B. Back to Info"
 		echo "Q. Quit"
 		read SELECT
-		case "$SELECT" in
+		case $SELECT in
 			1)
 				WEBSRV=lighttpd
 				APPLOW=lighttpd

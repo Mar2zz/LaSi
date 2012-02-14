@@ -292,7 +292,7 @@ Info_Sabnzbd () {
 }
 
 Install_Sabnzbd () {
-	if ls /usr/local/bin/SABnzbd.py > /dev/null; then
+	if which SABnzbd.py > /dev/null; then
 		clear
 		echo
 		echo "SABnzbd is already installed"
@@ -937,8 +937,8 @@ check_App () {
 		echo "$SETAPP is already running on this system"
 		echo "You could try to update"
 		echo
-		sleep 3
-		Info_$SETAPP
+		sleep 2
+		cf_Update
 	fi
 
 	if [ "$(ls -A $USRDIR/$APPLOW)" ]; then
@@ -948,12 +948,12 @@ check_App () {
 		echo "Assuming $SETAPP is already installed"
 		echo "You could try to update"
 		echo
-		sleep 4
-		Info_$SETAPP
+		sleep 2
+		cf_Update
 	fi
 }
 
-update_App () {
+Updater () {
 	Summ_Update () {
 		echo
 		echo
@@ -1221,12 +1221,12 @@ cf_Choice () {
             case $APPLOW in
                 sabnzbd|spotweb|transmission)
                 echo
-                echo "Unpdating $SETAPP is not available, yet!"
+                echo "Updating $SETAPP is not available, yet!"
                 sleep 2
                 Info_$SETAPP
                 ;;
                 *)
-                update_App
+                Updater
                 ;;
             esac
             ;;
@@ -1305,6 +1305,37 @@ cf_Uninstall () {
 			cf_Uninstall
 			;;
 	esac
+}
+
+cf_Update () {
+	echo
+	echo "Do you like to update $SETAPP NOW?"
+	echo
+	read -p "[yes/no]: " REPLY
+	case $REPLY in
+	[Yy]*)
+        Updater
+        # give time to read output from above installprocess before returning to menu
+        echo
+        read -sn 1 -p "Press a key to continue"
+        # for multiple install continue in next item, else back to info
+        if [ "${#items[@]}" = 1 ]; then
+        LaSi_Menu
+        fi
+        ;;
+    [Nn]*)
+		Info_$SETAPP
+        ;;
+    [Qq]*)
+        exit
+        ;;
+    *)
+        echo "Answer yes to install"
+        echo "no for menu"
+        echo "or Q to quit"
+        cf_Update
+        ;;
+    esac
 }
 
 ##### Chose Ports Tree or PKG system #####
