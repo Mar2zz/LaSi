@@ -71,7 +71,7 @@ LaSi_Menu (){
 	echo "1. SABnzbd+       6.  LazyLibrarian (alpha stage)"
 	echo "2. AutoSub        7.  Maraschino"
 	echo "3. Beets          8.  SickBeard"
-	echo "4. CouchPotato    9.  SpotWeb (broken)"
+	echo "4. CouchPotato    9.  SpotWeb"
 	echo "5. Headphones     10. Transmission (incl. webinterface)"
     echo
     # tell about commandline options
@@ -101,7 +101,7 @@ LaSi_Menu (){
         # first check if sources need an update
         #if [ $unattended = 1 ]; then [ $update_apt = 1 ] || update_Apt; fi
 
-        case $item in
+        case "$item" in
 
         # Sabnzbd
         1)
@@ -232,10 +232,8 @@ Info_AutoSub () {
 Install_AutoSub () {
 	check_App
 	check_mercurial
-	sudo hg clone https://code.google.com/p/auto-sub/ $USRDIR/$APPLOW
-	#sudo cp $USRDIR/$APPLOW/config.properties $USRDIR/$APPLOW/config
-	#/usr/local/bin/python $USRDIR/$APPLOW/AutoSub.py --config=$USRDIR/$APPLOW/config --daemon
-	sudo sed -i ".backup" 's|path = /home/user/auto-sub|path = /usr/local/autosub|' /usr/local/autosub/config.properties
+	sudo hg clone https://code.google.com/p/auto-sub/ $USRDIR/$APPLOW &&
+	sudo sed -i ".backup" 's|path = /home/user/auto-sub|path = /usr/local/autosub|' /usr/local/autosub/config.properties &&
     chown -R $APPUSER $USRDIR/$APPLOW
 
     if ! grep 'AutoSub.py' /etc/crontab > /dev/null; then
@@ -292,7 +290,7 @@ Info_Sabnzbd () {
 }
 
 Install_Sabnzbd () {
-	if which SABnzbd.py > /dev/null; then
+	if ls /usr/local/bin/SABnzbd.py > /dev/null; then
 		clear
 		echo
 		echo "SABnzbd is already installed"
@@ -612,8 +610,9 @@ Info_Beets () {
 Install_Beets () {
 	check_App
 	check_python
-    sudo git clone https://github.com/sampsyo/beets.git $USRDIR/$APPLOW
-    cd $USRDIR/$APPLOW && /usr/local/bin/python setup.py install
+    sudo git clone https://github.com/sampsyo/beets.git $USRDIR/$APPLOW &&
+    cd $USRDIR/$APPLOW && /usr/local/bin/python setup.py install &&
+    chmod -R $APPUSER $USRDIR/$APPLOW
 
     # create a configfile and databasefile
     if ! ls $USRDIR/$APPLOW/.beetsconfig > /dev/null; then
@@ -669,13 +668,217 @@ Info_Spotweb () {
 }
 
 Install_Spotweb () {
+
+	install_Spotweb () {
+		if [ "$WEBSRV" = "lighttpd" ]; then
+			DOCUROOT=`sed -ne '/^server.document-root =/p' /usr/local/etc/lighttpd/lighttpd.conf | awk -F '"' '{ print $2 }'`
+			SPOTDIR=$DOCUROOT/spotweb
+		elif [ "$WEBSRV" = "apache22" ]; then
+			DOCUROOT=`sed -ne '/^var.server_root =/p' /usr/local/etc/apache22/httpd.conf | awk -F '"' '{ print $2 }'`
+			SPOTDIR=$DOCUROOT/spotweb
+		fi
+
+		if [ "$(ls -A $SPOTDIR)" ]; then
+			clear
+			echo
+			echo "Installation folder for SpotWeb is not empty"
+			echo "Assuming SpotWeb is already installed"
+			echo
+			sleep 3
+			Info_Spotweb
+		fi
+
+		sudo git clone https://github.com/spotweb/spotweb.git $SPOTDIR &&
+		sudo chown -R www:www $SPOTDIR &&
+		sudo sed -i ".backup" 's/;date.timezone =/date.timezone = "Europe\/Amsterdam"/g' /usr/local/etc/php.ini &&
+		sudo $RCPATH/$WEBSRV restart
+	}
+
+	config_SQL () {
+
+        cf_SQL () {
+            echo
+            echo "Do you want to create a new database?"
+            echo "Warning: All existing info in an existing spotwebdatabase will be lost!"
+            read -p "[yes/no]: " DBREPLY
+            case $DBREPLY in
+                [YyJj]*)
+                    input_PW
+                    new_database=1
+                    ;;
+                [Nn]*)
+                    new_database=0
+                    ;;
+                *)
+                    echo "Answer yes or no"
+                    cf_SQL
+                    ;;
+            esac
+        }
+
+        input_PW () {
+			if [ "$SQLPASSWORD" != "" ]; then
+				stty_orig=`stty -g`
+				echo
+				echo "What is your mySQL password?"
+				stty -echo
+                echo "[mysql] password:"
+                read SQLPASSWORD
+                stty $stty_orig
+                create_DB
+			else
+				create_DB
+			fi
+        }
+
+        create_DB () {
+            MYSQL=$(which mysql)
+
+            # check password
+            if ! $($MYSQL mysql -u root --password="$SQLPASSWORD" -e "SHOW DATABASES;" > /dev/null); then
+                echo "Password is wrong, try again"
+                input_PW
+            fi
+
+            # drop DB if it exists
+            if $($MYSQL mysql -u root --password="$SQLPASSWORD" -e "SHOW DATABASES;" | grep 'spotweb' > /dev/null); then
+                $MYSQL mysql -u root --password="$SQLPASSWORD" -e "DROP DATABASE spotweb;" > /dev/null
+            fi
+
+            # drop USER if it exists
+            if $($MYSQL mysql -u root --password="$SQLPASSWORD" -e "select user.user from mysql.user;" | grep 'spotweb' > /dev/null); then
+                $MYSQL mysql -u root --password="$SQLPASSWORD" -e "DROP USER 'spotweb'@'localhost';" > /dev/null
+            fi
+
+            # create DB
+            $MYSQL mysql -u root --password="$SQLPASSWORD" -e "
+            CREATE DATABASE spotweb;
+            CREATE USER 'spotweb'@'localhost' IDENTIFIED BY 'spotweb';
+            GRANT ALL PRIVILEGES ON spotweb.* TO spotweb @'localhost' IDENTIFIED BY 'spotweb';"
+
+            # check if database and user is created
+            if ! $($MYSQL mysql -u root --password="$SQLPASSWORD" -e "SHOW DATABASES;" | grep 'spotweb' > /dev/null); then
+                echo
+                echo "Creation of database failed, try again"
+                error_Msg
+            fi
+
+            if ! $($MYSQL mysql -u root --password="$SQLPASSWORD" -e "select user.user from mysql.user;" | grep 'spotweb' > /dev/null); then
+                echo
+                echo "Creation of user failed, try again"
+                error_Msg
+            fi
+
+            echo
+            echo "Created a database named spotweb for user spotweb with password spotweb"
+            echo
+        }
+
+	cf_SQL
+	# Upgrade spotweb database
+	cd $SPOTDIR && /usr/local/bin/php $SPOTDIR/upgrade-db.php
+
+	Summ_Spotweb
+	Summ_Spotweb >> /tmp/LaSi/lasi_install.log
+	}
+
+	cf_CronRetrieve () {
+		echo
+		echo "Do you want to set a hourly cronjob for retrieving spots?"
+		read -p "[yes/no]: " CRONRETRIEVE
+		case $CRONRETRIEVE in
+			[YyJj]*)
+				# check if another cronjob for this exists and remove it
+				[ -e /etc/cron.hourly/spotweb_spots ] && sudo rm -f /etc/cron.hourly/spotweb_spots
+
+				# create lasi file in correct location
+				# would like to use sed for this, but can't figure out how...
+echo "#!/bin/sh
+
+# Author: Mar2zz
+# Email: lasi.mar2zz@gmail.com
+# Blogs: mar2zz.tweakblogs.net
+# License: GNU GPL v3
+
+# This job is set by the Lazy admin Scripted installer
+
+set -e
+
+[ -x /usr/local/bin/php ] || exit 0
+[ -e $SPOTDIR/retrieve.php ] || exit 0
+
+/usr/local/bin/php $SPOTDIR/retrieve.php || exit 1
+" > /tmp/LaSi/spotweb_spots
+
+                sudo mv -f /tmp/LaSi/spotweb_spots /etc/cron.hourly/spotweb_spots
+                sudo chmod +x /etc/cron.hourly/spotweb_spots
+
+                echo
+                echo "Cronjob set."
+                echo "See /etc/cron.hourly/spotweb_spots."
+                echo
+                ;;
+
+            [Nn]*)
+                echo "You can set cronjobs yourself if you want to."
+                echo "Type crontab -e for personal jobs or sudo crontab -e for root jobs."
+                echo
+                ;;
+            *)
+                echo "Answer yes or no."
+                cf_CronRetrieve
+                ;;
+        esac
+	}
+
+	cf_Retrieve () {
+		echo
+		echo "Do you want to retrieve spots now?"
+		read -p "[yes/no]: " RETRIEVE
+		case $RETRIEVE in
+			[YyJj]*)
+				if [ $new_database = 1 ]; then
+					echo
+					echo "You need to set your newsserver and other options first in spotweb."
+					echo "Go to http://$HOSTNAME/spotweb/?page=editsettings"
+					echo "Login with admin / admin"
+					echo "and set it at the Nieuwsserver-tab, after that, continue ..."
+					read -sn 1 -p "Press a key to continue"
+				fi
+					echo "This will take a while!"
+					sleep 2
+					/usr/local/bin/php $SPOTDIR/retrieve.php
+					;;
+			[Nn]*)
+					;;
+				*)
+					echo "Answer yes or no"
+					cf_Retrieve
+					;;
+		esac
+	}
+
 	check_git
-	#wget -q -O /tmp/LaSi/$APPLOW.sh $DROPBOX/$SETAPP/$APPLOW.sh || { echo "Connection to dropbox failed, try again later"; exit 1; }
-	clear
-	echo "I'm sorry"
-	echo "Installation of Spotweb is broken"
-	sleep 3
-	LaSi_Menu
+	check_WEBSRV
+	check_php
+	check_phpext
+	check_mysql
+	install_Spotweb
+	config_SQL
+	cf_CronRetrieve
+}
+
+Summ_Spotweb () {
+clear
+echo
+echo "
+Done! Installed SpotWeb.
+
+SpotWeb is now located @ http://$HOSTNAME/spotweb
+Go there to configure SpotWeb. Login admin:admin
+
+After configuring run $SPOTDIR/retrieve.php to fill the database with spots
+"
 }
 
 ######################
@@ -727,6 +930,7 @@ Install_Transmission () {
 		echo "Replace the last number with an asterix, e.g. 192.168.10.*"
 		echo
 		read -p 'IP-range : ' IPRANGE
+
 	}
 
 	if which transmission-daemon > /dev/null; then
@@ -841,12 +1045,22 @@ install_REQ () {
 	read -p "(yes/no)   :" REPLY
 		case $REPLY in
 			[Yy]*)
-				pkg_Choice
-				if [ "$SETPKG" = "ports" ]; then
-					cd $REQPATH &&
-					sudo make -DBATCH install clean || error_REQ
+				if [ $REQ = "php5-extensions" ]; then
+					pkg_Choice
+					install_phpext
 				else
-					sudo pkg_add -r $REQ || error_REQ
+					pkg_Choice
+					if [ "$SETPKG" = "ports" ]; then
+						if [ "$REQ" = "php" ] && [ "$WEBSRV" = "apache22" ]; then
+							cd /usr/ports/lang/php5 &&
+							sudo make WITH_APACHE=yes BATCH=yes install clean
+						else
+							cd $REQPATH &&
+							sudo make -DBATCH install clean || error_REQ
+						fi
+					else
+						sudo pkg_add -r $REQ || error_REQ
+					fi
 				fi
 				;;
 			[Nn]*)
@@ -863,6 +1077,38 @@ install_REQ () {
 				install_REQ
 				;;
 		esac
+}
+
+install_phpext () {
+	if [ "$SETPKG" = "ports" ]; then
+		clear
+		echo
+		echo "You're about to install php-extensions with the"
+		echo "Ports Collection. This means you have to configure"
+		echo "the make process to add the extensions required by Spotweb"
+		echo
+		echo "In the following menu add these extensions to the default"
+		echo "selection by checking them:"
+		echo
+		echo "$PHPEXT"
+		echo
+		echo "After checking(space) the extensions press enter(OK)"
+		echo
+		read -sn 1 -p "Press a key to continue to the config menu"
+		cd /usr/ports/lang/php5-extensions &&
+		sudo make config &&
+		sudo make BATCH=yes install clean || error_REQ
+	else
+		PHPEXT1=`sed -n '1p' /tmp/LaSi/php.ext`
+		PHPEXT2=`sed -n '2p' /tmp/LaSi/php.ext`
+		PHPEXT3=`sed -n '3p' /tmp/LaSi/php.ext`
+		PHPEXT4=`sed -n '4p' /tmp/LaSi/php.ext`
+		PHPEXT5=`sed -n '5p' /tmp/LaSi/php.ext`
+		PHPEXT6=`sed -n '6p' /tmp/LaSi/php.ext`
+		PHPEXT7=`sed -n '7p' /tmp/LaSi/php.ext`
+		PHPEXT8=`sed -n '8p' /tmp/LaSi/php.ext`
+		sudo pkg_add -r php5-extensions $PHPEXT1 $PHPEXT2 $PHPEXT3 $PHPEXT4 $PHPEXT5 $PHPEXT6 $PHPEXT7 $PHPEXT8 || error_REQ
+	fi
 }
 
 check_git () {
@@ -921,24 +1167,192 @@ check_python () {
 	fi
 }
 
+check_mysql () {
+	set_MYSQLPW () {
+		stty_orig=`stty -g`
+		clear
+		echo
+		echo "You need to set a password for the MYSQL root user"
+		echo
+		stty -echo
+		echo "[mysql] password:"
+		read SQLPASSWORD
+		stty $stty_orig
+		mysqladmin -u root password $SQLPASSWORD
+	}
+
+	if ! which mysql > /dev/null; then
+	APPLOW=mysql
+	REQ=mysql55-server
+	REQPATH=/usr/ports/databases/mysql55-server
+	install_REQ
+	set_RCD
+	set_MYSQLPW
+	fi
+}
+
+check_php () {
+	if ! which php > /dev/null; then
+	REQ=php5
+	REQPATH=/usr/ports/lang/php5
+	intall_REQ
+	fi
+}
+
+check_phpext () {
+	sudo rm -f /tmp/LaSi/php.ext &&
+	sudo rm -f /tmp/LaSi/php.dext
+	## Check php-extensions needed for Spotweb
+	if ! grep ctype /usr/local/etc/php/extensions.ini > /dev/null; then
+		echo "CTYPE" >> /tmp/LaSi/php.dext
+		fi
+	if ! grep curl /usr/local/etc/php/extensions.ini > /dev/null; then
+		echo "php5-curl" >> /tmp/LaSi/php.ext
+		fi
+	if ! grep dom /usr/local/etc/php/extensions.ini > /dev/null; then
+		echo "DOM" >> /tmp/LaSi/php.dext
+		fi
+	if ! grep gd.so /usr/local/etc/php/extensions.ini > /dev/null; then
+		echo "php5-gd" >> /tmp/LaSi/php.ext
+		fi
+	if ! grep gettext /usr/local/etc/php/extensions.ini > /dev/null; then
+		echo "php5-gettext" >> /tmp/LaSi/php.ext
+		fi
+	if ! grep mbstring /usr/local/etc/php/extensions.ini > /dev/null; then
+		echo "php5-mbstring" >> /tmp/LaSi/php.ext
+		fi
+	if ! grep mysql /usr/local/etc/php/extensions.ini > /dev/null; then
+		echo "php5-mysql" >> /tmp/LaSi/php.ext
+		fi
+	if ! grep openssl /usr/local/etc/php/extensions.ini > /dev/null; then
+		echo "php5-openssl" >> /tmp/LaSi/php.ext
+		fi
+	if ! grep xml /usr/local/etc/php/extensions.ini > /dev/null; then
+		echo "XML" >> /tmp/LaSi/php.dext
+		fi
+	if ! grep zip /usr/local/etc/php/extensions.ini > /dev/null; then
+		echo "php5-zip" >> /tmp/LaSi/php.ext
+		fi
+	if ! grep zlib /usr/local/etc/php/extensions.ini > /dev/null; then
+		echo "php5-zlib" >> /tmp/LaSi/php.ext
+		fi
+	## any ?
+	if ls /tmp/LaSi/php.ext > /dev/null; then
+		PHPEXT=`cat /tmp/LaSi/php.ext`
+		REQ=php5-extensions
+		REQPATH=/usr/ports/lang/php5-extensions
+		install_REQ
+		fi
+}
+
+check_WEBSRV () {
+
+	cf_Webserver () {
+		clear
+		LaSi_Logo
+		echo
+		echo "There's is NO webserver installed on this system"
+		echo "A webserver is needed to run $SETAPP"
+		echo
+		echo "Which webserver do you like to install?"
+		echo
+		echo "Options:"
+		echo
+		echo "1. Lighttpd"
+		echo "2. Apache"
+		echo
+		echo "B. Back to Info"
+		echo "Q. Quit"
+		read SELECT
+		case "$SELECT" in
+			1)
+				WEBSRV=lighttpd
+				APPLOW=lighttpd
+				cf_Installweb
+				;;
+			2)
+				WEBSRV=apache22
+				APPLOW=apache22
+				cf_Installweb
+				;;
+			[Bb]*)
+				Info_$SETAPP
+				;;
+			[Qq]*)
+				exit
+				;;
+			*)
+				echo "Please choose..."
+				cf_Webserver
+				;;
+		esac
+	}
+
+	cf_Installweb () {
+		echo
+		echo "Are you sure you want to continue and install $APPLOW?"
+		read -p "[yes/no]: " REPLY
+		echo
+		case $REPLY in
+			[Yy]*)
+				Install_WEBSRV
+				;;
+			[Nn]*)
+				Info_$SETAPP
+				;;
+			[Qq]*)
+				exit
+				;;
+			*)
+				echo "Answer yes to install"
+				echo "no for menu"
+				echo "or Q to quit"
+				cf_Installweb
+				;;
+		esac
+	}
+
+	install_WEBSRV () {
+		pkg_Choice
+		if [ "$SETPKG" = "ports" ]; then
+			cd /usr/ports/www/$WEBSRV &&
+			sudo make -DBATCH install clean || error_REQ
+		else
+			sudo pkg_add -r $WEBSRV || error_REQ
+		fi
+
+		if [ "$WEBSRV" = "apache22" ]; then
+			check_php
+			sed -i ".backup" 's/DirectoryIndex index.html/DirectoryIndex index.php index.html/' /usr/local/etc/apache22/httpd.conf &&
+			echo AddType application/x-httpd-php .php > /usr/local/etc/apache22/Includes/php5.conf &&
+			echo AddType application/x-httpd-php-source .phps >> /usr/local/etc/apache22/Includes/php5.conf
+		fi
+		set_RCD
+	}
+
+	if which lighttpd > /dev/null; then
+		WEBSRV=lighttpd
+	elif which apache > /dev/null; then
+		WEBSRV=apache22
+	else
+		cf_Webserver
+	fi
+}
+
 check_Log () {
     # remove any previous lasi_install logs
     rm -f /tmp/LaSi/lasi_install.log
 }
 
 check_App () {
-	if [ "$APPLOW" = "maraschino" ]; then
-		local SETAPP=maraschino-cherrypy
-	fi
-	
 	if pgrep -f $SETAPP.py > /dev/null; then
 		clear
 		echo
 		echo "$SETAPP is already running on this system"
 		echo "You could try to update"
 		echo
-		sleep 2
-		cf_Update
+		sleep 3
+		Info_$SETAPP
 	fi
 
 	if [ "$(ls -A $USRDIR/$APPLOW)" ]; then
@@ -948,85 +1362,40 @@ check_App () {
 		echo "Assuming $SETAPP is already installed"
 		echo "You could try to update"
 		echo
-		sleep 2
-		cf_Update
+		sleep 3
+		Info_$SETAPP
 	fi
 }
 
-Updater () {
+update_App () {
 	Summ_Update () {
 		echo
 		echo
 		echo "Finished updating $SETAPP"
 		sleep 2
+		LaSi_Menu
 	}
 
-	case $APPLOW in
-		autosub)
-			echo
-			echo "Checking for updates $SETAPP"
-			echo
-			chown -R root $USRDIR/$APPLOW/.hg
-			cd $USRDIR/$APPLOW
-			hg pull
-			hg update
+	if [ "$APPLOW" = "autosub" ]; then
+		echo
+		echo "Checking for updates $SETAPP"
+		echo
+		cd $USRDIR/$APPLOW
+		hg pull
+		Summ_Update
+	elif [ "$APPLOW" = "beets" ] || [ "$APPLOW" = "couchpotato" ] || [ "$APPLOW" = "headphones" ] || [ "$APPLOW" = "sickbeard" ] || [ "$APPLOW" = "lazylibrarian" ]; then
+		echo
+		echo "Checking for updates $SETAPP"
+		echo
+		cd $USRDIR/$APPLOW
+		if ! git pull | grep "Already up-to-date"
+			then
+			$RCPATH/$APPLOW restart
 			Summ_Update
-			;;
-		couchpotato|headphones|lazylibrarian|maraschino|sickbeard)
-			APPDIR=`sed -n "/"$APPLOW"_dir:=/p" $RCPATH/$APPLOW | awk -F '"' '{ print $2 }'`
-			if ! pgrep -f $SETAPP.py > /dev/null; then
-				if [ "$APPDIR" = "" ]; then 
-					echo
-					echo "Can't find where $SETAPP is installed"
-					sleep 2
-					Info_$SETAPP
-				elif [ "$(ls -A $USRDIR/$APPLOW)" ]; then
-					echo
-					echo "Checking for updates $SETAPP"
-					echo
-					cd $APPDIR
-					if ! git pull | grep "Already up-to-date"
-						then
-						$RCPATH/$APPLOW start
-						Summ_Update
-					fi
-					sleep 2
-					Info_$SETAPP
-				else
-					echo
-					echo "Can't find where $SETAPP is installed"
-					echo "or folder is empty; not updating"
-					sleep 2
-					Info_$SETAPP
-				fi
-			else
-				echo
-				echo "Checking for updates $SETAPP"
-				echo
-				cd $APPDIR
-				if ! git pull | grep "Already up-to-date"
-					then
-					$RCPATH/$APPLOW restart
-					Summ_Update
-				fi
-				sleep 2
-				Info_$SETAPP
-			fi
-			;;
-		beets)
-			echo
-			echo "Checking for updates $SETAPP"
-			echo
-			cd $USRDIR/$APPLOW
-			if ! git pull | grep "Already up-to-date"
-				then
-				$RCPATH/$APPLOW restart
-				Summ_Update
-			fi
-			sleep 2
-			Info_$SETAPP
-			;;
-		esac
+		fi
+		sleep 2
+		LaSi_Menu
+	fi
 }
 
 check_Port () {
@@ -1153,7 +1522,7 @@ Select_USER () {
 	echo
 	echo "Q. Quit"
 	read SELECT
-	case $SELECT in
+	case "$SELECT" in
 		[1]*)
 			APPUSER=share
 			;;
@@ -1203,30 +1572,30 @@ cf_Choice () {
 	esac
 
     read SELECT
-    case $SELECT in
+    case "$SELECT" in
         1)
-			cf_Install
-			;;
+					cf_Install
+					;;
         2)
-			if [ "$APPLOW" = "spotweb" ] || [ "$APPLOW" = "autosub" ]; then
-				echo
-				echo "Uninstaller for $SETAPP is not available, yet!"
-				sleep 2
-				Info_$SETAPP
-			else
-				cf_Uninstall
-			fi
-			;;
+					if [ "$APPLOW" = "spotweb" ] || [ "$APPLOW" = "autosub" ]; then
+						echo
+						echo "Uninstaller for $SETAPP is not available, yet!"
+						sleep 2
+						Info_$SETAPP
+					else
+						cf_Uninstall
+					fi
+					;;
         3)
-            case $APPLOW in
-                sabnzbd|spotweb|transmission)
+            case "$APPLOW" in
+                maraschino|sabnzbd|spotweb|transmission)
                 echo
-                echo "Updating $SETAPP is not available, yet!"
+                echo "Unpdating $SETAPP is not available, yet!"
                 sleep 2
                 Info_$SETAPP
                 ;;
                 *)
-                Updater
+                update_App
                 ;;
             esac
             ;;
@@ -1283,59 +1652,28 @@ cf_Uninstall () {
 		[Yy]*)
 			Uninstaller
 			# give time to read output from above installprocess before returning to menu
-			echo 
-			echo "$SETAPP has been removed from this system"
-			echo
-			read -sn 1 -p "Press a key to continue"
-			# for multiple install continue in next item, else back to info
-			if [ "${#items[@]}" = 1 ]; then
-			Info_$SETAPP
-			fi
+      echo 
+      echo "$SETAPP has been removed from this system"
+      echo
+      read -sn 1 -p "Press a key to continue"
+      # for multiple install continue in next item, else back to info
+      if [ "${#items[@]}" = 1 ]; then
+      Info_$SETAPP
+      fi
 			;;
-		[Nn]*)
-			Info_$SETAPP
-			;;
-		[Qq]*)
-			exit
-			;;
-		*)
-			echo "Answer yes to $uninstaller"
-			echo "no for menu"
-			echo "or Q to quit"
-			cf_Uninstall
-			;;
-	esac
-}
-
-cf_Update () {
-	echo
-	echo "Do you like to update $SETAPP NOW?"
-	echo
-	read -p "[yes/no]: " REPLY
-	case $REPLY in
-	[Yy]*)
-        Updater
-        # give time to read output from above installprocess before returning to menu
-        echo
-        read -sn 1 -p "Press a key to continue"
-        # for multiple install continue in next item, else back to info
-        if [ "${#items[@]}" = 1 ]; then
-        LaSi_Menu
-        fi
-        ;;
     [Nn]*)
-		Info_$SETAPP
-        ;;
+			Info_$SETAPP
+			;;
     [Qq]*)
-        exit
-        ;;
+			exit
+      ;;
     *)
-        echo "Answer yes to install"
-        echo "no for menu"
-        echo "or Q to quit"
-        cf_Update
-        ;;
-    esac
+      echo "Answer yes to $uninstaller" 
+      echo "no for menu"
+      echo "or Q to quit"
+      cf_Uninstall
+      ;;
+	esac
 }
 
 ##### Chose Ports Tree or PKG system #####
@@ -1358,7 +1696,7 @@ pkg_Choice() {
 	echo "B. Back to menu"
 	echo "Q. Quit"
 	read SELECT
-		case $SELECT in
+		case "$SELECT" in
 			[1]*)
 				check_Portstree
 				;;
@@ -1382,70 +1720,71 @@ pkg_Choice() {
 
 ##### Un-Installer #####
 Uninstaller () {
-	
-	case $APPLOW in
-		sabnzbd)
-			if ! which SABnzbd.py > /dev/null; then
-				echo
-				echo "No $SETAPP installed on this system"
-				sleep 2
-				Info_$SETAPP
-			else
-				sudo $RCPATH/$APPLOW stop
-				sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
-				sudo rm $RCPATH/$APPLOW
-				pkg_delete "$APPLOW*" || error_Msg
-			fi
-			;;
-		transmission)
-			if ! which transmission-daemon > /dev/null; then
-				echo
-				echo "No $SETAPP installed on this system"
-				sleep 2
-				Info_$SETAPP
-			else
-				sudo $RCPATH/$APPLOW stop
-				sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
-				sudo rm $RCPATH/$APPLOW
-				pkg_delete "$APPLOW*" || error_Msg
-			fi
-			;;
-		beets)
-			if ! which beet > /dev/null;then
-				echo
-				echo "No $SETAPP installed on this system"
-				sleep 2
-				Info_$SETAPP
-			else
-				sudo rm -rf $USRDIR/$APPLOW
-				sudo rm /usr/local/bin/beet				
-			fi
-			;;
-		couchpotato|headphones|lazylibrarian|maraschino|sickbeard)
-			if [ "$APPLOW" = "maraschino" ]; then
-				local SETAPP=maraschino-cherrypy
-			fi
-			
+	if [ "$APPLOW" = "sabnzbd" ]; then
+		if ! which SABnzbd.py > /dev/null; then
+			echo
+			echo "No $SETAPP installed on this system"
+			sleep 2
+			Info_$SETAPP
+		else
+			sudo $RCPATH/$APPLOW stop
+			sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
+			pkg_delete "$APPLOW*" || error_Msg
+		fi
+	fi
+
+	if [ "$APPLOW" = "transmission" ]; then
+		if ! which transmission-daemon > /dev/null; then
+			echo
+			echo "No $SETAPP installed on this system"
+			sleep 2
+			Info_$SETAPP
+		else
+			sudo $RCPATH/$APPLOW stop
+			sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
+			pkg_delete "$APPLOW*" || error_Msg
+		fi
+	fi
+
+	if [ "$APPLOW" = "beets" ]; then
+		if ! which beet > /dev/null;then
+			echo
+			echo "No $SETAPP installed on this system"
+			sleep 2
+			Info_$SETAPP
+		else
+			sudo rm -rf $USRDIR/$APPLOW
+			sudo rm /usr/local/bin/beet				
+		fi
+	fi
+		
+	if [ "$APPLOW" = "couchpotato" ] || [ "$APPLOW" = "headphones" ] || [ "$APPLOW" = "sickbeard" ] || [ "$APPLOW" = "lazylibrarian" ] || [ "$APPLOW" = "maraschino" ]; then
+		if [ "$APPLOW" = "maraschino" ]; then
+			local SETAPP=maraschino-cherrypy
 			if ls $RCPATH/$APPLOW > /dev/null; then
 				if pgrep -f $SETAPP.py > /dev/null; then
-					$RCPATH/$APPLOW stop
-					sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
+				$RCPATH/$APPLOW stop
+				sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
 				fi
 				APPDIR=`sed -n "/"$APPLOW"_dir:=/p" $RCPATH/$APPLOW | awk -F '"' '{ print $2 }'`
-				sudo rm $RCPATH/$APPLOW
 			fi
-			
-			if ls $APPDIR > /dev/null; then
-				sudo rm -rf $APPDIR
-			else
-				echo "Can't find $SETAPP installation folder"
-				error_Msg
+		fi
+		
+		if ls $RCPATH/$APPLOW > /dev/null; then
+			if pgrep -f $SETAPP.py > /dev/null; then
+				$RCPATH/$APPLOW stop
+				sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
 			fi
-			;;
-		*)
-			echo "not available"
-			;;
-	esac
+			APPDIR=`sed -n "/"$APPLOW"_dir:=/p" $RCPATH/$APPLOW | awk -F '"' '{ print $2 }'`
+		fi
+
+		if ls $APPDIR > /dev/null; then
+			sudo rm -rf $APPDIR
+		else
+			echo "Can't find $SETAPP installation folder"
+			error_Msg
+		fi
+	fi
 }
 
 ##### CRONJOBS #####
@@ -1459,34 +1798,45 @@ cf_Cronjob () {
 
 ##### FreeBSD rc.d Script #####
 set_RCD () {
-	if ! ls $RCPATH/$APPLOW > /dev/null; then
-		cd $RCPATH
-		sudo fetch $DROPBOX/$SETAPP/$APPLOW
-		sudo sed -i "" "s/USERNAME/$APPUSER/g" $RCPATH/$APPLOW
-		if [ "$APPLOW" = "transmission" ]; then
-			sudo sed -i "" "s|DOWNDIR|$DOWNDIR|g" $RCPATH/$APPLOW
-			sudo sed -i "" "s|IPRANGE|$IPRANGE|g" $RCPATH/$APPLOW
+	if ! [ "$APPLOW" = "apache" ] || [ "$APPLOW" = "lighttpd" ] || [ "$APPLOW" = "mysql" ]; then
+		if ! ls $RCPATH/$APPLOW > /dev/null; then
+			cd $RCPATH &&
+			sudo fetch $DROPBOX/$SETAPP/$APPLOW &&
+			sudo sed -i "" "s/USERNAME/$APPUSER/g" $RCPATH/$APPLOW
+			if [ "$APPLOW" = "transmission" ]; then
+				sudo sed -i "" "s|DOWNDIR|$DOWNDIR|g" $RCPATH/$APPLOW &&
+				sudo sed -i "" "s|IPRANGE|$IPRANGE|g" $RCPATH/$APPLOW
+			fi
+			sudo chmod 555 $RCPATH/$APPLOW
+		else
+			cd $RCPATH &&
+			sudo mv -f $APPLOW $APPLOW.backup &&
+			sudo fetch $DROPBOX/$SETAPP/$APPLOW &&
+			sudo sed -i "" "s/USERNAME/$APPUSER/g" $RCPATH/$APPLOW
+			if [ "$APPLOW" = "transmission" ]; then
+				sudo sed -i "" "s|DOWNDIR|$DOWNDIR|g" $RCPATH/$APPLOW &&
+				sudo sed -i "" "s|IPRANGE|$IPRANGE|g" $RCPATH/$APPLOW
+			fi
+			sudo chmod 555 $RCPATH/$APPLOW
 		fi
-		sudo chmod 555 $RCPATH/$APPLOW
-	else
-		cd $RCPATH
-		sudo mv -f $APPLOW $APPLOW.backup
-		sudo fetch $DROPBOX/$SETAPP/$APPLOW
-		sudo sed -i "" "s/USERNAME/$APPUSER/g" $RCPATH/$APPLOW
-		if [ "$APPLOW" = "transmission" ]; then
-			sudo sed -i "" "s|DOWNDIR|$DOWNDIR|g" $RCPATH/$APPLOW
-			sudo sed -i "" "s|IPRANGE|$IPRANGE|g" $RCPATH/$APPLOW
-		fi
-		sudo chmod 555 $RCPATH/$APPLOW
 	fi
 
 	if ! grep ''$APPLOW'_enable="YES"' /etc/rc.conf > /dev/null; then
 		sudo echo ''$APPLOW'_enable="YES"' >> /etc/rc.conf
+			if [ "$APPLOW" = "mysql" ]; then
+				local APPLOW=mysql-server
+			fi
 		sudo $RCPATH/$APPLOW start || error_Msg
 	elif grep '#'$APPLOW'_enable="YES"' /etc/rc.conf > /dev/null; then
 		sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
 		sudo echo ''$APPLOW'_enable="YES"' >> /etc/rc.conf
+			if [ "$APPLOW" = "mysql" ]; then
+				local APPLOW=mysql-server
+			fi
 		sudo $RCPATH/$APPLOW start || error_Msg
+	elif [ "$APPLOW" = "mysql" ]; then
+		local APPLOW=mysql-server
+		sudo $RCPATH/$APPLOW restart || error_Msg
 	else
 		sudo $RCPATH/$APPLOW restart || error_Msg
 	fi
