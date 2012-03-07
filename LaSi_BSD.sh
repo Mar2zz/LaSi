@@ -887,6 +887,60 @@ check_mercurial () {
 	fi
 }
 
+check_php () {
+	if ! which php > /dev/null; then
+	REQ=php5
+	REQPATH=/usr/ports/lang/php5
+	intall_REQ
+	fi
+}
+
+check_phpext () {
+	sudo rm -f /tmp/LaSi/php.ext &&
+	sudo rm -f /tmp/LaSi/php.dext
+	## Check php-extensions needed for Spotweb
+	if ! grep ctype /usr/local/etc/php/extensions.ini > /dev/null; then
+		echo "CTYPE" >> /tmp/LaSi/php.dext
+		fi
+	if ! grep curl /usr/local/etc/php/extensions.ini > /dev/null; then
+		echo "php5-curl" >> /tmp/LaSi/php.ext
+		fi
+	if ! grep dom /usr/local/etc/php/extensions.ini > /dev/null; then
+		echo "DOM" >> /tmp/LaSi/php.dext
+		fi
+	if ! grep gd.so /usr/local/etc/php/extensions.ini > /dev/null; then
+		echo "php5-gd" >> /tmp/LaSi/php.ext
+		fi
+	if ! grep gettext /usr/local/etc/php/extensions.ini > /dev/null; then
+		echo "php5-gettext" >> /tmp/LaSi/php.ext
+		fi
+	if ! grep mbstring /usr/local/etc/php/extensions.ini > /dev/null; then
+		echo "php5-mbstring" >> /tmp/LaSi/php.ext
+		fi
+	if ! grep mysql /usr/local/etc/php/extensions.ini > /dev/null; then
+		echo "php5-mysql" >> /tmp/LaSi/php.ext
+		fi
+	if ! grep openssl /usr/local/etc/php/extensions.ini > /dev/null; then
+		echo "php5-openssl" >> /tmp/LaSi/php.ext
+		fi
+	if ! grep xml /usr/local/etc/php/extensions.ini > /dev/null; then
+		echo "XML" >> /tmp/LaSi/php.dext
+		fi
+	if ! grep zip /usr/local/etc/php/extensions.ini > /dev/null; then
+		echo "php5-zip" >> /tmp/LaSi/php.ext
+		fi
+	if ! grep zlib /usr/local/etc/php/extensions.ini > /dev/null; then
+		echo "php5-zlib" >> /tmp/LaSi/php.ext
+		fi
+	## any ?
+	if ls /tmp/LaSi/php.ext > /dev/null; then
+		PHPEXT=`cat /tmp/LaSi/php.ext`
+		REQ=php5-extensions
+		REQPATH=/usr/ports/lang/php5-extensions
+		install_REQ
+		fi
+}
+
 check_python () {
 	if ! which python > /dev/null; then
 	REQ=python
@@ -916,6 +970,100 @@ check_python () {
 		REQPATH=/usr/ports/www/py-cherrypy
 		intall_REQ
 		fi
+	fi
+}
+
+check_WEBSRV () {
+
+	cf_Webserver () {
+		clear
+		LaSi_Logo
+		echo
+		echo "There's is NO webserver installed on this system"
+		echo "A webserver is needed to run $SETAPP"
+		echo
+		echo "Which webserver do you like to install?"
+		echo
+		echo "Options:"
+		echo
+		echo "1. Lighttpd"
+		echo "2. Apache"
+		echo
+		echo "B. Back to Info"
+		echo "Q. Quit"
+		read SELECT
+		case "$SELECT" in
+			1)
+				WEBSRV=lighttpd
+				APPLOW=lighttpd
+				cf_Installweb
+				;;
+			2)
+				WEBSRV=apache22
+				APPLOW=apache22
+				cf_Installweb
+				;;
+			[Bb]*)
+				Info_$SETAPP
+				;;
+			[Qq]*)
+				exit
+				;;
+			*)
+				echo "Please choose..."
+				cf_Webserver
+				;;
+		esac
+	}
+
+	cf_Installweb () {
+		echo
+		echo "Are you sure you want to continue and install $APPLOW?"
+		read -p "[yes/no]: " REPLY
+		echo
+		case $REPLY in
+			[Yy]*)
+				Install_WEBSRV
+				;;
+			[Nn]*)
+				Info_$SETAPP
+				;;
+			[Qq]*)
+				exit
+				;;
+			*)
+				echo "Answer yes to install"
+				echo "no for menu"
+				echo "or Q to quit"
+				cf_Installweb
+				;;
+		esac
+	}
+
+	install_WEBSRV () {
+		pkg_Choice
+		if [ "$SETPKG" = "ports" ]; then
+			cd /usr/ports/www/$WEBSRV &&
+			sudo make -DBATCH install clean || error_REQ
+		else
+			sudo pkg_add -r $WEBSRV || error_REQ
+		fi
+
+		if [ "$WEBSRV" = "apache22" ]; then
+			check_php
+			sed -i ".backup" 's/DirectoryIndex index.html/DirectoryIndex index.php index.html/' /usr/local/etc/apache22/httpd.conf &&
+			echo AddType application/x-httpd-php .php > /usr/local/etc/apache22/Includes/php5.conf &&
+			echo AddType application/x-httpd-php-source .phps >> /usr/local/etc/apache22/Includes/php5.conf
+		fi
+		set_RCD
+	}
+
+	if which lighttpd > /dev/null; then
+		WEBSRV=lighttpd
+	elif which apache > /dev/null; then
+		WEBSRV=apache22
+	else
+		cf_Webserver
 	fi
 }
 
@@ -1457,34 +1605,45 @@ cf_Cronjob () {
 
 ##### FreeBSD rc.d Script #####
 set_RCD () {
-	if ! ls $RCPATH/$APPLOW > /dev/null; then
-		cd $RCPATH
-		sudo fetch $DROPBOX/$SETAPP/$APPLOW
-		sudo sed -i "" "s/USERNAME/$APPUSER/g" $RCPATH/$APPLOW
-		if [ "$APPLOW" = "transmission" ]; then
-			sudo sed -i "" "s|DOWNDIR|$DOWNDIR|g" $RCPATH/$APPLOW
-			sudo sed -i "" "s|IPRANGE|$IPRANGE|g" $RCPATH/$APPLOW
+	if ! [ "$APPLOW" = "apache" ] || [ "$APPLOW" = "lighttpd" ] || [ "$APPLOW" = "mysql" ]; then
+		if ! ls $RCPATH/$APPLOW > /dev/null; then
+			cd $RCPATH &&
+			sudo fetch $DROPBOX/$SETAPP/$APPLOW &&
+			sudo sed -i "" "s/USERNAME/$APPUSER/g" $RCPATH/$APPLOW
+			if [ "$APPLOW" = "transmission" ]; then
+				sudo sed -i "" "s|DOWNDIR|$DOWNDIR|g" $RCPATH/$APPLOW &&
+				sudo sed -i "" "s|IPRANGE|$IPRANGE|g" $RCPATH/$APPLOW
+			fi
+			sudo chmod 555 $RCPATH/$APPLOW
+		else
+			cd $RCPATH &&
+			sudo mv -f $APPLOW $APPLOW.backup &&
+			sudo fetch $DROPBOX/$SETAPP/$APPLOW &&
+			sudo sed -i "" "s/USERNAME/$APPUSER/g" $RCPATH/$APPLOW
+			if [ "$APPLOW" = "transmission" ]; then
+				sudo sed -i "" "s|DOWNDIR|$DOWNDIR|g" $RCPATH/$APPLOW &&
+				sudo sed -i "" "s|IPRANGE|$IPRANGE|g" $RCPATH/$APPLOW
+			fi
+			sudo chmod 555 $RCPATH/$APPLOW
 		fi
-		sudo chmod 555 $RCPATH/$APPLOW
-	else
-		cd $RCPATH
-		sudo mv -f $APPLOW $APPLOW.backup
-		sudo fetch $DROPBOX/$SETAPP/$APPLOW
-		sudo sed -i "" "s/USERNAME/$APPUSER/g" $RCPATH/$APPLOW
-		if [ "$APPLOW" = "transmission" ]; then
-			sudo sed -i "" "s|DOWNDIR|$DOWNDIR|g" $RCPATH/$APPLOW
-			sudo sed -i "" "s|IPRANGE|$IPRANGE|g" $RCPATH/$APPLOW
-		fi
-		sudo chmod 555 $RCPATH/$APPLOW
 	fi
 
 	if ! grep ''$APPLOW'_enable="YES"' /etc/rc.conf > /dev/null; then
 		sudo echo ''$APPLOW'_enable="YES"' >> /etc/rc.conf
+			if [ "$APPLOW" = "mysql" ]; then
+				local APPLOW=mysql-server
+			fi
 		sudo $RCPATH/$APPLOW start || error_Msg
 	elif grep '#'$APPLOW'_enable="YES"' /etc/rc.conf > /dev/null; then
 		sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
 		sudo echo ''$APPLOW'_enable="YES"' >> /etc/rc.conf
+			if [ "$APPLOW" = "mysql" ]; then
+				local APPLOW=mysql-server
+			fi
 		sudo $RCPATH/$APPLOW start || error_Msg
+	elif [ "$APPLOW" = "mysql" ]; then
+		local APPLOW=mysql-server
+		sudo $RCPATH/$APPLOW restart || error_Msg
 	else
 		sudo $RCPATH/$APPLOW restart || error_Msg
 	fi
