@@ -669,11 +669,217 @@ Info_Spotweb () {
 }
 
 Install_Spotweb () {
-	clear
-	echo "I'm sorry"
-	echo "Installation of Spotweb is broken"
-	sleep 3
-	LaSi_Menu
+
+	install_Spotweb () {
+		if [ "$WEBSRV" = "lighttpd" ]; then
+			DOCUROOT=`sed -ne '/^server.document-root =/p' /usr/local/etc/lighttpd/lighttpd.conf | awk -F '"' '{ print $2 }'`
+			SPOTDIR=$DOCUROOT/spotweb
+		elif [ "$WEBSRV" = "apache22" ]; then
+			DOCUROOT=`sed -ne '/^var.server_root =/p' /usr/local/etc/apache22/httpd.conf | awk -F '"' '{ print $2 }'`
+			SPOTDIR=$DOCUROOT/spotweb
+		fi
+
+		if [ "$(ls -A $SPOTDIR)" ]; then
+			clear
+			echo
+			echo "Installation folder for SpotWeb is not empty"
+			echo "Assuming SpotWeb is already installed"
+			echo
+			sleep 3
+			Info_Spotweb
+		fi
+
+		sudo git clone https://github.com/spotweb/spotweb.git $SPOTDIR &&
+		sudo chown -R www:www $SPOTDIR &&
+		sudo sed -i ".backup" 's/;date.timezone =/date.timezone = "Europe\/Amsterdam"/g' /usr/local/etc/php.ini &&
+		sudo $RCPATH/$WEBSRV restart
+	}
+
+	config_SQL () {
+
+        cf_SQL () {
+            echo
+            echo "Do you want to create a new database?"
+            echo "Warning: All existing info in an existing spotwebdatabase will be lost!"
+            read -p "[yes/no]: " DBREPLY
+            case $DBREPLY in
+                [YyJj]*)
+                    input_PW
+                    new_database=1
+                    ;;
+                [Nn]*)
+                    new_database=0
+                    ;;
+                *)
+                    echo "Answer yes or no"
+                    cf_SQL
+                    ;;
+            esac
+        }
+
+        input_PW () {
+			if [ "$SQLPASSWORD" != "" ]; then
+				stty_orig=`stty -g`
+				echo
+				echo "What is your mySQL password?"
+				stty -echo
+                echo "[mysql] password:"
+                read SQLPASSWORD
+                stty $stty_orig
+                create_DB
+			else
+				create_DB
+			fi
+        }
+
+        create_DB () {
+            MYSQL=$(which mysql)
+
+            # check password
+            if ! $($MYSQL mysql -u root --password="$SQLPASSWORD" -e "SHOW DATABASES;" > /dev/null); then
+                echo "Password is wrong, try again"
+                input_PW
+            fi
+
+            # drop DB if it exists
+            if $($MYSQL mysql -u root --password="$SQLPASSWORD" -e "SHOW DATABASES;" | grep 'spotweb' > /dev/null); then
+                $MYSQL mysql -u root --password="$SQLPASSWORD" -e "DROP DATABASE spotweb;" > /dev/null
+            fi
+
+            # drop USER if it exists
+            if $($MYSQL mysql -u root --password="$SQLPASSWORD" -e "select user.user from mysql.user;" | grep 'spotweb' > /dev/null); then
+                $MYSQL mysql -u root --password="$SQLPASSWORD" -e "DROP USER 'spotweb'@'localhost';" > /dev/null
+            fi
+
+            # create DB
+            $MYSQL mysql -u root --password="$SQLPASSWORD" -e "
+            CREATE DATABASE spotweb;
+            CREATE USER 'spotweb'@'localhost' IDENTIFIED BY 'spotweb';
+            GRANT ALL PRIVILEGES ON spotweb.* TO spotweb @'localhost' IDENTIFIED BY 'spotweb';"
+
+            # check if database and user is created
+            if ! $($MYSQL mysql -u root --password="$SQLPASSWORD" -e "SHOW DATABASES;" | grep 'spotweb' > /dev/null); then
+                echo
+                echo "Creation of database failed, try again"
+                error_Msg
+            fi
+
+            if ! $($MYSQL mysql -u root --password="$SQLPASSWORD" -e "select user.user from mysql.user;" | grep 'spotweb' > /dev/null); then
+                echo
+                echo "Creation of user failed, try again"
+                error_Msg
+            fi
+
+            echo
+            echo "Created a database named spotweb for user spotweb with password spotweb"
+            echo
+        }
+
+	cf_SQL
+	# Upgrade spotweb database
+	cd $SPOTDIR && /usr/local/bin/php $SPOTDIR/upgrade-db.php
+
+	Summ_Spotweb
+	Summ_Spotweb >> /tmp/LaSi/lasi_install.log
+	}
+
+	cf_CronRetrieve () {
+		echo
+		echo "Do you want to set a hourly cronjob for retrieving spots?"
+		read -p "[yes/no]: " CRONRETRIEVE
+		case $CRONRETRIEVE in
+			[YyJj]*)
+				# check if another cronjob for this exists and remove it
+				[ -e /etc/cron.hourly/spotweb_spots ] && sudo rm -f /etc/cron.hourly/spotweb_spots
+
+				# create lasi file in correct location
+				# would like to use sed for this, but can't figure out how...
+echo "#!/bin/sh
+
+# Author: Mar2zz
+# Email: lasi.mar2zz@gmail.com
+# Blogs: mar2zz.tweakblogs.net
+# License: GNU GPL v3
+
+# This job is set by the Lazy admin Scripted installer
+
+set -e
+
+[ -x /usr/local/bin/php ] || exit 0
+[ -e $SPOTDIR/retrieve.php ] || exit 0
+
+/usr/local/bin/php $SPOTDIR/retrieve.php || exit 1
+" > /tmp/LaSi/spotweb_spots
+
+                sudo mv -f /tmp/LaSi/spotweb_spots /etc/cron.hourly/spotweb_spots
+                sudo chmod +x /etc/cron.hourly/spotweb_spots
+
+                echo
+                echo "Cronjob set."
+                echo "See /etc/cron.hourly/spotweb_spots."
+                echo
+                ;;
+
+            [Nn]*)
+                echo "You can set cronjobs yourself if you want to."
+                echo "Type crontab -e for personal jobs or sudo crontab -e for root jobs."
+                echo
+                ;;
+            *)
+                echo "Answer yes or no."
+                cf_CronRetrieve
+                ;;
+        esac
+	}
+
+	cf_Retrieve () {
+		echo
+		echo "Do you want to retrieve spots now?"
+		read -p "[yes/no]: " RETRIEVE
+		case $RETRIEVE in
+			[YyJj]*)
+				if [ $new_database = 1 ]; then
+					echo
+					echo "You need to set your newsserver and other options first in spotweb."
+					echo "Go to http://$HOSTNAME/spotweb/?page=editsettings"
+					echo "Login with admin / admin"
+					echo "and set it at the Nieuwsserver-tab, after that, continue ..."
+					read -sn 1 -p "Press a key to continue"
+				fi
+					echo "This will take a while!"
+					sleep 2
+					/usr/local/bin/php $SPOTDIR/retrieve.php
+					;;
+			[Nn]*)
+					;;
+				*)
+					echo "Answer yes or no"
+					cf_Retrieve
+					;;
+		esac
+	}
+
+	check_git
+	check_WEBSRV
+	check_php
+	check_phpext
+	check_mysql
+	install_Spotweb
+	config_SQL
+	cf_CronRetrieve
+}
+
+Summ_Spotweb () {
+clear
+echo
+echo "
+Done! Installed SpotWeb.
+
+SpotWeb is now located @ http://$HOSTNAME/spotweb
+Go there to configure SpotWeb. Login admin:admin
+
+After configuring run $SPOTDIR/retrieve.php to fill the database with spots
+"
 }
 
 ######################
@@ -785,7 +991,7 @@ check_Portstree () {
 		read -p "(yes/no)   :" REPLY
 		case $REPLY in
 			[Yy]*)
-				SETPKG=ports
+				export SETPKG=ports
 				echo
 				echo "Let's GO!"
 				echo
@@ -812,12 +1018,12 @@ check_Portstree () {
 	if ! ls /usr/ports > /dev/null; then
 		install_Portstree
 	elif find /var/db/portsnap -iname "INDEX" -mtime -1 > /dev/null; then
-		SETPKG=ports
+		export SETPKG=ports
 		echo
         echo "Ports Tree is up to date"
         sleep 2
 	else
-		SETPKG=ports
+		export SETPKG=ports
 		clear
         echo
         echo "Going to update the Ports Tree"
@@ -884,6 +1090,30 @@ check_mercurial () {
 	REQ=mercurial
 	REQPATH=/usr/ports/devel/mercurial
 	install_REQ
+	fi
+}
+
+check_mysql () {
+	set_MYSQLPW () {
+		stty_orig=`stty -g`
+		clear
+		echo
+		echo "You need to set a password for the MYSQL root user"
+		echo
+		stty -echo
+		echo "[mysql] password:"
+		read SQLPASSWORD
+		stty $stty_orig
+		mysqladmin -u root password $SQLPASSWORD
+	}
+
+	if ! which mysql > /dev/null; then
+	APPLOW=mysql
+	REQ=mysql55-server
+	REQPATH=/usr/ports/databases/mysql55-server
+	install_REQ
+	set_RCD
+	set_MYSQLPW
 	fi
 }
 
@@ -1509,7 +1739,7 @@ pkg_Choice() {
 				check_Portstree
 				;;
 			[2]*)
-				SETPKG=pkg
+				export SETPKG=pkg
 				;;
 			[Bb]*)
 				LaSi_Menu
