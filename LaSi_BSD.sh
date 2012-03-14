@@ -71,7 +71,7 @@ LaSi_Menu (){
 	echo "1. SABnzbd+       6.  LazyLibrarian (alpha stage)"
 	echo "2. AutoSub        7.  Maraschino"
 	echo "3. Beets          8.  SickBeard"
-	echo "4. CouchPotato    9.  SpotWeb (broken)"
+	echo "4. CouchPotato    9.  SpotWeb"
 	echo "5. Headphones     10. Transmission (incl. webinterface)"
     echo
     # tell about commandline options
@@ -991,7 +991,7 @@ check_Portstree () {
 		read -p "(yes/no)   :" REPLY
 		case $REPLY in
 			[Yy]*)
-				export SETPKG=ports
+				SETPKG=ports
 				echo
 				echo "Let's GO!"
 				echo
@@ -1017,13 +1017,14 @@ check_Portstree () {
 
 	if ! ls /usr/ports > /dev/null; then
 		install_Portstree
-	elif find /var/db/portsnap -iname "INDEX" -mtime -1 > /dev/null; then
-		export SETPKG=ports
+	elif find /var/db/portsnap -iname "INDEX" -mtime -1
+		then
+		SETPKG=ports
 		echo
         echo "Ports Tree is up to date"
         sleep 2
 	else
-		export SETPKG=ports
+		SETPKG=ports
 		clear
         echo
         echo "Going to update the Ports Tree"
@@ -1182,7 +1183,7 @@ check_python () {
 		if ! which cheetah > /dev/null; then
 		REQ=py27-cheetah
 		REQPATH=/usr/ports/devel/py-cheetah
-		intall_REQ
+		install_REQ
 		fi
 	fi
 
@@ -1190,7 +1191,7 @@ check_python () {
 		if ! ls /usr/local/lib/python2.7/site-packages/setuptools* > /dev/null; then
 		REQ=py27-setuptools
 		REQPATH=/usr/ports/devel/py-setuptools
-		intall_REQ
+		install_REQ
 		fi
 	fi
 
@@ -1198,7 +1199,7 @@ check_python () {
 		if ! ls /usr/local/lib/python2.7/site-packages/CherryPy* > /dev/null; then
 		REQ=py27-cherrypy
 		REQPATH=/usr/ports/www/py-cherrypy
-		intall_REQ
+		install_REQ
 		fi
 	fi
 }
@@ -1716,7 +1717,7 @@ cf_Update () {
 
 ##### Chose Ports Tree or PKG system #####
 pkg_Choice() {
-	if ! [ "$SETPKG" = "pkg" ] || [ "$SETPKG" = "ports" ]; then
+	if [ "$SETPKG" != "pkg" ] && [ "$SETPKG" != "ports" ]; then
 	clear
 	LaSi_Logo
 	echo
@@ -1739,7 +1740,7 @@ pkg_Choice() {
 				check_Portstree
 				;;
 			[2]*)
-				export SETPKG=pkg
+				SETPKG=pkg
 				;;
 			[Bb]*)
 				LaSi_Menu
