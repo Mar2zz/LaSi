@@ -1017,12 +1017,12 @@ check_Portstree () {
 
 	if ! ls /usr/ports > /dev/null; then
 		install_Portstree
-	elif find /var/db/portsnap -iname "INDEX" -mtime -1
-		then
-		SETPKG=ports
-		echo
-        echo "Ports Tree is up to date"
-        sleep 2
+#	elif find /var/db/portsnap -iname "INDEX" -mtime -1
+#		then
+#		SETPKG=ports
+#		echo
+#       echo "Ports Tree is up to date"
+#       sleep 2
 	else
 		SETPKG=ports
 		clear

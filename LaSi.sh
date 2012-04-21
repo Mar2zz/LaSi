@@ -41,8 +41,8 @@ if which apt-get > /dev/null; then
 # Synology
 elif which ipkg; then
 	wget -nv -O /tmp/LaSi_syn.sh http://dl.dropbox.com/u/18712538/LaSi/LaSi_syn.sh || { echo "Connection to dropbox failed, try again later"; exit 1; }
-	sudo chmod +x LaSi_Deb.sh &&
-	/tmp/./LaSi_Deb.sh
+	sudo chmod +x LaSi_syn.sh &&
+	/tmp/./LaSi_syn.sh
 # FreeBSD based
 elif [ "`uname`" = "FreeBSD" ]; then
 	# Check if user can sudo
