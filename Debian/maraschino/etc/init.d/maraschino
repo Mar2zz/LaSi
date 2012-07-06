@@ -30,7 +30,7 @@ SETTINGS_LOADED=FALSE
 DESC=Maraschino
 
 # only accept values from /etc/default/maraschino
-unset RUN_AS CONFIG DATADIR PID_FILE
+unset RUN_AS DATADIR PID_FILE
 
 . /lib/lsb/init-functions
 
@@ -69,10 +69,14 @@ load_settings() {
             return 1; }
         [ -z "${RUN_AS%:*}" ] && exit 1
 
-        DAEMON_OPTS="maraschino-cherrypy.py"
-
-        [ -n "$PID_FILE" ] && PID_FILE=$PID_FILE
-        [ -n "$PID_FILE" ] || PID_FILE=/var/run/maraschino/maraschino.pid
+        DAEMON_OPTS="Maraschino.py --daemon"
+        [ -n "$DATADIR" ] && DAEMON_OPTS="$DAEMON_OPTS --database=$DATADIR"
+        [ -z "$DATADIR" ] && DAEMON_OPTS="$DAEMON_OPTS --database=/home/$RUN_AS/.maraschino"
+        [ -n "$PORT" ] && DAEMON_OPTS="$DAEMON_OPTS --port=$PORT"
+        if ! [ -n "$PID_FILE" ]; then
+            PID_FILE=/var/run/maraschino/maraschino.pid
+        fi
+        DAEMON_OPTS="$DAEMON_OPTS --pidfile=$PID_FILE"
 
         SETTINGS_LOADED=TRUE
     fi
@@ -106,7 +110,7 @@ start_maraschino () {
         log_daemon_msg "Starting $DESC"
         [ "$WEB_UPDATE" = 1 ] && enable_updates
         handle_pid
-        start-stop-daemon -o -d $APP_PATH -c $RUN_AS --start --background --pidfile $PID_FILE  --make-pidfile --exec $DAEMON -- $DAEMON_OPTS
+        start-stop-daemon -o -d $APP_PATH -c $RUN_AS --start --pidfile $PID_FILE --exec $DAEMON -- $DAEMON_OPTS
         check_retval
     else
         log_success_msg "$DESC: already running (pid $PID)"

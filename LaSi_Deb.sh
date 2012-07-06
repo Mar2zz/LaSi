@@ -772,20 +772,13 @@ Install_Maraschino () {
 
     sudo dpkg -i /tmp/maraschino.deb || error_Depends
 
-    if ! pgrep -f "cherrypy-maraschino.py" > /dev/null; then
-        #check_Port
+    if ! pgrep -f "Maraschino.py" > /dev/null; then
         sudo sed -i "
             s/ENABLE_DAEMON=0/ENABLE_DAEMON=1/g
             s/RUN_AS.*/RUN_AS=$USER/
             s/WEB_UPDATE=0/WEB_UPDATE=1/g
         " /etc/default/maraschino
         echo "Changed daemon settings..."
-        # handle db
-        if grep '/path/to/maraschino.db' /opt/maraschino/settings.py > /dev/null; then
-            mkdir -p $HOME/.maraschino
-            sudo sed -i "s!/path/to/maraschino.db!$HOME/.maraschino/maraschino.db!g" /opt/maraschino/settings.py
-            echo "Saving database to $HOME/.maraschino/maraschino.db"
-        fi
         sudo /etc/init.d/maraschino start || error_Msg
     fi
 

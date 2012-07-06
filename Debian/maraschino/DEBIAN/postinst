@@ -20,17 +20,6 @@ else
     exit 1
 fi
 
-# restore settings.py if it exists in /tmp or create
-if [ -e /tmp/maraschino-settings.py ]; then
-    mv -f /tmp/maraschino-settings.py /opt/maraschino/settings.py
-else
-    cp -f /opt/maraschino/settings_example.py /opt/maraschino/settings.py
-fi
-
 # execute init.script
 update-rc.d maraschino defaults  | grep /etc/init.d/maraschino
-if grep '/path/to/maraschino.db' /opt/maraschino/settings.py > /dev/null; then
-    echo 'You need to specify a database in /opt/maraschino/settings.py'
-else
-    /etc/init.d/maraschino start
-fi
+/etc/init.d/maraschino start

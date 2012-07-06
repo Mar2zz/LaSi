@@ -1,5 +1,5 @@
 Package: maraschino
-Version: 2012.01.04
+Version: 2012.07.06
 Section: web 
 Priority: optional
 Architecture: all
@@ -13,5 +13,5 @@ Description: Maraschino is a webbased HTPC monitor for all your media-apps. is a
  .
  Maraschino can be found @ http://www.maraschinoproject.com/ and is written and maintained by Mr. Kipling and others
  .
- Maraschino is installed in /opt/maraschino, config and data in ~/.maraschino (configurable).
+ Maraschino is installed in /opt/maraschino, database in ~/.maraschino (configurable).
  Type maraschino --help for options

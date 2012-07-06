@@ -3,12 +3,9 @@
 set -e
 
 # Stop maraschino service.
-if pgrep -f maraschino-cherrypy.py > /dev/null; then
+if pgrep -f Maraschino.py > /dev/null; then
     [ -e /etc/init.d/maraschino ] && /etc/init.d/maraschino stop
 fi
-
-# backup settingsfile if it exists
-[ -e /opt/maraschino/settings.py ] && mv -f /opt/maraschino/settings.py /tmp/maraschino-settings.py
 
 # remove path if exists
 if [ -d /opt/maraschino ]; then
