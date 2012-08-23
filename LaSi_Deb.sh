@@ -1208,6 +1208,7 @@ set -e
     }
     cf_Retrieve
 
+    sudo service apache2 restart
 }
 
 Summ_Spotweb () {
