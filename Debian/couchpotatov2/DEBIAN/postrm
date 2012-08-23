@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -e
+
+# remove stuff if purge
+if [ $1 = 'purge' ]; then
+    /usr/sbin/update-rc.d -f couchpotatov2 remove | grep /etc/init.d/couchpotatov2
+    rm -f /etc/cron.hourly/couchpotatov2
+    rm -f /etc/cron.daily/couchpotatov2
+    rm -f /etc/cron.weekly/couchpotatov2
+    rm -f /etc/cron.monthly/couchpotatov2
+fi
+
