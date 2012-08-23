@@ -2,6 +2,11 @@
 
 set -e
 
+# remove path if exists
+if [ -d /opt/headphones ]; then 
+    rm -Rf /opt/headphones
+fi
+
 # if git exists clone repo, else wget headphones.tar.gz
 if which git > /dev/null; then
     git clone https://github.com/rembo10/headphones.git /opt/headphones

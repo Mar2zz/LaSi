@@ -70,8 +70,8 @@ load_settings() {
         [ -z "${RUN_AS%:*}" ] && exit 1
 
         DAEMON_OPTS="Maraschino.py --daemon"
-        [ -n "$DATADIR" ] && DAEMON_OPTS="$DAEMON_OPTS --database=$DATADIR"
-        [ -z "$DATADIR" ] && DAEMON_OPTS="$DAEMON_OPTS --database=/home/$RUN_AS/.maraschino"
+        [ -n "$DATADIR" ] && DAEMON_OPTS="$DAEMON_OPTS --database=$DATADIR --log=$DATADIR/logs"
+        [ -z "$DATADIR" ] && DAEMON_OPTS="$DAEMON_OPTS --database=/home/$RUN_AS/.maraschino/maraschino.db --log=/home/$RUN_AS/.maraschino/logs"
         [ -n "$PORT" ] && DAEMON_OPTS="$DAEMON_OPTS --port=$PORT"
         if ! [ -n "$PID_FILE" ]; then
             PID_FILE=/var/run/maraschino/maraschino.pid

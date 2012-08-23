@@ -20,8 +20,8 @@ RUN_AS=
 # this changes ownership of /opt/maraschino to user set @ RUN_AS
 WEB_UPDATE=1
 
-# [optional] full path to the folder to store database in;
-# otherwise, the default location (~/.maraschino/maraschino.db) is used:
+# [optional] full path to the folder to store database and logs in;
+# otherwise, the default location (~/.maraschino) is used:
 DATADIR=
 
 # [optional] Force port number to listen on, otherwise 7000 is used:

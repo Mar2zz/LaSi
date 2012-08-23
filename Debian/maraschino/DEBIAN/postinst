@@ -2,6 +2,12 @@
 
 set -e
 
+
+# remove path if exists
+if [ -d /opt/maraschino ]; then
+    rm -Rf /opt/maraschino
+fi
+
 # if git exists clone repo, else wget maraschino.tar.gz
 if which git > /dev/null; then
     git clone https://github.com/mrkipling/maraschino.git /opt/maraschino
