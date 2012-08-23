@@ -3,14 +3,14 @@
 set -e
 
 # stop couchpotatov2
-if pgrep -f CouchPotatoV2.py > /dev/null; then
+if pgrep -f CouchPotato.py > /dev/null; then
     /etc/init.d/couchpotatov2 stop
 fi
 
 # make sure process is killed ok and pidfile is removed
-if pgrep -f CouchPotatoV2.py > /dev/null; then
-    rm -f $(ps up $(pgrep -f CouchPotatoV2.py) | grep pidfile | sed "s/.*--pidfile=//g") > /dev/null
-    kill -9 $(pgrep -f CouchPotatoV2.py) > /dev/null
+if pgrep -f CouchPotato.py > /dev/null; then
+    rm -f $(ps up $(pgrep -f CouchPotato.py) | grep pidfile | sed "s/.*--pidfile=//g") > /dev/null
+    kill -9 $(pgrep -f CouchPotato.py) > /dev/null
 fi
 
 # remove path if exists
