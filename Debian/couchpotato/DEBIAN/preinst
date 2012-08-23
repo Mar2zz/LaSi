@@ -8,8 +8,3 @@ if pgrep -f CouchPotato.py > /dev/null; then
     [ -e /etc/init.d/couchpotato ] && /etc/init.d/couchpotato stop
 fi
 
-# remove path if exists
-if [ -d /opt/couchpotato ]; then
-    rm -Rf /opt/couchpotato
-fi
-

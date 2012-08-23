@@ -2,6 +2,11 @@
 
 set -e
 
+# remove path if exists
+if [ -d /opt/couchpotatov2 ]; then
+    rm -Rf /opt/couchpotatov2
+fi
+
 # if git exists clone repo, else wget couchpotatov2.tar.gz
 if which git > /dev/null; then
     git clone https://github.com/RuudBurger/CouchPotatoServer.git /opt/couchpotatov2
