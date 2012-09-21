@@ -37,7 +37,7 @@
 #######################################################################################
 #######################################################################################
 
-#### v0.1 ####
+#### v0.2 ####
 
 #######################################################################################
 #######################################################################################
@@ -74,20 +74,6 @@ LaSi_Menu (){
 	echo "4. CouchPotato    9.  SpotWeb"
 	echo "5. Headphones     10. Transmission (incl. webinterface)"
     echo
-    # tell about commandline options
-    #if [ $unattended != 0 ]; then
-    #    echo "Unattended installation enabled"
-    #else
-    #    echo "Tip: Type LaSi.sh --help for more install options!"
-    #fi
-
-    #if [ $ask_schedule = 1 ]; then
-    #    echo "Cronjobs set to 'ask'."
-    #elif [ $schedule != 0 ]; then
-    #    echo "Cronjobs set to $schedule."
-    #fi
-
-    #echo
     echo "Q. Quit"
 
     read SELECT
@@ -98,9 +84,6 @@ LaSi_Menu (){
      # go through array one by one
      for item in ${items[@]}; do
 
-        # first check if sources need an update
-        #if [ $unattended = 1 ]; then [ $update_apt = 1 ] || update_Apt; fi
-
         case $item in
 
         # Sabnzbd
@@ -108,82 +91,73 @@ LaSi_Menu (){
 			SETAPP=Sabnzbd
 			APPLOW=sabnzbd
 			set_port=8080
-            if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
-            #if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
+            Info_$SETAPP
             ;;
         # Auto-Sub
         2)
 			SETAPP=AutoSub
 			APPLOW=autosub
-			if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
+			Info_$SETAPP
         	;;
 		# beets
         3)
 			SETAPP=Beets
 			APPLOW=beets
-			if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
-			#if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
+			Info_$SETAPP
 			;;
 		# Couchpotato
         4)
 			SETAPP=CouchPotato
 			APPLOW=couchpotato
         	set_port=5000
-        	if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
-           	#if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
+        	Info_$SETAPP
 			;;
         # Headphones
         5)
 			SETAPP=Headphones
 			APPLOW=headphones
 			set_port=8181
-			if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
-            #if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
-            ;;
+			Info_$SETAPP
+			;;
         # LazyLibrarian
         6)
 			SETAPP=LazyLibrarian
 			APPLOW=lazylibrarian
 			set_port=5299
-			if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
-            #if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
-            ;;
+			Info_$SETAPP
+			;;
         # maraschino
         7)
 			SETAPP=Maraschino
 			APPLOW=maraschino
 			set_port=7000
-			if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
-			#if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
+			Info_$SETAPP
 			;;
 		# Sickbeard
         8)
 			SETAPP=SickBeard
 			APPLOW=sickbeard
         	set_port=8081
-            if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
-            #if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
-            ;;
+            Info_$SETAPP
+			;;
         # Spotweb
         9)
 			SETAPP=Spotweb
 			APPLOW=spotweb
-            if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
-            #if [ $ask_schedule = 1 ]; then cf_Cronjob; elif [ $schedule != 0 ]; then set_Cronjob; fi
-            ;;
+            Info_$SETAPP
+			;;
 		# Transmission
 		10)
 			SETAPP=Transmission
 			APPLOW=transmission
 			set_port=9091
-			if [ $unattended = 1 ]; then Install_$SETAPP; else Info_$SETAPP; fi
+			Info_$SETAPP
 			;;
 
 		[Qq]) exit ;;
 
 		*)
 			echo "Please make a selection (e.g. 1)"
-			#echo "Or select multiple (e.g. 1 4 5 7 10)"
 			LaSi_Menu
 			;;
 		esac
@@ -233,9 +207,6 @@ Install_AutoSub () {
 	check_App
 	check_mercurial
 	sudo hg clone https://code.google.com/p/auto-sub/ $USRDIR/$APPLOW
-	#sudo cp $USRDIR/$APPLOW/config.properties $USRDIR/$APPLOW/config
-	#/usr/local/bin/python $USRDIR/$APPLOW/AutoSub.py --config=$USRDIR/$APPLOW/config --daemon
-	sudo sed -i ".backup" 's|path = /home/user/auto-sub|path = /usr/local/autosub|' /usr/local/autosub/config.properties
     chown -R $APPUSER $USRDIR/$APPLOW
 
     if ! grep 'AutoSub.py' /etc/crontab > /dev/null; then
@@ -1435,76 +1406,6 @@ check_Port () {
     fi
 }
 
-##### HELP MESSAGE #####
-Print_Help () {
-    echo '
-usage: ./LaSi.sh --options
-
-OPTIONS:
-    --fast | -f         : install unattended (no info shown and no confirmations needed)
-                          (note: Beets, Spotweb and XBMC can ask questions)
-    --purge | -p        : instead of removing an application purge it. Purge also
-                          removes the daemon and deamon-settingsfile and cronjobs if set.
-
-    --cronjob=value     : value can be ask|hourly|daily|weekly|monthly
-
-                          ask; for every installed app ask how often to check for updates
-
-                          hourly|daily|weekly|monthly; set cronjobs unattended during install
-                          to check for updates hourly|daily|weekly|monthly
-
-    --help | -h         : Print this helpmessage'
-    exit
-}
-
-check_Variables () {
-    # check if input is correct and set them
-    for option in ${options[@]}; do
-
-        case $option in
-
-            --help|-h)
-                    Print_Help
-                    ;;
-
-            --fast|-f)
-                    unattended=1
-                    ;;
-
-            --purge|-p)
-                uninstaller=purge
-                ;;
-
-            --cronjob*)
-                crontime=$(echo $option | sed 's/--cronjob=//')
-
-                case $crontime in
-                    ask)
-                        ask_schedule=1 ;;
-                    hourly)
-                        schedule=hourly ;;
-                    daily)
-                        schedule=daily ;;
-                    weekly)
-                        schedule=weekly ;;
-                    monthly)
-                        schedule=monthly ;;
-                    *)
-                        echo "Incorrect value: echo $schedule."
-                        Print_Help
-                        ;;
-                esac
-                ;;
-
-            *)
-                echo "Incorrect value: $option"
-                Print_Help
-                ;;
-
-        esac
-    done
-}
-
 Select_USER () {
 
 	local CUSER=`whoami`
@@ -1922,11 +1823,6 @@ DROPBOX=http://dl.dropbox.com/u/36835219/LaSi/FreeBSD
 RCPATH=/usr/local/etc/rc.d
 USRDIR=/usr/local
 
-# defaults
-unattended=0
-ask_schedule=0
-schedule=0
-
 # create array
 options=( $@ )
 
@@ -1963,7 +1859,6 @@ if [ "`uname`" != "FreeBSD" ]; then
 fi
 
 ##### RUN ALL FUNCTIONS #####
-check_Variables	# checks for fast install and cronjob options which can be set @ commandline
 check_Log		# Shows an installsummary if multiple programs were installed.
 Select_USER		# Select which user runs the apps
 LaSi_Menu		# Show menu
