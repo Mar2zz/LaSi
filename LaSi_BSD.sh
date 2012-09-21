@@ -365,7 +365,7 @@ Info_CouchPotato () {
     clear
     echo "
 *###############################################################*
-*###################### CouchPotato ############################*
+*#################### CouchPotato V2 ###########################*
 #                                                               #
 # CouchPotato is an automatic NZB and torrent downloader.       #
 # You can keep a 'movies I want'-list and it will search        #
@@ -389,7 +389,7 @@ Install_CouchPotato () {
 	check_git
 	check_wget
 	check_python
-    sudo git clone https://github.com/RuudBurger/CouchPotato.git $USRDIR/$APPLOW &&
+    sudo git clone https://github.com/RuudBurger/CouchPotatoServer.git $USRDIR/$APPLOW &&
     chown -R $APPUSER $USRDIR/$APPLOW
     set_RCD
 
