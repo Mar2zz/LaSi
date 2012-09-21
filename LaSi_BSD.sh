@@ -206,19 +206,12 @@ Info_AutoSub () {
 Install_AutoSub () {
 	check_App
 	check_mercurial
-	sudo hg clone https://code.google.com/p/auto-sub/ $USRDIR/$APPLOW
+	sudo hg clone -r eba1b3b0d4ff https://code.google.com/p/auto-sub/ $USRDIR/$APPLOW
     chown -R $APPUSER $USRDIR/$APPLOW
 
     if ! grep 'AutoSub.py' /etc/crontab > /dev/null; then
 		sudo echo "@reboot $APPUSER cd /usr/local/autosub/ && /usr/local/bin/python AutoSub.py > /dev/null" >> /etc/crontab
     fi
-    echo
-    echo "Now set your defaults in AutoSub config"
-    echo "You need to change the rootpath to the path where"
-    echo "your TV-shows are located"
-    echo
-    read -sn 1 -p "Press a key to continue"
-    ee $USRDIR/$APPLOW/config.properties
 
 Summ_$SETAPP
 Summ_$SETAPP >> /tmp/lasi_install.log
@@ -229,7 +222,7 @@ clear
 echo
 echo "
 Done! Installed $SETAPP.
-Auto-Sub will automatically start at boot.
+Auto-Sub will automatically start at reboot.
 "
 }
 
