@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/local/bin/bash
 
 # Author: Mar2zz
 # Email: lasi.mar2zz@gmail.com
@@ -1271,7 +1271,7 @@ check_App () {
 	if [ "$APPLOW" = "maraschino" ]; then
 		local SETAPP=maraschino-cherrypy
 	fi
-	
+
 	if pgrep -f $SETAPP.py > /dev/null; then
 		clear
 		echo
@@ -1316,7 +1316,7 @@ Updater () {
 		couchpotato|headphones|lazylibrarian|maraschino|sickbeard)
 			APPDIR=`sed -n "/"$APPLOW"_dir:=/p" $RCPATH/$APPLOW | awk -F '"' '{ print $2 }'`
 			if ! pgrep -f $SETAPP.py > /dev/null; then
-				if [ "$APPDIR" = "" ]; then 
+				if [ "$APPDIR" = "" ]; then
 					echo
 					echo "Can't find where $SETAPP is installed"
 					sleep 2
@@ -1554,7 +1554,7 @@ cf_Uninstall () {
 		[Yy]*)
 			Uninstaller
 			# give time to read output from above installprocess before returning to menu
-			echo 
+			echo
 			echo "$SETAPP has been removed from this system"
 			echo
 			read -sn 1 -p "Press a key to continue"
@@ -1653,7 +1653,7 @@ pkg_Choice() {
 
 ##### Un-Installer #####
 Uninstaller () {
-	
+
 	case $APPLOW in
 		sabnzbd)
 			if ! which SABnzbd.py > /dev/null; then
@@ -1689,14 +1689,14 @@ Uninstaller () {
 				Info_$SETAPP
 			else
 				sudo rm -rf $USRDIR/$APPLOW
-				sudo rm /usr/local/bin/beet				
+				sudo rm /usr/local/bin/beet
 			fi
 			;;
 		couchpotato|headphones|lazylibrarian|maraschino|sickbeard)
 			if [ "$APPLOW" = "maraschino" ]; then
 				local SETAPP=maraschino-cherrypy
 			fi
-			
+
 			if ls $RCPATH/$APPLOW > /dev/null; then
 				if pgrep -f $SETAPP.py > /dev/null; then
 					$RCPATH/$APPLOW stop
@@ -1705,7 +1705,7 @@ Uninstaller () {
 				APPDIR=`sed -n "/"$APPLOW"_dir:=/p" $RCPATH/$APPLOW | awk -F '"' '{ print $2 }'`
 				sudo rm $RCPATH/$APPLOW
 			fi
-			
+
 			if ls $APPDIR > /dev/null; then
 				sudo rm -rf $APPDIR
 			else
