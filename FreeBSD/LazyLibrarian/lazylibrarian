@@ -19,6 +19,7 @@
 #     Default is same as lazylibrarian_dir.
 # lazylibrarian_pid:  The name of the pidfile to create.
 #     Default is lazylibrarian.pid in lazylibrarian_dir.
+PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
 
 . /etc/rc.subr
 
@@ -32,7 +33,6 @@ load_rc_config ${name}
 : ${lazylibrarian_dir:="/usr/local/lazylibrarian"}
 : ${lazylibrarian_chdir:="${lazylibrarian_dir}"}
 : ${lazylibrarian_pid:="${lazylibrarian_dir}/lazylibrarian.pid"}
-PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
 
 WGET="/usr/local/bin/wget" 	# You need wget for this script to safely shutdown couchpotato.
 HOST="localhost" 			# Set LazyLibrarian address here.

@@ -19,7 +19,6 @@
 #     Default is same as couchpotato_dir.
 # couchpotato_pid:  The name of the pidfile to create.
 #     Default is couchpotato.pid in couchpotato_dir.
-PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
 
 . /etc/rc.subr
 
@@ -87,3 +86,4 @@ couchpotato_status() {
 }
 
 run_rc_command "$1"
+
