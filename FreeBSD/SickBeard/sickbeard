@@ -69,7 +69,7 @@ verify_sickbeard_pid() {
 sickbeard_stop() {
     echo "Stopping $name"
     verify_sickbeard_pid
-    ${WGET} -O - -q --user=${SBUSR} --password=${SBPWD} "http://${HOST}:${PORT}/home/shutdown/" >/dev/null
+    ${WGET} -O - -q --user=${SBUSR} --password=${SBPWD} "http://${HOST}:${PORT}/home/shutdown/?pid=${pid}" >/dev/null
     if [ -n "${pid}" ]; then
       wait_for_pids ${pid}
       echo "Stopped"
