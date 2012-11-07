@@ -33,6 +33,7 @@ load_rc_config ${name}
 : ${couchpotato_chdir:="${couchpotato_dir}"}
 : ${couchpotato_pid:="${couchpotato_dir}/couchpotato.pid"}
 : ${couchpotato_conf:="${couchpotato_dir}/data/settings.conf"}
+pidfile="${couchpotato_dir}/couchpotato.pid"
 
 WGET="/usr/local/bin/wget" # You need wget for this script to safely shutdown CouchPotato.
 if [ -e "${couchpotato_conf}" ]; then
