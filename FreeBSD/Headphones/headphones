@@ -29,7 +29,7 @@ rcvar=${name}_enable
 load_rc_config ${name}
 
 : ${headphones_enable:="NO"}
-: ${headphones_user:="_sabnzbd"}
+: ${headphones_user:="USERNAME"}
 : ${headphones_dir:="/usr/local/headphones"}
 : ${headphones_chdir:="${headphones_dir}"}
 : ${headphones_pid:="${headphones_dir}/headphones.pid"}
