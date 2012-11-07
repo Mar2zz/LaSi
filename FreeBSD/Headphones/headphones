@@ -51,7 +51,7 @@ command_args="-f -p ${headphones_pid} python ${headphones_dir}/Headphones.py ${h
 
 # Check for wget and refuse to start without it.
 if [ ! -x "${WGET}" ]; then
-  warn "couchpotato not started: You need wget to safely shut down Headphones."
+  warn "Headphones not started: You need wget to safely shut down Headphones."
   exit 1
 fi
 
