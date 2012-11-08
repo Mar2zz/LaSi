@@ -33,6 +33,7 @@ load_rc_config ${name}
 : ${sickbeard_dir:="/usr/local/sickbeard"}
 : ${sickbeard_chdir:="${sickbeard_dir}"}
 : ${sickbeard_pid:="${sickbeard_dir}/sickbeard.pid"}
+pidfile="${sickbeard_dir}/sickbeard.pid"
 
 WGET="/usr/local/bin/wget" # You need wget for this script to safely shutdown Sick Beard.
 HOST="127.0.0.1" # Set Sick Beard address here.
