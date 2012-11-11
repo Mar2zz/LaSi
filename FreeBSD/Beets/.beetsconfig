@@ -10,8 +10,6 @@ import_quiet_fallback: skip
 import_timid: no
 import_log: /usr/local/beets/beetslog.txt
 art_filename: folder
-pluginpath: /usr/local/beets/plugins/
-plugins:
 threaded: yes
 color: yes
 

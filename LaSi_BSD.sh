@@ -68,11 +68,11 @@ LaSi_Menu (){
 	echo
 	echo "Make a choice to see info and/or install these apps..."
 	echo
-	echo "1. SABnzbd+       6.  LazyLibrarian (alpha stage)"
-	echo "2. AutoSub        7.  Maraschino"
-	echo "3. Beets          8.  SickBeard"
-	echo "4. CouchPotato    9.  SpotWeb"
-	echo "5. Headphones     10. Transmission (incl. webinterface)"
+	echo "1. SABnzbd+       7.  Maraschino"
+	echo "2. AutoSub        8.  SickBeard"
+	echo "3. Beets          9.  SpotWeb"
+	echo "4. CouchPotato    10. Transmission (incl. webinterface)"
+	echo "5. Headphones"
     echo
     echo "Q. Quit"
 
@@ -103,6 +103,7 @@ LaSi_Menu (){
         3)
 			SETAPP=Beets
 			APPLOW=beets
+			set_port=8888
 			Info_$SETAPP
 			;;
 		# Couchpotato
@@ -119,13 +120,13 @@ LaSi_Menu (){
 			set_port=8181
 			Info_$SETAPP
 			;;
-        # LazyLibrarian
-        6)
-			SETAPP=LazyLibrarian
-			APPLOW=lazylibrarian
-			set_port=5299
-			Info_$SETAPP
-			;;
+#       # LazyLibrarian
+#        6)
+#			SETAPP=LazyLibrarian
+#			APPLOW=lazylibrarian
+#			set_port=5299
+#			Info_$SETAPP
+#			;;
         # maraschino
         7)
 			SETAPP=Maraschino
@@ -358,7 +359,7 @@ Info_CouchPotato () {
     clear
     echo "
 *###############################################################*
-*#################### CouchPotato V2 ###########################*
+*################### CouchPotatoServer #########################*
 #                                                               #
 # CouchPotato is an automatic NZB and torrent downloader.       #
 # You can keep a 'movies I want'-list and it will search        #
@@ -395,8 +396,10 @@ clear
 echo
 echo "
 Done! Installed $SETAPP.
-Type couchpotato --help for options.
+
 CouchPotato is by default located @ http://$HOSTNAME:$set_port
+
+The configuration is up to you and can be done using the webinterface.
 "
 }
 
@@ -443,19 +446,21 @@ clear
 echo
 echo "
 Done! Installed $SETAPP.
-Type headphones --help for options
+
 Headphones is by default located @ http://$HOSTNAME:$set_port
+
+The configuration is up to you and can be done using the webinterface.
 "
 }
 
 #########################
 ##### LazyLibrarian #####
 #########################
-Info_LazyLibrarian () {
-    clear
-    echo "
-*###############################################################*
-*#################### LazyLibrarian ############################*
+#Info_LazyLibrarian () {
+#    clear
+#    echo "
+#*###############################################################*
+#*#################### LazyLibrarian ############################*
 #                                                               #
 # LazyLibrarian is an automatic NZB downloader.                 #
 # You can keep a 'Books I like to read'-list and it will        #
@@ -463,36 +468,36 @@ Info_LazyLibrarian () {
 #                                                               #
 # Once an book is found, it will send it to SABnzbd.            #
 #                                                               #
-*###############################################################*
+#*###############################################################*
 #                                                               #
 # Headphones is written by Mar2zz in his spare time...          #
 #                                                               #
 # Visit https://github.com/Mar2zz/LazyLibrarian                 #
-*###############################################################*"
-    cf_Choice
-}
-
-Install_LazyLibrarian () {
-    check_App
-    check_git
-    check_python
-    sudo git clone https://github.com/Mar2zz/LazyLibrarian.git $USRDIR/$APPLOW
-    chown -R $APPUSER $USRDIR/$APPLOW
-    set_RCD
-
-Summ_$SETAPP
-Summ_$SETAPP >> /tmp/LaSi/lasi_install.log
-}
-
-Summ_LazyLibrarian () {
-clear
-echo
-echo "
-Done! Installed $SETAPP.
-
-LazyLibrarian is by default located @ http://$HOSTNAME:$set_port
-"
-}
+#*###############################################################*"
+#    cf_Choice
+#}
+#
+#Install_LazyLibrarian () {
+#    check_App
+#    check_git
+#    check_python
+#    sudo git clone https://github.com/Mar2zz/LazyLibrarian.git $USRDIR/$APPLOW
+#    chown -R $APPUSER $USRDIR/$APPLOW
+#    set_RCD
+#
+#Summ_$SETAPP
+#Summ_$SETAPP >> /tmp/LaSi/lasi_install.log
+#}
+#
+#Summ_LazyLibrarian () {
+#clear
+#echo
+#echo "
+#Done! Installed $SETAPP.
+#
+#LazyLibrarian is by default located @ http://$HOSTNAME:$set_port
+#"
+#}
 
 ######################
 ##### MARASCHINO #####
@@ -542,6 +547,7 @@ Summ_Maraschino () {
 clear
 echo "
 Done! Installed $SETAPP.
+
 $SETAPP is by default located @ http://$HOSTNAME:$set_port
 "
 }
@@ -599,8 +605,8 @@ clear
 echo
 echo "
 Done! Installed $SETAPP.
-Type beet --help for options
-or start importing music with the following command:
+
+Start importing music with the following command:
 # beet import /path/to/new_music
 "
 }
