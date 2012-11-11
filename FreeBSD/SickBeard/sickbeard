@@ -19,12 +19,13 @@
 #     Default is same as sickbeard_dir.
 # sickbeard_pid:  The name of the pidfile to create.
 #     Default is sickbeard.pid in sickbeard_dir.
-PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
 
 . /etc/rc.subr
 
 name="sickbeard"
 rcvar=${name}_enable
+
+PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
 
 load_rc_config ${name}
 

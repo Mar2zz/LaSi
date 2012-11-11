@@ -25,6 +25,8 @@
 name="couchpotato"
 rcvar=${name}_enable
 
+PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
+
 load_rc_config ${name}
 
 : ${couchpotato_enable:="NO"}

@@ -16,12 +16,13 @@
 #     Default is same as maraschino_dir.
 # maraschino_pid:  The name of the pidfile to create.
 #     Default is maraschino.pid in maraschino_dir.
-PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
 
 . /etc/rc.subr
 
 name="maraschino"
 rcvar=${name}_enable
+
+PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
 
 load_rc_config ${name}
 
@@ -30,6 +31,7 @@ load_rc_config ${name}
 : ${maraschino_dir:="/usr/local/maraschino"}
 : ${maraschino_chdir:="${maraschino_dir}"}
 : ${maraschino_pid:="${maraschino_dir}/maraschino.pid"}
+pidfile="${maraschino_dir}/maraschino.pid"
 
 status_cmd="${name}_status"
 stop_cmd="${name}_stop"

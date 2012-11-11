@@ -27,6 +27,8 @@
 name="transmission"
 rcvar=${name}_enable
 
+PATH="/usr/local/bin:$PATH"
+
 command=/usr/local/bin/transmission-daemon
 
 load_rc_config ${name}

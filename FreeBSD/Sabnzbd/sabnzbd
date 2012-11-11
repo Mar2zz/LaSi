@@ -25,7 +25,6 @@
 name="sabnzbd"
 rcvar=sabnzbd_enable
 
-# Required, for some reason, to find all our binaries when starting via service.
 PATH="/usr/local/bin:$PATH"
 
 load_rc_config ${name}

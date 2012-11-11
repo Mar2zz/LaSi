@@ -19,12 +19,13 @@
 #     Default is same as headphones_dir.
 # headphones_pid:  The name of the pidfile to create.
 #     Default is headphones.pid in headphones_dir.
-PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
 
 . /etc/rc.subr
 
 name="headphones"
 rcvar=${name}_enable
+
+PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
 
 load_rc_config ${name}
 
