@@ -265,13 +265,9 @@ Install_Sabnzbd () {
 		sleep 3
 		Info_Sabnzbd
 	else
-		pkg_Choice
-		if [ "$SETPKG" = "ports" ]; then
-			cd /usr/ports/news/sabnzbdplus &&
-			sudo make -DBATCH install clean || error_Msg
-		else
-			sudo pkg_add -r sabnzbdplus || error_Msg
-		fi
+		check_Portstree
+		cd /usr/ports/news/sabnzbdplus
+		sudo make -DBATCH install clean || error_Msg
 		sudo chown -R $APPUSER $USRDIR/$APPLOW
 		set_RCD
 	fi
@@ -911,13 +907,9 @@ Install_Transmission () {
 		sleep 3
 		Info_$SETAPP
 	else
-		pkg_Choice
-		if [ "$SETPKG" = "ports" ]; then
-			cd /usr/ports/net-p2p/transmission-daemon &&
-			sudo make -DBATCH install clean || error_Msg
-		else
-			sudo pkg_add -r transmission-daemon || error_Msg
-		fi
+		check_Portstree
+		cd /usr/ports/net-p2p/transmission-daemon
+		sudo make -DBATCH install clean || error_Msg
 
 		if ! ls $USRDIR/$APPLOW > /dev/null; then
 			sudo mkdir $USRDIR/$APPLOW
@@ -961,7 +953,6 @@ check_Portstree () {
 		read -p "(yes/no)   :" REPLY
 		case $REPLY in
 			[Yy]*)
-				SETPKG=ports
 				echo
 				echo "Let's GO!"
 				echo
@@ -987,14 +978,12 @@ check_Portstree () {
 
 	if ! ls /usr/ports > /dev/null; then
 		install_Portstree
-#	elif find /var/db/portsnap -iname "INDEX" -mtime -1
-#		then
-#		SETPKG=ports
-#		echo
-#       echo "Ports Tree is up to date"
-#       sleep 2
+	elif find /var/db/portsnap -iname "INDEX" -mtime -1 -print
+		then
+		echo
+        echo "Ports Tree is up to date"
+        sleep 2
 	else
-		SETPKG=ports
 		clear
         echo
         echo "Going to update the Ports Tree"
@@ -1016,13 +1005,9 @@ install_REQ () {
 	read -p "(yes/no)   :" REPLY
 		case $REPLY in
 			[Yy]*)
-				pkg_Choice
-				if [ "$SETPKG" = "ports" ]; then
-					cd $REQPATH &&
-					sudo make -DBATCH install clean || error_REQ
-				else
-					sudo pkg_add -r $REQ || error_REQ
-				fi
+				check_Portstree
+				cd $REQPATH
+				sudo make -DBATCH install clean || error_REQ
 				;;
 			[Nn]*)
 				Info_$SETAPP
@@ -1242,13 +1227,9 @@ check_WEBSRV () {
 	}
 
 	install_WEBSRV () {
-		pkg_Choice
-		if [ "$SETPKG" = "ports" ]; then
+			check_Portstree
 			cd /usr/ports/www/$WEBSRV &&
 			sudo make -DBATCH install clean || error_REQ
-		else
-			sudo pkg_add -r $WEBSRV || error_REQ
-		fi
 
 		if [ "$WEBSRV" = "apache22" ]; then
 			check_php
@@ -1613,48 +1594,6 @@ cf_Update () {
         cf_Update
         ;;
     esac
-}
-
-##### Chose Ports Tree or PKG system #####
-pkg_Choice() {
-	if [ "$SETPKG" != "pkg" ] && [ "$SETPKG" != "ports" ]; then
-	clear
-	LaSi_Logo
-	echo
-	echo "How do you like to install your software?"
-	echo "Use the Ports Collection or the Packages System"
-	echo
-	echo "If you don't know what I'm talking about, take a look at:"
-	echo "http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/ports-overview.html"
-	echo
-	echo "Options:"
-	echo
-	echo "1. Ports Collection  <= RECOMMENDED"
-	echo "2. Package System    <= Faster installation than Ports"
-	echo
-	echo "B. Back to menu"
-	echo "Q. Quit"
-	read SELECT
-		case $SELECT in
-			[1]*)
-				check_Portstree
-				;;
-			[2]*)
-				SETPKG=pkg
-				;;
-			[Bb]*)
-				LaSi_Menu
-				;;
-			[Qq]*)
-				exit
-				;;
-			*)
-				echo "Please choose..."
-				echo
-				pkg_Choice
-				;;
-		esac
-	fi
 }
 
 ##### Un-Installer #####
