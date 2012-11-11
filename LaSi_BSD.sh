@@ -110,7 +110,7 @@ LaSi_Menu (){
         4)
 			SETAPP=CouchPotato
 			APPLOW=couchpotato
-        	set_port=5000
+        	set_port=5050
         	Info_$SETAPP
 			;;
         # Headphones
@@ -978,7 +978,7 @@ check_Portstree () {
 
 	if ! ls /usr/ports > /dev/null; then
 		install_Portstree
-	elif find /var/db/portsnap -iname "INDEX" -mtime -1 -print
+	elif find /var/db/portsnap -iname "INDEX" -mtime -1 -print > /dev/null
 		then
 		echo
         echo "Ports Tree is up to date"
