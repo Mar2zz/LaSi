@@ -38,10 +38,11 @@ load_rc_config ${name}
 pidfile="${headphones_dir}/headphones.pid"
 
 WGET="/usr/local/bin/wget" # You need wget for this script to safely shutdown Headphones.
-HOST="127.0.0.1" # Set Sick Beard address here.
-PORT="8181" # Set Sick Beard port here.
-HPUSR="" # Set Sick Beard username (if you use one) here.
-HPPWD="" # Set Sick Beard password (if you use one) here.
+if [ -e "${headphones_conf}" ]; then
+        HOST=`grep -A14 "\[General\]" "${headphones_conf}"|egrep "^http_host"|perl -wple 's/^http_host = (.*)$/$1/'`
+        PORT=`grep -A14 "\[General\]" "${headphones_conf}"|egrep "^http_port"|perl -wple 's/^http_port = (.*)$/$1/'`
+        HPAPI=`grep -A14 "\[General\]" "${headphones_conf}"|egrep "^api_key"|perl -wple 's/^api_key = (.*)$/$1/'`
+fi
 
 status_cmd="${name}_status"
 stop_cmd="${name}_stop"
@@ -70,9 +71,13 @@ verify_headphones_pid() {
 
 # Try to stop Headphones cleanly by calling shutdown over http.
 headphones_stop() {
+    if [ ! -e "${headphones_conf}" ]; then
+        echo "Headphones' settings file does not exist. Try starting Headphones, as this should create the file."
+        exit 1
+    fi
     echo "Stopping $name"
     verify_headphones_pid
-    ${WGET} -O - -q --user=${HPUSR} --password=${HPPWD} "http://${HOST}:${PORT}/shutdown" >/dev/null
+    ${WGET} -O - -q "http://${HOST}:${PORT}/api?apikey=${HPAPI}&cmd=shutdown" >/dev/null
     if [ -n "${pid}" ]; then
       wait_for_pids ${pid}
       echo "Stopped"
