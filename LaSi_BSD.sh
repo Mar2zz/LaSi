@@ -787,12 +787,13 @@ Summ_APP () {
 clear
 echo
 echo "
-Done! Installed $SETAPP.
+Done! Succesfully Installed $SETAPP!
 
 $SETAPP is up and running 
-and by default located @ http://$IP:$set_port
+and by default located @ http://$HOSTNAME:$set_port
 
-The remaining configuration is up to you and can be done using the webinterface.
+The remaining configuration is up to you 
+and can be done using the webinterface.
 "
 if [ "$APPLOW" = "sickbeard" ]; then
 echo "NOTE!
@@ -800,6 +801,7 @@ echo "NOTE!
 Also configured SABnzbd.ini to look in the SickBeard script folder and
 created an sickbeard/autoProcessTV.cfg file.
 "
+fi
 }
 
 ###############################################
