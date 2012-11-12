@@ -1595,6 +1595,8 @@ Uninstaller () {
 			if ls $RCPATH/$APPLOW > /dev/null; then
 				if pgrep -f $SETAPP.py > /dev/null; then
 					$RCPATH/$APPLOW stop
+				fi
+				if grep ''$APPLOW'_enable="YES"' /etc/rc.conf > /dev/null; then
 					sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
 				fi
 				APPDIR=`sed -n "/"$APPLOW"_dir:=/p" $RCPATH/$APPLOW | awk -F '"' '{ print $2 }'`
