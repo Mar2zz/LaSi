@@ -139,6 +139,7 @@ LaSi_Menu (){
         9)
 			SETAPP=Spotweb
 			APPLOW=spotweb
+			set_port=spotweb
             Info_$SETAPP
 			;;
 		# Transmission
@@ -207,20 +208,7 @@ Install_AutoSub () {
     chown -R $APPUSER $USRDIR/$APPLOW
 	set_RCD
 
-Summ_$SETAPP
-Summ_$SETAPP >> /tmp/lasi_install.log
-}
-
-Summ_AutoSub () {
-clear
-echo
-echo "
-Done! Installed $SETAPP.
-
-$SETAPP is running and by default located @ http://$HOSTNAME:$set_port
-
-The remaining configuration is up to you and can be done using the webinterface.
-"
+Summ_APP
 }
 
 ###################
@@ -268,18 +256,7 @@ Install_Sabnzbd () {
 		set_RCD
 	fi
 
-Summ_$SETAPP
-Summ_$SETAPP >> /tmp/LaSi/lasi_install.log
-}
-
-Summ_Sabnzbd () {
-clear
-echo
-echo "
-Done! Installed $SETAPP.
-Type sabnzbdplus --help for options
-Sabnzbdplus is by default located @ http://$HOSTNAME:$set_port
-"
+Summ_APP
 }
 
 #####################
@@ -324,24 +301,7 @@ Install_SickBeard () {
     sudo sed -i ".backup" 's/script_dir = ""/script_dir = \/usr\/local\/sickbeard\/autoProcessTV/' $USRDIR/sabnzbd/sabnzbd.ini
     set_RCD
 
-Summ_$SETAPP
-Summ_$SETAPP >> /tmp/LaSi/lasi_install.log
-}
-
-Summ_SickBeard () {
-clear
-echo
-echo "
-Done! Installed $SETAPP
-
-Type sickbeard --help for options
-SickBeard is by default located @ http://$HOSTNAME:$set_port
-
-Also configured SABnzbd+ to look in the Sick Beard script folder and
-created an autoProcessTV.cfg file.
-
-The remaining configuration is up to you and can be done using the webinterface.
-"
+Summ_APP
 }
 
 #######################
@@ -379,20 +339,7 @@ Install_CouchPotato () {
     chown -R $APPUSER $USRDIR/$APPLOW
     set_RCD
 
-Summ_$SETAPP
-Summ_$SETAPP >> /tmp/LaSi/lasi_install.log
-}
-
-Summ_CouchPotato () {
-clear
-echo
-echo "
-Done! Installed $SETAPP.
-
-CouchPotato is by default located @ http://$HOSTNAME:$set_port
-
-The configuration is up to you and can be done using the webinterface.
-"
+Summ_APP
 }
 
 ######################
@@ -429,20 +376,7 @@ Install_Headphones () {
     chown -R $APPUSER $USRDIR/$APPLOW
     set_RCD
 
-Summ_$SETAPP
-Summ_$SETAPP >> /tmp/LaSi/lasi_install.log
-}
-
-Summ_Headphones () {
-clear
-echo
-echo "
-Done! Installed $SETAPP.
-
-Headphones is by default located @ http://$HOSTNAME:$set_port
-
-The configuration is up to you and can be done using the webinterface.
-"
+Summ_APP
 }
 
 ######################
@@ -485,17 +419,7 @@ Install_Maraschino () {
 	chown -R $APPUSER $USRDIR/$APPLOW
 	set_RCD
 
-Summ_$SETAPP
-Summ_$SETAPP >> /tmp/lasi_install.log
-}
-
-Summ_Maraschino () {
-clear
-echo "
-Done! Installed $SETAPP.
-
-$SETAPP is by default located @ http://$HOSTNAME:$set_port
-"
+Summ_APP
 }
 
 ###############
@@ -543,7 +467,6 @@ Install_Beets () {
     fi
 
 Summ_$SETAPP
-Summ_$SETAPP > /tmp/LaSi/lasi_install.log
 }
 
 Summ_Beets () {
@@ -695,8 +618,7 @@ Install_Spotweb () {
 	# Upgrade spotweb database
 	cd $SPOTDIR && /usr/local/bin/php $SPOTDIR/upgrade-db.php
 
-	Summ_Spotweb
-	Summ_Spotweb >> /tmp/LaSi/lasi_install.log
+	Summ_APP
 	}
 
 	cf_CronRetrieve () {
@@ -785,19 +707,6 @@ set -e
 	cf_CronRetrieve
 }
 
-Summ_Spotweb () {
-clear
-echo
-echo "
-Done! Installed SpotWeb.
-
-SpotWeb is now located @ http://$HOSTNAME/spotweb
-Go there to configure SpotWeb. Login admin:admin
-
-After configuring run $SPOTDIR/retrieve.php to fill the database with spots
-"
-}
-
 ######################
 #### TRANSMISSION ####
 ######################
@@ -870,15 +779,26 @@ Install_Transmission () {
 		set_RCD
 	fi
 
-Summ_$SETAPP
-Summ_$SETAPP >> /tmp/lasi_install.log
+Summ_APP
 }
 
-Summ_Transmission () {
+### Summary after installing apps
+Summ_APP () {
+clear
+echo
 echo "
 Done! Installed $SETAPP.
 
-Transmission is by default located @ http://$HOSTNAME:9091
+$SETAPP is up and running 
+and by default located @ http://$IP:$set_port
+
+The remaining configuration is up to you and can be done using the webinterface.
+"
+if [ "$APPLOW" = "sickbeard" ]; then
+echo "NOTE!
+
+Also configured SABnzbd.ini to look in the SickBeard script folder and
+created an sickbeard/autoProcessTV.cfg file.
 "
 }
 
