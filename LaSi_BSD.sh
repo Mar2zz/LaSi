@@ -1416,7 +1416,7 @@ cf_Choice () {
 			cf_Install
 			;;
         2)
-			if [ "$APPLOW" = "spotweb" ] || [ "$APPLOW" = "autosub" ]; then
+			if [ "$APPLOW" = "spotweb" ]; then
 				echo
 				echo "Uninstaller for $SETAPP is not available, yet!"
 				sleep 2
@@ -1587,7 +1587,7 @@ Uninstaller () {
 				sudo rm /usr/local/bin/beet
 			fi
 			;;
-		couchpotato|headphones|lazylibrarian|maraschino|sickbeard)
+		autosub|couchpotato|headphones|lazylibrarian|maraschino|sickbeard)
 			if [ "$APPLOW" = "maraschino" ]; then
 				local SETAPP=maraschino-cherrypy
 			fi
