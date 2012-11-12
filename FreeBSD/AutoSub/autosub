@@ -1,0 +1,86 @@
+#!/bin/sh
+#
+# PROVIDE: autosub
+# REQUIRE: DAEMON
+# KEYWORD: shutdown
+#
+# Add the following lines to /etc/rc.conf.local or /etc/rc.conf
+# to enable this service:
+#
+# autosub_enable (bool):	Set to NO by default.
+#			Set it to YES to enable it.
+# autosub_user:  The user account AutoSub daemon runs as what
+#			you want it to be. It uses '_sabnzbd' user by
+#			default. Do not sets it as empty or it will run
+#			as root.
+# autosub_dir:	Directory where AutoSub lives.
+#			Default: /usr/local/autosub
+# autosub_chdir:  Change to this directory before running AutoSub.
+#     Default is same as autosub_dir.
+# autosub_pid:  The name of the pidfile to create.
+#     Default is autosub.pid in autosub_dir.
+
+. /etc/rc.subr
+
+name="autosub"
+rcvar=${name}_enable
+
+PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
+
+load_rc_config ${name}
+
+: ${autosub_enable:="NO"}
+: ${autosub_user:="USERNAME"}
+: ${autosub_dir:="/usr/local/autosub"}
+: ${autosub_chdir:="${autosub_dir}"}
+: ${autosub_pid:="${autosub_dir}/autosub.pid"}
+pidfile="${autosub_dir}/autosub.pid"
+
+WGET="/usr/local/bin/wget" # You need wget for this script to safely shutdown AutoSub.
+HOST="127.0.0.1" # Set AutoSub address here.
+PORT="8083" # Set AutoSub port here.
+ASUSR="" # Set AutoSub username (if you use one) here.
+ASPWD="" # Set AutoSub password (if you use one) here.
+
+status_cmd="${name}_status"
+stop_cmd="${name}_stop"
+
+command="/usr/sbin/daemon"
+command_args="-f -p ${autosub_pid} python ${autosub_dir}/AutoSub.py --daemon"
+
+# Check for wget and refuse to start without it.
+if [ ! -x "${WGET}" ]; then
+  warn "AutoSub not started: You need wget to safely shut down AutoSub."
+  exit 1
+fi
+
+# Ensure user is root when running this script.
+if [ `id -u` != "0" ]; then
+  echo "Oops, you should be root before running this!"
+  exit 1
+fi
+
+verify_autosub_pid() {
+    # Make sure the pid corresponds to the AutoSub process.
+    pid=`cat ${autosub_pid} 2>/dev/null`
+    ps -p ${pid} | grep -q "python ${autosub_dir}/AutoSub.py"
+    return $?
+}
+
+# Try to stop AutoSub cleanly by calling shutdown over http.
+autosub_stop() {
+    echo "Stopping $name"
+    verify_autosub_pid
+    ${WGET} -O - -q --user=${ASUSR} --password=${ASPWD} "http://${HOST}:${PORT}/home/shutdown" >/dev/null
+    if [ -n "${pid}" ]; then
+      wait_for_pids ${pid}
+      echo "Stopped"
+    fi
+}
+
+autosub_status() {
+    verify_autosub_pid && echo "$name is running as ${pid}" || echo "$name is not running"
+}
+
+run_rc_command "$1"
+
