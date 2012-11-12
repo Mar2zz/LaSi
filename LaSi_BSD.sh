@@ -452,6 +452,8 @@ Install_Beets () {
 	check_python
     sudo git clone https://github.com/sampsyo/beets.git $USRDIR/$APPLOW
     cd $USRDIR/$APPLOW && /usr/local/bin/python setup.py install
+	# pip install beets		### Install Beets
+	# pip install flask		### Install Flask
 
     # create a configfile and databasefile
     if ! ls $USRDIR/$APPLOW/.beetsconfig > /dev/null; then
@@ -1018,6 +1020,11 @@ check_python () {
 		REQPATH=/usr/ports/devel/py-setuptools
 		install_REQ
 		fi
+		#if ! ls /usr/local/lib/python2.7/site-packages/pip* > /dev/null; then
+		#REQ=py27-pip
+		#REQPATH=/usr/ports/devel/py-pip
+		#install_REQ
+		#fi
 	fi
 }
 
