@@ -48,7 +48,7 @@ status_cmd="${name}_status"
 stop_cmd="${name}_stop"
 
 command="/usr/sbin/daemon"
-command_args="-f -p ${headphones_pid} python ${headphones_dir}/Headphones.py ${headphones_flags} --quiet"
+command_args="-f -p ${headphones_pid} python ${headphones_dir}/Headphones.py --quiet --nolaunch"
 
 # Check for wget and refuse to start without it.
 if [ ! -x "${WGET}" ]; then
