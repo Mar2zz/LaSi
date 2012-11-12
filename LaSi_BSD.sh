@@ -414,8 +414,6 @@ Install_Maraschino () {
 	check_git
 	check_python
 	git clone https://github.com/mrkipling/maraschino.git $USRDIR/$APPLOW
-	cp $USRDIR/$APPLOW/settings_example.py $USRDIR/$APPLOW/settings.py
-	sed -i "" 's|/path/to/maraschino.db|/usr/local/maraschino/maraschino.db|' $USRDIR/$APPLOW/settings.py
 	chown -R $APPUSER $USRDIR/$APPLOW
 	set_RCD
 
@@ -1018,14 +1016,6 @@ check_python () {
 		if ! ls /usr/local/lib/python2.7/site-packages/setuptools* > /dev/null; then
 		REQ=py27-setuptools
 		REQPATH=/usr/ports/devel/py-setuptools
-		install_REQ
-		fi
-	fi
-
-	if [ "$APPLOW" = "maraschino" ]; then
-		if ! ls /usr/local/lib/python2.7/site-packages/CherryPy* > /dev/null; then
-		REQ=py27-cherrypy
-		REQPATH=/usr/ports/www/py-cherrypy
 		install_REQ
 		fi
 	fi

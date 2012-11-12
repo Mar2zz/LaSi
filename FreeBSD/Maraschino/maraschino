@@ -37,7 +37,7 @@ status_cmd="${name}_status"
 stop_cmd="${name}_stop"
 
 command="/usr/sbin/daemon"
-command_args="-f -p ${maraschino_pid} python ${maraschino_dir}/maraschino-cherrypy.py -q"
+command_args="-f -p ${maraschino_pid} python ${maraschino_dir}/Maraschino.py"
 
 # Ensure user is root when running this script.
 if [ `id -u` != "0" ]; then
@@ -48,14 +48,14 @@ fi
 verify_maraschino_pid() {
     # Make sure the pid corresponds to the Maraschino process.
     pid=`cat ${maraschino_pid} 2>/dev/null`
-    ps -p ${pid} | grep -q "python ${maraschino_dir}/maraschino-cherrypy.py"
+    ps -p ${pid} | grep -q "python ${maraschino_dir}/Maraschino.py"
     return $?
 }
 
 maraschino_stop() {
     echo "Stopping $name"
     verify_maraschino_pid
-	maraschino_pid=`ps -U ${maraschino_user} | grep "python.*maraschino-cherrypy.py.*--daemon" | grep -v 'grep' | awk '{print $1}'`
+	maraschino_pid=`ps -U ${maraschino_user} | grep "python.*Maraschino.py.*--daemon" | grep -v 'grep' | awk '{print $1}'`
     if [ -n "${pid}" ]; then
         kill ${pid}
     fi
