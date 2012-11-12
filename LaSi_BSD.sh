@@ -203,7 +203,7 @@ Install_AutoSub () {
 	check_mercurial
 	check_wget
 	check_python
-	sudo hg clone https://code.google.com/p/auto-sub/ $USRDIR/$APPLOW
+	sudo hg clone -r eba1b3b0d4ff https://code.google.com/p/auto-sub/ $USRDIR/$APPLOW
     chown -R $APPUSER $USRDIR/$APPLOW
 	set_RCD
 
