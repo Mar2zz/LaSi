@@ -121,13 +121,6 @@ LaSi_Menu (){
 			set_port=8181
 			Info_$SETAPP
 			;;
-#       # LazyLibrarian
-#        6)
-#			SETAPP=LazyLibrarian
-#			APPLOW=lazylibrarian
-#			set_port=5299
-#			Info_$SETAPP
-#			;;
         # maraschino
         7)
 			SETAPP=Maraschino
@@ -324,10 +317,10 @@ Install_SickBeard () {
 	check_git
     check_wget
     check_python
-    sudo git clone https://github.com/midgetspy/Sick-Beard.git $USRDIR/$APPLOW &&
-    sudo cp $USRDIR/$APPLOW/autoProcessTV/autoProcessTV.cfg.sample $USRDIR/$APPLOW/autoProcessTV/autoProcessTV.cfg &&
-    sudo chown -R $APPUSER $USRDIR/$APPLOW &&
-    sudo chmod -R 555 $USRDIR/$APPLOW/autoProcessTV &&
+    sudo git clone https://github.com/midgetspy/Sick-Beard.git $USRDIR/$APPLOW
+    sudo cp $USRDIR/$APPLOW/autoProcessTV/autoProcessTV.cfg.sample $USRDIR/$APPLOW/autoProcessTV/autoProcessTV.cfg
+    sudo chown -R $APPUSER $USRDIR/$APPLOW
+    sudo chmod -R 555 $USRDIR/$APPLOW/autoProcessTV
     sudo sed -i ".backup" 's/script_dir = ""/script_dir = \/usr\/local\/sickbeard\/autoProcessTV/' $USRDIR/sabnzbd/sabnzbd.ini
     set_RCD
 
@@ -382,7 +375,7 @@ Install_CouchPotato () {
 	check_git
 	check_wget
 	check_python
-    sudo git clone https://github.com/RuudBurger/CouchPotatoServer.git $USRDIR/$APPLOW &&
+    sudo git clone https://github.com/RuudBurger/CouchPotatoServer.git $USRDIR/$APPLOW
     chown -R $APPUSER $USRDIR/$APPLOW
     set_RCD
 
@@ -432,7 +425,7 @@ Install_Headphones () {
     check_App
     check_git
     check_python
-    sudo git clone https://github.com/rembo10/headphones.git $USRDIR/$APPLOW &&
+    sudo git clone https://github.com/rembo10/headphones.git $USRDIR/$APPLOW
     chown -R $APPUSER $USRDIR/$APPLOW
     set_RCD
 
@@ -451,52 +444,6 @@ Headphones is by default located @ http://$HOSTNAME:$set_port
 The configuration is up to you and can be done using the webinterface.
 "
 }
-
-#########################
-##### LazyLibrarian #####
-#########################
-#Info_LazyLibrarian () {
-#    clear
-#    echo "
-#*###############################################################*
-#*#################### LazyLibrarian ############################*
-#                                                               #
-# LazyLibrarian is an automatic NZB downloader.                 #
-# You can keep a 'Books I like to read'-list and it will        #
-# search for NZBs of these books every X hours.                 #
-#                                                               #
-# Once an book is found, it will send it to SABnzbd.            #
-#                                                               #
-#*###############################################################*
-#                                                               #
-# Headphones is written by Mar2zz in his spare time...          #
-#                                                               #
-# Visit https://github.com/Mar2zz/LazyLibrarian                 #
-#*###############################################################*"
-#    cf_Choice
-#}
-#
-#Install_LazyLibrarian () {
-#    check_App
-#    check_git
-#    check_python
-#    sudo git clone https://github.com/Mar2zz/LazyLibrarian.git $USRDIR/$APPLOW
-#    chown -R $APPUSER $USRDIR/$APPLOW
-#    set_RCD
-#
-#Summ_$SETAPP
-#Summ_$SETAPP >> /tmp/LaSi/lasi_install.log
-#}
-#
-#Summ_LazyLibrarian () {
-#clear
-#echo
-#echo "
-#Done! Installed $SETAPP.
-#
-#LazyLibrarian is by default located @ http://$HOSTNAME:$set_port
-#"
-#}
 
 ######################
 ##### MARASCHINO #####
@@ -1231,13 +1178,13 @@ check_WEBSRV () {
 
 	install_WEBSRV () {
 			check_Portstree
-			cd /usr/ports/www/$WEBSRV &&
+			cd /usr/ports/www/$WEBSRV
 			sudo make -DBATCH install clean || error_REQ
 
 		if [ "$WEBSRV" = "apache22" ]; then
 			check_php
-			sed -i ".backup" 's/DirectoryIndex index.html/DirectoryIndex index.php index.html/' /usr/local/etc/apache22/httpd.conf &&
-			echo AddType application/x-httpd-php .php > /usr/local/etc/apache22/Includes/php5.conf &&
+			sed -i ".backup" 's/DirectoryIndex index.html/DirectoryIndex index.php index.html/' /usr/local/etc/apache22/httpd.conf
+			echo AddType application/x-httpd-php .php > /usr/local/etc/apache22/Includes/php5.conf
 			echo AddType application/x-httpd-php-source .phps >> /usr/local/etc/apache22/Includes/php5.conf
 		fi
 		set_RCD
@@ -1680,21 +1627,21 @@ cf_Cronjob () {
 set_RCD () {
 	if ! [ "$APPLOW" = "apache" ] || [ "$APPLOW" = "lighttpd" ] || [ "$APPLOW" = "mysql" ]; then
 		if ! ls $RCPATH/$APPLOW > /dev/null; then
-			cd $RCPATH &&
-			sudo fetch $DROPBOX/$SETAPP/$APPLOW &&
+			cd $RCPATH
+			sudo fetch $DROPBOX/$SETAPP/$APPLOW
 			sudo sed -i "" "s/USERNAME/$APPUSER/g" $RCPATH/$APPLOW
 			if [ "$APPLOW" = "transmission" ]; then
-				sudo sed -i "" "s|DOWNDIR|$DOWNDIR|g" $RCPATH/$APPLOW &&
+				sudo sed -i "" "s|DOWNDIR|$DOWNDIR|g" $RCPATH/$APPLOW
 				sudo sed -i "" "s|IPRANGE|$IPRANGE|g" $RCPATH/$APPLOW
 			fi
 			sudo chmod 555 $RCPATH/$APPLOW
 		else
-			cd $RCPATH &&
-			sudo mv -f $APPLOW $APPLOW.backup &&
-			sudo fetch $DROPBOX/$SETAPP/$APPLOW &&
+			cd $RCPATH
+			sudo mv -f $APPLOW $APPLOW.backup
+			sudo fetch $DROPBOX/$SETAPP/$APPLOW
 			sudo sed -i "" "s/USERNAME/$APPUSER/g" $RCPATH/$APPLOW
 			if [ "$APPLOW" = "transmission" ]; then
-				sudo sed -i "" "s|DOWNDIR|$DOWNDIR|g" $RCPATH/$APPLOW &&
+				sudo sed -i "" "s|DOWNDIR|$DOWNDIR|g" $RCPATH/$APPLOW
 				sudo sed -i "" "s|IPRANGE|$IPRANGE|g" $RCPATH/$APPLOW
 			fi
 			sudo chmod 555 $RCPATH/$APPLOW
