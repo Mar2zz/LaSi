@@ -1313,6 +1313,7 @@ cf_Choice () {
 		echo "Options:"
 		echo "1. Install $SETAPP"
 		echo "2. Uninstall $SETAPP"
+		echo "4. Restore initscript after portupgrade"
 		echo
 		echo "B. Back to menu"
 		echo "Q. Quit"
@@ -1356,7 +1357,20 @@ cf_Choice () {
                 Updater
                 ;;
             esac
-            ;;
+		4)
+			case $APPLOW in
+                sabnzbd|transmission)
+                echo
+                echo "Now restoring $APPLOW init-script"
+                sleep 2
+				set_RCD
+				cf_Choice
+                ;;
+                *)
+				echo "This option is not available for $SETAPP"
+				cf_Choice
+                ;;
+            esac
         [Bb]*)
             LaSi_Menu
             ;;
