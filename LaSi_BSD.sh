@@ -1357,6 +1357,7 @@ cf_Choice () {
                 Updater
                 ;;
             esac
+			;;
 		4)
 			case $APPLOW in
                 sabnzbd|transmission)
@@ -1371,6 +1372,7 @@ cf_Choice () {
 				cf_Choice
                 ;;
             esac
+			;;
         [Bb]*)
             LaSi_Menu
             ;;
