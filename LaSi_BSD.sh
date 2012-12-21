@@ -51,9 +51,9 @@ LaSi_Logo () {
     echo "                    ___           ___                  "
     echo "                   /\  \         /\__\                 "
     echo "                  /::\  \       /:/ _/_       ___      "
-    echo "                 /:/\:\  \     /:/ /\  \     /\__\     "
-    echo "  ___     ___   /:/ /::\  \   /:/ /::\  \   /:/__/     "
-    echo " /\  \   /\__\ /:/_/:/\:\__\ /:/_/:/\:\__\ /::\  \     "
+    echo " ___             /:/\:\  \     /:/ /\  \     /\__\     "
+    echo "/\  \     ___   /:/ /::\  \   /:/ /::\  \   /:/__/     "
+    echo "\:\  \   /\__\ /:/_/:/\:\__\ /:/_/:/\:\__\ /::\  \     "
     echo " \:\  \ /:/  / \:\/:/  \/__/ \:\/:/ /:/  / \/\:\  \__  "
     echo "  \:\  /:/  /   \::/__/       \::/ /:/  /     \:\/\__\ "
     echo "   \:\/:/  /     \:\  \        \/_/:/  /       \::/  / "
@@ -68,11 +68,11 @@ LaSi_Menu (){
 	echo
 	echo "Make a choice to see info and/or install these apps..."
 	echo
-	echo "1. SABnzbd+       7.  Maraschino"
-	echo "2. AutoSub        8.  SickBeard"
-	echo "3. Beets          9.  SpotWeb"
-	echo "4. CouchPotato    10. Transmission (incl. webinterface)"
-	echo "5. Headphones"
+	echo "1. SABnzbd+       6.  LazyLibrarian"
+	echo "2. AutoSub        7.  Maraschino"
+	echo "3. Beets          8.  SickBeard"
+	echo "4. CouchPotato    9.  SpotWeb"
+	echo "5. Headphones     10. Transmission (incl. webinterface)"
     echo
     echo "Q. Quit"
 
@@ -119,6 +119,13 @@ LaSi_Menu (){
 			SETAPP=Headphones
 			APPLOW=headphones
 			set_port=8181
+			Info_$SETAPP
+			;;
+		# LazyLibrarian
+        6)
+			SETAPP=LazyLibrarian
+			APPLOW=lazylibrarian
+			set_port=8082
 			Info_$SETAPP
 			;;
         # maraschino
@@ -373,6 +380,42 @@ Install_Headphones () {
     check_git
     check_python
     sudo git clone https://github.com/rembo10/headphones.git $USRDIR/$APPLOW
+    chown -R $APPUSER $USRDIR/$APPLOW
+    set_RCD
+
+Summ_APP
+}
+
+#########################
+##### LazyLibrarian #####
+#########################
+Info_LazyLibrarian () {
+    clear
+    echo "
+*###############################################################*
+*#################### LazyLibrarian ############################*
+#                                                               #
+# LazyLibrarian is an automatic NZB downloader.                 #
+# You can keep a 'Authors/Books I like to read'-list and it will#
+# search for NZBs of these books                                #
+#                                                               #
+# Once an book is found, it will send it to SABnzbd and when    #
+# a download is finished it wil process it and add cover and    #
+# metadata to it.                                               #
+#                                                               #
+*###############################################################*
+#                                                               #
+# Visit https://github.com/LibrarianMike/LazyLibrarian          #
+#                                                               #
+*###############################################################*"
+cf_Choice
+}
+
+Install_LazyLibrarian () {
+    check_App
+    check_git
+    check_python
+    git clone https://github.com/LibrarianMike/LazyLibrarian.git $USRDIR/$APPLOW
     chown -R $APPUSER $USRDIR/$APPLOW
     set_RCD
 
@@ -848,13 +891,9 @@ check_Portstree () {
 		esac
 	}
 
-	if ! ls /usr/ports > /dev/null; then
+	if ! ls /usr/ports/INDEX*
+	then
 		install_Portstree
-#	elif find /var/db/portsnap -iname "INDEX" -mtime -1 -print > /dev/null
-#		then
-#		echo
-#       echo "Ports Tree is up to date"
-#       sleep 2
 	else
 		clear
         echo
