@@ -894,13 +894,20 @@ check_Portstree () {
 	if ! ls /usr/ports/INDEX*
 	then
 		install_Portstree
+	elif find /var/db/portsnap -maxdepth 0 -empty | read; then
+		clear
+		echo
+		echo "Assuming ZFSguru portstree-service installed"
+		echo "Installing $SETAPP now"
+		echo
+		sleep 2
 	else
 		clear
         echo
         echo "Going to update the Ports Tree"
-        echo
+		echo
         sleep 2
-        portsnap fetch update
+        sudo portsnap fetch update
 	fi
 }
 
