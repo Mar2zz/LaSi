@@ -211,7 +211,7 @@ Install_AutoSub () {
 	check_mercurial
 	check_wget
 	check_python
-	sudo hg clone -r eba1b3b0d4ff https://code.google.com/p/auto-sub/ $USRDIR/$APPLOW
+	hg clone -r eba1b3b0d4ff https://code.google.com/p/auto-sub/ $USRDIR/$APPLOW
     chown -R $APPUSER $USRDIR/$APPLOW
 	set_RCD
 
@@ -258,8 +258,8 @@ Install_Sabnzbd () {
 	else
 		check_Portstree
 		cd /usr/ports/news/sabnzbdplus
-		sudo make -DBATCH install clean || error_Msg
-		sudo chown -R $APPUSER $USRDIR/$APPLOW
+		make -DBATCH install clean || error_Msg
+		chown -R $APPUSER $USRDIR/$APPLOW
 		set_RCD
 	fi
 
@@ -301,11 +301,11 @@ Install_SickBeard () {
 	check_git
     check_wget
     check_python
-    sudo git clone https://github.com/midgetspy/Sick-Beard.git $USRDIR/$APPLOW
-    sudo cp $USRDIR/$APPLOW/autoProcessTV/autoProcessTV.cfg.sample $USRDIR/$APPLOW/autoProcessTV/autoProcessTV.cfg
-    sudo chown -R $APPUSER $USRDIR/$APPLOW
-    sudo chmod -R 555 $USRDIR/$APPLOW/autoProcessTV
-    sudo sed -i ".backup" 's/script_dir = ""/script_dir = \/usr\/local\/sickbeard\/autoProcessTV/' $USRDIR/sabnzbd/sabnzbd.ini
+    git clone https://github.com/midgetspy/Sick-Beard.git $USRDIR/$APPLOW
+    cp $USRDIR/$APPLOW/autoProcessTV/autoProcessTV.cfg.sample $USRDIR/$APPLOW/autoProcessTV/autoProcessTV.cfg
+    chown -R $APPUSER $USRDIR/$APPLOW
+    chmod -R 755 $USRDIR/$APPLOW/autoProcessTV
+    sed -i ".backup" 's/script_dir = ""/script_dir = \/usr\/local\/sickbeard\/autoProcessTV/' $USRDIR/sabnzbd/sabnzbd.ini
     set_RCD
 
 Summ_APP
@@ -342,7 +342,7 @@ Install_CouchPotato () {
 	check_git
 	check_wget
 	check_python
-    sudo git clone https://github.com/RuudBurger/CouchPotatoServer.git $USRDIR/$APPLOW
+    git clone https://github.com/RuudBurger/CouchPotatoServer.git $USRDIR/$APPLOW
     chown -R $APPUSER $USRDIR/$APPLOW
     set_RCD
 
@@ -379,7 +379,7 @@ Install_Headphones () {
     check_App
     check_git
     check_python
-    sudo git clone https://github.com/rembo10/headphones.git $USRDIR/$APPLOW
+    git clone https://github.com/rembo10/headphones.git $USRDIR/$APPLOW
     chown -R $APPUSER $USRDIR/$APPLOW
     set_RCD
 
@@ -493,7 +493,7 @@ Info_Beets () {
 Install_Beets () {
 	check_App
 	check_python
-    sudo git clone https://github.com/sampsyo/beets.git $USRDIR/$APPLOW
+    git clone https://github.com/sampsyo/beets.git $USRDIR/$APPLOW
     cd $USRDIR/$APPLOW && /usr/local/bin/python setup.py install
 	# pip install beets		### Install Beets
 	# pip install flask		### Install Flask
@@ -571,10 +571,10 @@ Install_Spotweb () {
 			Info_Spotweb
 		fi
 
-		sudo git clone https://github.com/spotweb/spotweb.git $SPOTDIR &&
-		sudo chown -R www:www $SPOTDIR &&
-		sudo sed -i ".backup" 's/;date.timezone =/date.timezone = "Europe\/Amsterdam"/g' /usr/local/etc/php.ini &&
-		sudo $RCPATH/$WEBSRV restart
+		git clone https://github.com/spotweb/spotweb.git $SPOTDIR &&
+		chown -R www:www $SPOTDIR &&
+		sed -i ".backup" 's/;date.timezone =/date.timezone = "Europe\/Amsterdam"/g' /usr/local/etc/php.ini &&
+		$RCPATH/$WEBSRV restart
 	}
 
 	config_SQL () {
@@ -671,7 +671,7 @@ Install_Spotweb () {
 		case $CRONRETRIEVE in
 			[YyJj]*)
 				# check if another cronjob for this exists and remove it
-				[ -e /etc/cron.hourly/spotweb_spots ] && sudo rm -f /etc/cron.hourly/spotweb_spots
+				[ -e /etc/cron.hourly/spotweb_spots ] && rm -f /etc/cron.hourly/spotweb_spots
 
 				# create lasi file in correct location
 				# would like to use sed for this, but can't figure out how...
@@ -692,8 +692,8 @@ set -e
 /usr/local/bin/php $SPOTDIR/retrieve.php || exit 1
 " > /tmp/LaSi/spotweb_spots
 
-                sudo mv -f /tmp/LaSi/spotweb_spots /etc/cron.hourly/spotweb_spots
-                sudo chmod +x /etc/cron.hourly/spotweb_spots
+                mv -f /tmp/LaSi/spotweb_spots /etc/cron.hourly/spotweb_spots
+                chmod +x /etc/cron.hourly/spotweb_spots
 
                 echo
                 echo "Cronjob set."
@@ -703,7 +703,7 @@ set -e
 
             [Nn]*)
                 echo "You can set cronjobs yourself if you want to."
-                echo "Type crontab -e for personal jobs or sudo crontab -e for root jobs."
+                echo "Type crontab -e for personal jobs or crontab -e for root jobs."
                 echo
                 ;;
             *)
@@ -788,8 +788,8 @@ Install_Transmission () {
 		echo
 		read -p 'PATH : ' DOWNDIR
 		if ! ls $DOWNDIR > /dev/null; then
-			sudo mkdir $DOWNDIR
-			sudo chown -R $APPUSER $DOWNDIR
+			mkdir $DOWNDIR
+			chown -R $APPUSER $DOWNDIR
 		fi
 		echo
 		echo
@@ -811,13 +811,13 @@ Install_Transmission () {
 	else
 		check_Portstree
 		cd /usr/ports/net-p2p/transmission-daemon
-		sudo make -DBATCH install clean || error_Msg
+		make -DBATCH install clean || error_Msg
 
 		if ! ls $USRDIR/$APPLOW > /dev/null; then
-			sudo mkdir $USRDIR/$APPLOW
+			mkdir $USRDIR/$APPLOW
 		fi
 
-		sudo chown -R $APPUSER $USRDIR/$APPLOW
+		chown -R $APPUSER $USRDIR/$APPLOW
 		set_DOWNDIR
 		set_RCD
 	fi
@@ -873,7 +873,7 @@ check_Portstree () {
 				echo
 				sleep 2
 				clear
-				sudo portsnap fetch extract
+				portsnap fetch extract
 				;;
 			[Nn]*)
 				LaSi_Menu
@@ -900,7 +900,7 @@ check_Portstree () {
         echo "Going to update the Ports Tree"
         echo
         sleep 2
-        sudo portsnap fetch update
+        portsnap fetch update
 	fi
 }
 
@@ -918,7 +918,7 @@ install_REQ () {
 			[Yy]*)
 				check_Portstree
 				cd $REQPATH
-				sudo make -DBATCH install clean || error_REQ
+				make -DBATCH install clean || error_REQ
 				;;
 			[Nn]*)
 				Info_$SETAPP
@@ -993,8 +993,8 @@ check_php () {
 }
 
 check_phpext () {
-	sudo rm -f /tmp/LaSi/php.ext &&
-	sudo rm -f /tmp/LaSi/php.dext
+	rm -f /tmp/LaSi/php.ext &&
+	rm -f /tmp/LaSi/php.dext
 	## Check php-extensions needed for Spotweb
 	if ! grep ctype /usr/local/etc/php/extensions.ini > /dev/null; then
 		echo "CTYPE" >> /tmp/LaSi/php.dext
@@ -1137,7 +1137,7 @@ check_WEBSRV () {
 	install_WEBSRV () {
 			check_Portstree
 			cd /usr/ports/www/$WEBSRV
-			sudo make -DBATCH install clean || error_REQ
+			make -DBATCH install clean || error_REQ
 
 		if [ "$WEBSRV" = "apache22" ]; then
 			check_php
@@ -1286,7 +1286,7 @@ check_Port () {
         SETAPPLOWer=$(echo $SETAPP | tr '[A-Z]' '[a-z]')
 
         # edit configfile to set new port
-        sudo sed -i "
+        sed -i "
             /=/s/PORT.*/PORT=$set_port/
         " /etc/default/$SETAPPLOWer
         echo "Port $set_port is set in /etc/default/$SETAPPLOWer..."
@@ -1531,9 +1531,9 @@ Uninstaller () {
 				sleep 2
 				Info_$SETAPP
 			else
-				sudo $RCPATH/$APPLOW stop
-				sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
-				sudo rm $RCPATH/$APPLOW
+				$RCPATH/$APPLOW stop
+				sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
+				rm $RCPATH/$APPLOW
 				pkg_delete "$APPLOW*" || error_Msg
 			fi
 			;;
@@ -1544,9 +1544,9 @@ Uninstaller () {
 				sleep 2
 				Info_$SETAPP
 			else
-				sudo $RCPATH/$APPLOW stop
-				sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
-				sudo rm $RCPATH/$APPLOW
+				$RCPATH/$APPLOW stop
+				sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
+				rm $RCPATH/$APPLOW
 				pkg_delete "$APPLOW*" || error_Msg
 			fi
 			;;
@@ -1557,8 +1557,8 @@ Uninstaller () {
 				sleep 2
 				Info_$SETAPP
 			else
-				sudo rm -rf $USRDIR/$APPLOW
-				sudo rm /usr/local/bin/beet
+				rm -rf $USRDIR/$APPLOW
+				rm /usr/local/bin/beet
 			fi
 			;;
 		autosub|couchpotato|headphones|lazylibrarian|maraschino|sickbeard)
@@ -1571,14 +1571,14 @@ Uninstaller () {
 					$RCPATH/$APPLOW stop
 				fi
 				if grep ''$APPLOW'_enable="YES"' /etc/rc.conf > /dev/null; then
-					sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
+					sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
 				fi
 				APPDIR=`sed -n "/"$APPLOW"_dir:=/p" $RCPATH/$APPLOW | awk -F '"' '{ print $2 }'`
-				sudo rm $RCPATH/$APPLOW
+				rm $RCPATH/$APPLOW
 			fi
 
 			if ls $APPDIR > /dev/null; then
-				sudo rm -rf $APPDIR
+				rm -rf $APPDIR
 			else
 				echo "Can't find $SETAPP installation folder"
 				error_Msg
@@ -1604,44 +1604,44 @@ set_RCD () {
 	if ! [ "$APPLOW" = "apache" ] || [ "$APPLOW" = "lighttpd" ] || [ "$APPLOW" = "mysql" ]; then
 		if ! ls $RCPATH/$APPLOW > /dev/null; then
 			cd $RCPATH
-			sudo fetch $DROPBOX/$SETAPP/$APPLOW
-			sudo sed -i "" "s/USERNAME/$APPUSER/g" $RCPATH/$APPLOW
+			fetch $DROPBOX/$SETAPP/$APPLOW
+			sed -i "" "s/USERNAME/$APPUSER/g" $RCPATH/$APPLOW
 			if [ "$APPLOW" = "transmission" ]; then
-				sudo sed -i "" "s|DOWNDIR|$DOWNDIR|g" $RCPATH/$APPLOW
-				sudo sed -i "" "s|IPRANGE|$IPRANGE|g" $RCPATH/$APPLOW
+				sed -i "" "s|DOWNDIR|$DOWNDIR|g" $RCPATH/$APPLOW
+				sed -i "" "s|IPRANGE|$IPRANGE|g" $RCPATH/$APPLOW
 			fi
-			sudo chmod 555 $RCPATH/$APPLOW
+			chmod 555 $RCPATH/$APPLOW
 		else
 			cd $RCPATH
-			sudo mv -f $APPLOW $APPLOW.backup
-			sudo fetch $DROPBOX/$SETAPP/$APPLOW
-			sudo sed -i "" "s/USERNAME/$APPUSER/g" $RCPATH/$APPLOW
+			mv -f $APPLOW $APPLOW.backup
+			fetch $DROPBOX/$SETAPP/$APPLOW
+			sed -i "" "s/USERNAME/$APPUSER/g" $RCPATH/$APPLOW
 			if [ "$APPLOW" = "transmission" ]; then
-				sudo sed -i "" "s|DOWNDIR|$DOWNDIR|g" $RCPATH/$APPLOW
-				sudo sed -i "" "s|IPRANGE|$IPRANGE|g" $RCPATH/$APPLOW
+				sed -i "" "s|DOWNDIR|$DOWNDIR|g" $RCPATH/$APPLOW
+				sed -i "" "s|IPRANGE|$IPRANGE|g" $RCPATH/$APPLOW
 			fi
-			sudo chmod 555 $RCPATH/$APPLOW
+			chmod 555 $RCPATH/$APPLOW
 		fi
 	fi
 
 	if ! grep ''$APPLOW'_enable="YES"' /etc/rc.conf > /dev/null; then
-		sudo echo ''$APPLOW'_enable="YES"' >> /etc/rc.conf
+		echo ''$APPLOW'_enable="YES"' >> /etc/rc.conf
 			if [ "$APPLOW" = "mysql" ]; then
 				local APPLOW=mysql-server
 			fi
-		sudo $RCPATH/$APPLOW start || error_Msg
+		$RCPATH/$APPLOW start || error_Msg
 	elif grep '#'$APPLOW'_enable="YES"' /etc/rc.conf > /dev/null; then
-		sudo sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
-		sudo echo ''$APPLOW'_enable="YES"' >> /etc/rc.conf
+		sed -i ".backup" "/$APPLOW/d" /etc/rc.conf
+		echo ''$APPLOW'_enable="YES"' >> /etc/rc.conf
 			if [ "$APPLOW" = "mysql" ]; then
 				local APPLOW=mysql-server
 			fi
-		sudo $RCPATH/$APPLOW start || error_Msg
+		$RCPATH/$APPLOW start || error_Msg
 	elif [ "$APPLOW" = "mysql" ]; then
 		local APPLOW=mysql-server
-		sudo $RCPATH/$APPLOW restart || error_Msg
+		$RCPATH/$APPLOW restart || error_Msg
 	else
-		sudo $RCPATH/$APPLOW restart || error_Msg
+		$RCPATH/$APPLOW restart || error_Msg
 	fi
 }
 
