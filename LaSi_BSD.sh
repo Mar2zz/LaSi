@@ -71,7 +71,7 @@ LaSi_Menu (){
 	echo "1. SABnzbd+       6.  LazyLibrarian"
 	echo "2. AutoSub        7.  Maraschino"
 	echo "3. Beets          8.  SickBeard"
-	echo "4. CouchPotato    9.  SpotWeb"
+	echo "4. CouchPotato    9.  SpotWeb (BROKEN!!)"
 	echo "5. Headphones     10. Transmission (incl. webinterface)"
     echo
     echo "Q. Quit"
