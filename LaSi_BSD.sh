@@ -305,10 +305,11 @@ Install_SickBeard () {
     cp $USRDIR/$APPLOW/autoProcessTV/autoProcessTV.cfg.sample $USRDIR/$APPLOW/autoProcessTV/autoProcessTV.cfg
     chown -R $APPUSER $USRDIR/$APPLOW
     chmod -R 755 $USRDIR/$APPLOW/autoProcessTV
-    sed -i ".backup" 's/script_dir = ""/script_dir = \/usr\/local\/sickbeard\/autoProcessTV/' $USRDIR/sabnzbd/sabnzbd.ini
+    rm -rf /usr/local/sickbeard/.git
+	sed -i "" 's/script_dir = ""/script_dir = \/usr\/local\/sickbeard\/autoProcessTV/' $USRDIR/sabnzbd/sabnzbd.ini
     set_RCD
-
-Summ_APP
+	
+	Summ_APP
 }
 
 #######################
